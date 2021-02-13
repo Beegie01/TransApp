@@ -1,3 +1,5 @@
+from inventory_cls import *
+
 class Purchase(Inventory):
 
     def __init__(self):
@@ -16,17 +18,18 @@ class Purchase(Inventory):
         self.purchases['Purchase_ID'].append(pur_id)
         print("\nPurchase_ID has been set!")
 
-    def new_purchase(self):
 
-        acc_range = [self.rods['ID'], self.nails['ID'], self.pipes['ID'], self.angles['ID'], self.bwires['ID']]
+    def prod_id(self):
 
-        P = True
-        while P:
-            print(f"{self.rods['ID']} for {self.rods['name']}\
-            \n{self.nails['ID']} for {self.nails['name']}\
-            \n{self.pipes['ID']} for {self.pipes['name']}\
-            \n{self.angles['ID']} for {self.angles['name']}\
-            \n{self.bwires['ID']} for {self.bwires['name']}")
+        acc_range = [self.inventory['Product_ID'][0], self.inventory['Product_ID'][1], \
+        self.inventory['Product_ID'][2], self.inventory['Product_ID'][3], self.inventory['Product_ID'][4]]
+
+        while True:
+            print(f"{self.inventory['Product_ID'][0]} for {self.inventory['Product_Name'][0]}\
+            \n{self.inventory['Product_ID'][1]} for {self.inventory['Product_Name'][1]}\
+            \n{self.inventory['Product_ID'][2]} for {self.inventory['Product_Name'][2]}\
+            \n{self.inventory['Product_ID'][3]} for {self.inventory['Product_Name'][3]}\
+            \n{self.inventory['Product_ID'][4]} for {self.inventory['Product_Name'][4]}")
 
             val = input("Enter 1-5:    ")
 
@@ -42,11 +45,11 @@ class Purchase(Inventory):
 
             self.purchases['Product_ID'].append(prd)
             print("\nProduct Entered!")
-            P = False
+            break
 
+    def pur_qty(self):
 
-        Q = True
-        while Q:
+        while True:
             val = input('\nQuantity:   ')
             try:
                 qty = float(val)
@@ -54,13 +57,13 @@ class Purchase(Inventory):
                 print(f"Error: {val} is not a number!")
                 continue
 
-            self.qty = qty
             self.purchases['Purchased_Quantity'].append(self.qty)
             print("\nQuantity Entered!")
-            Q = False
+            self.update_stock(qty)
+            break
 
-        R = True
-        while R:
+    def pur_rate(self):
+        while True:
             val = input('\nRate:    ')
             try:
                 rate = float(val)
@@ -70,32 +73,45 @@ class Purchase(Inventory):
 
             self.purchases['Rate_of_Purchase'].append(rate)
             print("\nRate Entered!")
-            R = False
+            self.purchases['Amount'].append(qty * rate)
+            break
 
-        self.purchases['Amount'].append(qty * rate)
+    def update_stock(self, qty):
 
-        if self.purchases['Product_ID'][-1] == self.rods['ID']:
-            self.rods['stock'] += self.qty
-        elif self.purchases['Product_ID'][-1] == self.nails['ID']:
-            self.nails['stock'] += self.qty
-        elif self.purchases['Product_ID'][-1] == self.pipes['ID']:
-            self.pipes['stock'] += self.qty
-        elif self.purchases['Product_ID'][-1] == self.angles['ID']:
-            self.angles['stock'] += self.qty
-        elif self.purchases['Product_ID'][-1] == self.bwires['ID']:
-            self.bwires['stock'] += self.qty
+        if self.purchases['Product_ID'][-1] == self.inventory['Product_ID'][0]:
+            self.inventory['Stock']['Iron Rods'] += qty
+        elif self.purchases['Product_ID'][-1] == self.inventory['Product_ID'][1]:
+            self.inventory['Stock']['Nails'] += qty
+        elif self.purchases['Product_ID'][-1] == self.inventory['Product_ID'][2]:
+            self.inventory['Stock']['Steel Pipes'] += qty
+        elif self.purchases['Product_ID'][-1] == self.inventory['Product_ID'][3]:
+            self.inventory['Stock']['Angle Bars'] += qty
+        elif self.purchases['Product_ID'][-1] == self.inventory['Product_ID'][4]:
+            self.inventory['Stock']['Binding Wire'] += qty
+
+    def new_purchase(self):
+
+        self.prod_id()
+
+        self.pur_qty()
+
+        self.pur_rate()
 
         self.set_id()
         return print("\n\nOne Purchase added!")
 
-    def save_row_to_file(self):
-            file = "C:\\Users\\welcome\\Desktop\\Transapp\\purchases.txt"
 
-            handle = open(file, 'a')
+    def commit_to_file(self):
+        file = "C:\\Users\\welcome\\Desktop\\Transapp\\purchases.txt"
 
-            #order_of_col: Purchase_Date, Purchase_Time, Product_ID, Purchase_Quantity, Rate_of_Purchase, Amount
-            text = f"\n{self.purchase_date}, {self.purchase_time}, {self.prod_id}, {self.qty}, {self.rate}, {self.amount}"
+        handle = open(file, 'a')
 
-            handle.write(text)
+        DELIM = ', '
+        #order_of_col: Purchase_Date, Purchase_Time, Product_ID, Purchase_Quantity, Rate_of_Purchase, Amount
+        text = f"\n{DELIM.join(self.purchases['Purchase_Date'])}, {DELIM.join(self.purchases['Purchase_Time'])}, {DELIM.join(self.purchases['Product_ID'])}, {DELIM.join(self.purchases['Purchased_Quantity'])}, {DELIM.join(self.purchases['Rate_of_Purchase'])}, {DELIM.join(self.purchases['Amount'])}"
 
-            handle.close()
+        handle.write(text)
+
+        handle.close()
+
+        print('New Purchase Detail Saved!')

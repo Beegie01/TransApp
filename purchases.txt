@@ -1,0 +1,1 @@
+Purchase_Date, Purchase_Time, Product_ID, Purchase_Quantity, Rate_of_Purchase, Amount

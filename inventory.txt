@@ -1,0 +1,1 @@
+Inventory_ID, Product_Name, Stock, Date

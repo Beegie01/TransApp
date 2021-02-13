@@ -1,0 +1,1 @@
+Order_Date, Order_Time, Order_ID, Product_ID, Customer_ID, Order_Quantity, Rate, Amount_Due, Amount_Deposited, Payment_Status, Date_of_Completion

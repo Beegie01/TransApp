@@ -1,45 +1,56 @@
+import string
+import datetime
+from datetime import datetime, date, time
+
+from datareservoir_cls import *
+
+
 class Customer(DataReservoir):
 
     def __init__(self):
-        self.customers['Date_Opened'].append(datetime.date(datetime.now()))
-        self.customers['Time_Opened'].append(datetime.time(datetime.now()))
-        #self.cust_id = None
-        #self.first_name = None
-        #self.last_name = None
-        #self.gender = None
-        #self.date_of_birth = None
-        #self.birthday = None
-        #self.country = None
-        #self.region = None
-        #self.office_addr = None
+        self.today = datetime.today()
+        self.date_opened = datetime.date(self.today)
+        self.time_opened = datetime.time(self.today)
+        self.customer_id = None
+        self.first_name = None
+        self.last_name = None
+        self.gender = None
+        self.date_of_birth = None
+        self.birthday = None
+        self.country = None
+        self.region = None
+        self.office_addr = None
+        self.last_added = []
+        self.all_added = []
 
 
     def set_id(self):
-        cust_id = str(self.customers['Date_Opened'][-1].year) + str(self.customers['Date_Opened'][-1].month)\
-        + self.customers['Last_Name'][-1][:2].upper() + self.customers['Gender'][-1][0].upper() + self.customers['First_Name'][-1][:2].upper()
-        self.customers['Customer_ID'].append(cust_id)
-        print("Customer_ID has been set!")
+        cust_id = str(self.date_opened.year) + str(self.date_opened.month)\
+        + self.last_name[:2].upper() + self.gender[0].upper() + self.first_name[:2].upper()
+
+        self.customer_id = cust_id
+        #self.customers['Customer_ID'].append(cust_id)
+        print("Customer ID has been set!")
 
     def __str__(self):
         return f"\nCUSTOMER DETAILS:\
-        \nID: {self.customers['Customer_ID']}\
-        \nFirst Name: {self.customers['First_Name']}\
-        \nLast Name: {self.customers['Last_Name']}\
-        \nGender: {self.customers['Gender']}\
-        \nAge: {[(datetime.date(datetime.now()).year - yr) for yr in self.customers['Date_Opened'].year]}\
-        \nBirth Day: {self.customers['Birthday']}\
-        \nCountry: {self.customers['Country']}\
-        \nRegion: {self.customers['Region']}\
-        \nOffice Address: {self.customers['Office_Address']}\
-        \nOpen Date: {self.customers['Date_Opened']}\
-        \nOpen Time: {self.customers['Time_Opened']}"
+        \nID: {[n[0] for n in self.all_added]}\
+        \nFirst Name: {[n[1] for n in self.all_added]}\
+        \nLast Name: {[n[2] for n in self.all_added]}\
+        \nGender: {[n[3] for n in self.all_added]}\
+        \nBirth Day: {[n[5] for n in self.all_added]}\
+        \nCountry: {[n[6] for n in self.all_added]}\
+        \nRegion: {[n[7] for n in self.all_added]}\
+        \nOffice Address: {[n[8] for n in self.all_added]}\
+        \nOpen Date: {[n[9] for n in self.all_added]}\
+        \nOpen Time: {[n[10] for n in self.all_added]}"
 
-    def new_customer(self):
 
-        F = True
-        while F:
+
+    def fname(self):
+        while True:
             counter = 0
-            val = input("First Name:    ")
+            val = input("\nFirst Name:    ")
 
             if val.isdigit():
                 print(f'{val} is invalid!')
@@ -53,14 +64,15 @@ class Customer(DataReservoir):
                 print(f"{val} contains wrong characters!\nPlease use only alphabets")
                 continue
 
-            self.customers['First_Name'].append(val.capitalize())
-            print("\nFirst Name Entered!")
-            F = False
+            self.first_name = val.capitalize()
+            #self.customers['First_Name'].append(val.capitalize())
+            print("First Name Entered!")
+            break
 
-        L = True
-        while L:
+    def lname(self):
+        while True:
             counter = 0
-            val = input("Last Name:    ")
+            val = input("\nLast Name:    ")
 
             if val.isdigit():
                 print(f'{val} is invalid!')
@@ -74,14 +86,15 @@ class Customer(DataReservoir):
                 print(f"{val} contains wrong characters!\nPlease use only alphabets")
                 continue
 
-            self.customers['Last_Name'].append(val.capitalize())
-            print("\nLast Name Entered!")
-            L = False
+            self.last_name = val.capitalize()
+            #self.customers['Last_Name'].append(val.capitalize())
+            print("Last Name Entered!")
+            break
 
-        G = True
+    def gend(self):
         acc_range = ['m', 'male', 'female', 'f']
-        while G:
-            val = input("Gender:\t")
+        while True:
+            val = input("\nGender:\t")
 
             if val.isdigit():
                 print(f'{val} is invalid!')
@@ -95,63 +108,68 @@ class Customer(DataReservoir):
                 gend = 'male'
             elif (val.lower() == 'f') or (val.lower() == 'female'):
                 gend = 'female'
-            self.customers['Gender'].append(gend.capitalize())
-            print("Gender Entered!")
-            G = False
 
+            self.gender = gend.capitalize()
+            #self.customers['Gender'].append(gend.capitalize())
+            print("Gender Entered!")
+            break
+
+    def dob(self):
         D = True
         while D:
             Yr = True
             while Yr:
-                print("Please Enter Date of Birth Below\n")
+                print("\nPlease Enter Date of Birth Below\n")
                 acc_range = range(1920, 2022)
-                inp = input("Year:   ")
+                inp = input("\nYear:   ")
 
                 try:
                     yr = int(inp)
                 except ValueError:
-                    print(f'{val} is invalid!')
+                    print(f'{inp} is invalid!')
                     continue
 
                 if yr not in acc_range:
-                    print(f'{val} is out of range!')
+                    print(f'{yr} is out of range!')
                     continue
                 Yr = False
 
             Mon = True
             while Mon:
                 acc_range = range(1,13)
-                inp = input("Month:   ")
+                inp = input("\nMonth:   ")
 
                 try:
                     mon = int(inp)
                 except ValueError:
-                    print(f'{val} is invalid!')
+                    print(f'{inp} is invalid!')
                     continue
 
                 if mon not in acc_range:
-                    print(f'{val} is out of range!')
+                    print(f'{mon} is out of range!')
                     continue
                 Mon = False
 
             Day = True
             while Day:
                 acc_range = range(1,31)
-                inp = input("Day:   ")
+                inp = input("\nDay:   ")
 
                 try:
                     day = int(inp)
                 except ValueError:
-                    print(f'{val} is invalid!')
+                    print(f'{inp} is invalid!')
                     continue
 
                 if day not in acc_range:
-                    print(f'{val} is out of range!')
+                    print(f'{day} is out of range!')
                     continue
                 Day = False
 
-            self.customers['Date_of_Birth'].append(date(yr,mon,day))
-            month = self.customers['Date_of_Birth'][-1].month
+            self.date_of_birth = date(yr,mon,day)
+
+            #self.customers['Date_of_Birth'].append(date(yr,mon,day))
+            month = self.date_of_birth.month
             if month == 1:
                 mon = 'January'
             elif month == 2:
@@ -176,15 +194,17 @@ class Customer(DataReservoir):
                 mon = 'November'
             elif month == 12:
                 mon = 'December'
-            bday = [mon, str(self.customers['Date_of_Birth'][-1].day)]
-            self.customers['Birthday'].append(' '.join(bday))
+
+            self.birthday = f'{mon}, {str(self.date_of_birth.day)}'
+
+            #self.customers['Birthday'].append(' '.join(bday))
             print("Date of Birth Entered!")
             D = False
 
-        C = True
-        while C:
+    def ctr(self):
+        while True:
             counter = 0
-            val = input("Country:    ")
+            val = input("\nCountry:    ")
 
             if val.isdigit():
                 print(f'{val} is invalid!')
@@ -198,14 +218,15 @@ class Customer(DataReservoir):
                 print(f"{val} contains wrong characters!\nPlease use only alphabets")
                 continue
 
-            self.customers['Country'].append(val.capitalize())
-            print("\nCountry Entered!")
-            C = False
+            self.country = val.capitalize()
+            #self.customers['Country'].append(val.capitalize())
+            print("Country Entered!")
+            break
 
-        R = True
-        while R:
+    def regn(self):
+        while True:
             counter = 0
-            val = input("Region:    ")
+            val = input("\nRegion:    ")
 
             if val.isdigit():
                 print(f'{val} is invalid!')
@@ -219,33 +240,70 @@ class Customer(DataReservoir):
                 print(f"{val} contains wrong characters!\nPlease use only alphabets")
                 continue
 
-            self.customers['Region'].append(val.capitalize())
-            print("\nRegion Entered!")
-            R = False
+            self.region = val.capitalize()
+            #self.customers['Region'].append(val.capitalize())
+            print("Region Entered!")
+            break
 
-        Addr = True
-        while Addr:
-            inp = input("Office Address:    ")
+    def addr(self):
+        while True:
+            inp = input("\nOffice Address:    ")
 
             if inp.isdigit():
-                print(f'{val} is invalid!')
+                print(f'{inp} is invalid!')
                 continue
 
-            self.customers['Office_Address'].append(inp.title())
+            self.office_addr = inp.title()
+            #self.customers['Office_Address'].append(inp.title())
             print("Office Address Entered!")
-            Addr = False
+            break
+
+    def new_customer(self):
+
+        # FIRST NAME
+        self.fname()
+
+        # LAST NAME
+        self.lname()
+
+        # GENDER
+        self.gend()
+
+        # DATE OF BIRTH
+        self.dob()
+
+        # COUNTRY
+        self.ctr()
+
+        # REGION
+        self.regn()
+
+        # OFFICE ADDRESS
+        self.addr()
 
         self.set_id()
+
+        add_list = [self.customer_id, self.first_name, self.last_name, self.gender, str(self.date_of_birth ),\
+        self.birthday, self.country, self.region, self.office_addr, str(self.date_opened), \
+        str(self.time_opened)]
+
+        self.last_added = add_list
+        ##print(self.last_added)
+        self.all_added.append(self.last_added)
+        #print(self.all_added)
         print("\n\nOne Customer Added!")
 
-    def save_row_to_file(self):
-            file = "C:\\Users\\welcome\\Desktop\\Transapp\\customers.txt"
+    def commit_to_file(self):
+        file = "C:\\Users\\welcome\\Desktop\\Transapp\\customers.txt"
 
-            handle = open(file, 'a')
+        handle = open(file, 'a')
 
-            #order_of_col: Customer_ID, First_Name, Last_Name, Gender, Date_of_Birth, Country, Region, Office_Address, Date_Opened, Time_Opened
-            text = f"\n{self.cust_id}, {self.first_name}, {self.last_name}, {self.gender}, {self.date_of_birth}, {self.country}, {self.region}, {self.office_addr}, {self.date_opened}, {self.time_opened}"
+        #DELIM = ', '
+        #order_of_col: Customer_ID, First_Name, Last_Name, Gender, Date_of_Birth, Birthday, Country, Region, Office_Address, Date_Opened, Time_Opened
+        text = f"\n{[new for new in self.all_added]}"
 
-            handle.write(text)
+        handle.write(text)
 
-            handle.close()
+        handle.close()
+
+        print('Customer Detail Saved!')

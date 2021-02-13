@@ -1,3 +1,5 @@
+from inventory_cls import *
+
 class Sales(Inventory):
 
     def __init__(self):
@@ -20,8 +22,9 @@ class Sales(Inventory):
         self.sales['Order_ID'].append(order_id)
         print("\nOrder_ID has been set!")
 
-    def new_order(self):
 
+
+    def prd_id(self):
         # CORRESPONDING PRODUCT ID
         P = True
         while P:
@@ -35,6 +38,7 @@ class Sales(Inventory):
             print("Product ID Entered!")
             P = False
 
+    def cst_id(self):
         # CORRESPONDING CUSTOMER ID
         C = True
         while C:
@@ -47,6 +51,7 @@ class Sales(Inventory):
             print("Customer ID Entered!")
             C = False
 
+    def ord_qty(self):
         # QUANTITY ORDERED BY CUSTOMER
         Q = True
         while Q:
@@ -61,6 +66,7 @@ class Sales(Inventory):
             print("\nQuantity Entered!")
             Q = False
 
+    def ord_rate(self):
         # SELLING RATE
         R = True
         while R:
@@ -75,6 +81,7 @@ class Sales(Inventory):
             print("\nRate Entered!")
             R = False
 
+    def amount(self):
         # CUSTOMER'S DEPOSIT
         D = True
         while D:
@@ -95,12 +102,15 @@ class Sales(Inventory):
             print("\nRate Entered!")
             D = False
 
+    def pay_status(self):
         # PAYMENT STATUS
         if self.sales['Amount_Due'][-1] == 0:
             self.sales['Payment_Status'].append('Payment Complete')
         elif self.sales['Amount_Due'][-1] > 0:
             self.sales['Payment_Status'].append('Pending Transaction')
 
+
+    def pay_date(self):
         # PAYMENT DATE
         if self.sales['Payment_Status'][-1] == 'Payment Complete':
             D = True
@@ -156,19 +166,40 @@ class Sales(Inventory):
 
                 self.sales['Date_of_Completion'].append(date(yr,mon,day))
                 print("Payment Date Entered!")
-                D = False
+            else:
+                print('Transaction Pending!')
+            D = False
 
-            self.set_id()
-            print("\n\nOne Order Added!")
+    def new_order(self):
 
-        def save_row_to_file(self):
-            file = "C:\\Users\\welcome\\Desktop\\Transapp\\orders.txt"
+        self.prd_id()
 
-            handle = open(file, 'a')
+        self.cst_id()
 
-            #order_of_col: Order_Date, Order_Time, Order_ID, Product_ID, Customer_ID, Order_Quantity, Rate, Amount_Due, Amount_Deposited, Payment_Status, Date_of_Completion
-            text = f"\n{self.order_date}, {self.order_time}, {self.order_id}, {self.prod_id}, {self.cust_id}, {self.qty}, {self.rate}, {self.amount_due}, {self.deposit}, {self.payment_status}, {self.date_of_completion}"
+        self.ord_qty()
 
-            handle.write(text)
+        self.ord_rate()
 
-            handle.close()
+        self.amount()
+
+        self.pay_status()
+
+        self.pay_date()
+
+        self.set_id()
+        print("\n\nOne Order Added!")
+
+    def commit_to_file(self):
+        file = "C:\\Users\\welcome\\Desktop\\Transapp\\orders.txt"
+
+        handle = open(file, 'a')
+
+        DELIM = ', '
+        #order_of_col: Order_Date, Order_Time, Order_ID, Product_ID, Customer_ID, Ordered_Quantity, Rate, Amount_Due, Amount_Deposited, Payment_Status, Date_of_Completion
+        text = f"\n{DELIM.join(self.sales['Order_Date'])}, {DELIM.join(self.sales['Order_Time'])}, {DELIM.join(self.sales['Order_ID'])}, {DELIM.join(self.sales['Product_ID'])}, {DELIM.join(self.sales['Customer_ID'])}, {DELIM.join(self.sales['Ordered_Quantity'])}, {DELIM.join(self.sales['Rate'])}, {DELIM.join(self.sales['Amount_Due'])}, {DELIM.join(self.sales['Amount_Deposited'])}, {DELIM.join(self.sales['Payment_Status'])}, {DELIM.join(self.sales['Date_of_Completion'])}"
+
+        handle.write(text)
+
+        handle.close()
+
+        print('New Order Saved!')
