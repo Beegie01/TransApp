@@ -1,53 +1,77 @@
-from inventory_cls import *
+import string
+import datetime
+from datetime import datetime, date, time
 
-class Sales(Inventory):
+from inventory_cls import *
+from accounts_cls import *
+
+class Sales(Inventory, Accounts):
 
     def __init__(self):
         Inventory.__init__(self)
-        self.sales['Order_Date'].append(datetime.date(datetime.now()))
-        self.sales['Order_Time'].append(datetime.time(datetime.now()))
-        #self.order_id = None
-        #self.prod_id = None
-        #self.cust_id = None
-        #self.qty = None
-        #self.rate = None
-        #self.amount_due = None
-        #self.deposit = None
-        #self.payment_status = None
-        #self.date_of_completion = None
+        Accounts.__init__(self)
+        self.today = datetime.today()
+        self.order_date = datetime.date(self.today)
+        self.order_time = datetime.time(self.today)
+        self.order_id = None
+        self.product_id = None
+        self.customer_id = None
+        self.ordered_quantity = None
+        self.rate_of_order = None
+        self.amount_due = None
+        self.amount_deposited = None
+        self.balance = None
+        self.payment_status = None
+        self.date_of_completion = None
+        self.last_added = None
+        self.all_added = []
 
     def set_id(self):
-        order_id = str(self.sales['Product_ID']) + self.sales['Customer_ID'][-1][:2] + str(self.sales['Order_Date'][-1].year) + str(self.sales['Order_Time'][-1].hour)\
-        + str(self.sales['Order_Time'][-1].minute)
-        self.sales['Order_ID'].append(order_id)
-        print("\nOrder_ID has been set!")
+        order_id = str(self.product_id) + self.customer_id[:2] + str(self.order_date.year) + str(self.order_time.hour)\
+        + str(self.order_time.minute)
+        self.order_id = order_id
+        print("\nOrder ID has been set!")
 
+    def __str__(self):
+        return f"\nCUSTOMER ORDER DETAILS:\
+        \nORDER ID: {[n[0] for n in self.all_added]}\
+        \nORDER DATE: {[n[1] for n in self.all_added]}\
+        \nORDER TIME: {[n[2] for n in self.all_added]}\
+        \nPRODUCT ID: {[n[3] for n in self.all_added]}\
+        \nCUSTOMER ID: {[n[4] for n in self.all_added]}\
+        \nORDERED QUANTITY: {[n[5] for n in self.all_added]}\
+        \nRATE OF ORDER: {[n[6] for n in self.all_added]}\
+        \nAMOUNT DUE: {[n[7] for n in self.all_added]}\
+        \nDEPOSITED AMOUNT: {[n[8] for n in self.all_added]}\
+        \nBALANCE: {[n[9] for n in self.all_added]}\
+        \nPAYMENT STATUS: {[n[10] for n in self.all_added]}\
+        \nDATE OF COMPLETION: {[n[11] for n in self.all_added]}"
 
 
     def prd_id(self):
         # CORRESPONDING PRODUCT ID
         P = True
         while P:
-            inp = input("Product ID:    ")
+            inp = input("\nProduct ID:    ")
             try:
                 prod_id = int(inp)
             except ValueError:
                 print(f"Error: {inp} is not a number!")
                 continue
-            self.sales['Product_ID'].append(prod_id)
+            self.product_id = prod_id
             print("Product ID Entered!")
             P = False
 
-    def cst_id(self):
+    def cust_id(self):
         # CORRESPONDING CUSTOMER ID
         C = True
         while C:
-            inp = input("Customer ID:    ")
+            inp = input("\nCustomer ID:    ")
 
-            if inp.isdigit() or len(inp) != 10:
+            if inp.isdigit() or (len(inp) != 10) or (inp in string.punctuation):
                 print(f"Error: {inp} is invalid!")
                 continue
-            self.sales['Customer_ID'].append(inp)
+            self.customer_id = inp
             print("Customer ID Entered!")
             C = False
 
@@ -62,23 +86,23 @@ class Sales(Inventory):
                 print(f"Error: {val} is not a number!")
                 continue
 
-            self.sales['Ordered_Quantity'].append(qty)
-            print("\nQuantity Entered!")
+            self.ordered_quantity = qty
+            print("Ordered Quantity Entered!")
             Q = False
 
     def ord_rate(self):
         # SELLING RATE
         R = True
         while R:
-            val = input('\nRate:    ')
+            val = input('\nRate of Product:    ')
             try:
                 rate = float(val)
             except ValueError:
                 print(f"Error: {val} is not a number!")
                 continue
 
-            self.sales['Rate'].append(rate)
-            print("\nRate Entered!")
+            self.rate_of_order = rate
+            print("Rate of Order Entered!")
             R = False
 
     def amount(self):
@@ -92,34 +116,34 @@ class Sales(Inventory):
                 print(f"Error: {val} is not a number!")
                 continue
 
-            self.sales['Amount_Deposited'].append(dep)
-            due = (rate * qty) - dep
+            self.amount_deposited = dep
+            due = (self.rate_of_order * self.ordered_quantity) - dep
             if due < 0:
-                self.sales['Amount_Due'].append(0)
-                self.accounts['Balance'].append(abs(due))
+                self.amount_due = 0
+                self.balance = abs(due)
             else:
-                self.sales['Amount_Due'].append(due)
-            print("\nRate Entered!")
+                self.amount_due = due
+            print("Deposited Amount Entered!")
             D = False
 
     def pay_status(self):
         # PAYMENT STATUS
-        if self.sales['Amount_Due'][-1] == 0:
-            self.sales['Payment_Status'].append('Payment Complete')
-        elif self.sales['Amount_Due'][-1] > 0:
-            self.sales['Payment_Status'].append('Pending Transaction')
+        if self.amount_due == 0:
+            self.payment_status = 'Payment Complete'
+        elif self.amount_due > 0:
+            self.payment_status = 'Pending Transaction'
 
 
     def pay_date(self):
         # PAYMENT DATE
-        if self.sales['Payment_Status'][-1] == 'Payment Complete':
+        if self.payment_status == 'Payment Complete':
             D = True
             while D:
                 Yr = True
                 while Yr:
-                    print("Please Enter Date of Last Payment Below\n")
+                    print("\nPlease Enter Date of Last Payment Below\n")
                     acc_range = range(1920, 2022)
-                    inp = input("Year:   ")
+                    inp = input("\nYear:   ")
 
                     try:
                         yr = int(inp)
@@ -135,7 +159,7 @@ class Sales(Inventory):
                 Mon = True
                 while Mon:
                     acc_range = range(1,13)
-                    inp = input("Month:   ")
+                    inp = input("\nMonth:   ")
 
                     try:
                         mon = int(inp)
@@ -151,7 +175,7 @@ class Sales(Inventory):
                 Day = True
                 while Day:
                     acc_range = range(1,31)
-                    inp = input("Day:   ")
+                    inp = input("\nDay:   ")
 
                     try:
                         day = int(inp)
@@ -164,8 +188,9 @@ class Sales(Inventory):
                         continue
                     Day = False
 
-                self.sales['Date_of_Completion'].append(date(yr,mon,day))
+                self.date_of_completion = date(yr,mon,day)
                 print("Payment Date Entered!")
+                D = False
             else:
                 print('Transaction Pending!')
             D = False
@@ -174,7 +199,7 @@ class Sales(Inventory):
 
         self.prd_id()
 
-        self.cst_id()
+        self.cust_id()
 
         self.ord_qty()
 
@@ -187,19 +212,27 @@ class Sales(Inventory):
         self.pay_date()
 
         self.set_id()
+
+        add_list = [self.order_id, str(self.order_date), str(self.order_time), self.product_id, self.customer_id, \
+        self.ordered_quantity, self.rate_of_order, self.amount_due, self.amount_deposited, self.balance,\
+         self.payment_status, str(self.date_of_completion)]
+
+        self.last_added = add_list
+        print(self.last_added)
+        self.all_added.append(self.last_added)
+        print(self.all_added)
         print("\n\nOne Order Added!")
 
     def commit_to_file(self):
-        file = "C:\\Users\\welcome\\Desktop\\Transapp\\orders.txt"
+        file = "C:\\Users\\welcome\\Desktop\\Transapp\\sales.txt"
 
         handle = open(file, 'a')
 
-        DELIM = ', '
-        #order_of_col: Order_Date, Order_Time, Order_ID, Product_ID, Customer_ID, Ordered_Quantity, Rate, Amount_Due, Amount_Deposited, Payment_Status, Date_of_Completion
-        text = f"\n{DELIM.join(self.sales['Order_Date'])}, {DELIM.join(self.sales['Order_Time'])}, {DELIM.join(self.sales['Order_ID'])}, {DELIM.join(self.sales['Product_ID'])}, {DELIM.join(self.sales['Customer_ID'])}, {DELIM.join(self.sales['Ordered_Quantity'])}, {DELIM.join(self.sales['Rate'])}, {DELIM.join(self.sales['Amount_Due'])}, {DELIM.join(self.sales['Amount_Deposited'])}, {DELIM.join(self.sales['Payment_Status'])}, {DELIM.join(self.sales['Date_of_Completion'])}"
+        #order_of_col: Order_ID, Order_Date, Order_Time, Product_ID, Customer_ID, Ordered_Quantity, Rate, Amount_Due, Amount_Deposited, Payment_Status, Date_of_Completion
+        text = f"\n{[new for new in self.all_added]}"
 
         handle.write(text)
 
         handle.close()
 
-        print('New Order Saved!')
+        print('\n\nOrder Details Saved!')

@@ -4,34 +4,38 @@ class Purchase(Inventory):
 
     def __init__(self):
         Inventory.__init__(self)
-        self.purchases['Purchase_Date'].append(datetime.date(datetime.now()))
-        self.purchases['Purchase_Time'].append(datetime.time(datetime.now()))
-        #self.purchase_id = None
-        #self.prod_id = None
-        #self.qty = None
-        #self.rate = None
-        #self.amount = None
+        self.today = datetime.today()
+        self.purchase_date = datetime.date(self.today)
+        self.purchase_time = datetime.time(self.today)
+        self.purchase_id = None
+        self.product_id = None
+        self.purchased_quantity = None
+        self.rate_of_purchase = None
+        self.amount = None
+        self.last_added = None
+        self.all_added = []
 
     def set_id(self):
-        pur_id = str(self.purchases['Purchase_Date'][-1].year) + str(self.purchases['Purchase_Date'][-1].month)\
-        + str(self.purchases['Product_ID'][-1]) + str(self.purchases['Purchase_Time'][-1].hour) + str(self.purchases['Purchase_Time'][-1].minute)
-        self.purchases['Purchase_ID'].append(pur_id)
-        print("\nPurchase_ID has been set!")
+        pur_id = str(self.purchase_date.year) + str(self.purchase_date.month)\
+        + str(self.purchase_id) + str(self.purchase_time.hour) + str(self.purchase_time.minute)
+
+        self.purchase_id = pur_id
+        print("Purchase_ID has been set!")
 
 
     def prod_id(self):
 
-        acc_range = [self.inventory['Product_ID'][0], self.inventory['Product_ID'][1], \
-        self.inventory['Product_ID'][2], self.inventory['Product_ID'][3], self.inventory['Product_ID'][4]]
+        acc_range = [Inventory.products['Product_ID'][0], Inventory.products['Product_ID'][1], \
+        Inventory.products['Product_ID'][2], Inventory.products['Product_ID'][3], Inventory.products['Product_ID'][4]]
 
         while True:
-            print(f"{self.inventory['Product_ID'][0]} for {self.inventory['Product_Name'][0]}\
-            \n{self.inventory['Product_ID'][1]} for {self.inventory['Product_Name'][1]}\
-            \n{self.inventory['Product_ID'][2]} for {self.inventory['Product_Name'][2]}\
-            \n{self.inventory['Product_ID'][3]} for {self.inventory['Product_Name'][3]}\
-            \n{self.inventory['Product_ID'][4]} for {self.inventory['Product_Name'][4]}")
+            print(f"{Inventory.products['Product_ID'][0]} for {Inventory.products['Product_Name'][0]}\
+            \n{Inventory.products['Product_ID'][1]} for {Inventory.products['Product_Name'][1]}\
+            \n{Inventory.products['Product_ID'][2]} for {Inventory.products['Product_Name'][2]}\
+            \n{Inventory.products['Product_ID'][3]} for {Inventory.products['Product_Name'][3]}\
+            \n{Inventory.products['Product_ID'][4]} for {Inventory.products['Product_Name'][4]}")
 
-            val = input("Enter 1-5:    ")
+            val = input("\nEnter between 1-5:    ")
 
             try:
                 prd = int(val)
@@ -43,8 +47,8 @@ class Purchase(Inventory):
                 print(f"{prd} is out of range!")
                 continue
 
-            self.purchases['Product_ID'].append(prd)
-            print("\nProduct Entered!")
+            self.product_id = prd
+            print("Product Entered!")
             break
 
     def pur_qty(self):
@@ -57,37 +61,37 @@ class Purchase(Inventory):
                 print(f"Error: {val} is not a number!")
                 continue
 
-            self.purchases['Purchased_Quantity'].append(self.qty)
-            print("\nQuantity Entered!")
+            self.purchased_quantity = qty
+            print("Quantity Entered!")
             self.update_stock(qty)
             break
 
     def pur_rate(self):
         while True:
-            val = input('\nRate:    ')
+            val = input('\nRate of Purchase:    ')
             try:
                 rate = float(val)
             except ValueError:
                 print(f"Error: {val} is not a number!")
                 continue
 
-            self.purchases['Rate_of_Purchase'].append(rate)
-            print("\nRate Entered!")
-            self.purchases['Amount'].append(qty * rate)
+            self.rate_of_purchase = rate
+            self.amount = self.purchased_quantity * rate
+            print("Rate Entered!")
             break
 
     def update_stock(self, qty):
 
-        if self.purchases['Product_ID'][-1] == self.inventory['Product_ID'][0]:
-            self.inventory['Stock']['Iron Rods'] += qty
-        elif self.purchases['Product_ID'][-1] == self.inventory['Product_ID'][1]:
-            self.inventory['Stock']['Nails'] += qty
-        elif self.purchases['Product_ID'][-1] == self.inventory['Product_ID'][2]:
-            self.inventory['Stock']['Steel Pipes'] += qty
-        elif self.purchases['Product_ID'][-1] == self.inventory['Product_ID'][3]:
-            self.inventory['Stock']['Angle Bars'] += qty
-        elif self.purchases['Product_ID'][-1] == self.inventory['Product_ID'][4]:
-            self.inventory['Stock']['Binding Wire'] += qty
+        if self.product_id == Inventory.products['Product_ID'][0]:
+            Inventory.products['Stock']['Iron Rods'] += qty
+        elif self.product_id == Inventory.products['Product_ID'][1]:
+            Inventory.products['Stock']['Nails'] += qty
+        elif self.product_id == Inventory.products['Product_ID'][2]:
+            Inventory.products['Stock']['Steel Pipes'] += qty
+        elif self.product_id == Inventory.products['Product_ID'][3]:
+            Inventory.products['Stock']['Angle Bars'] += qty
+        elif self.product_id == Inventory.products['Product_ID'][4]:
+            Inventory.products['Stock']['Binding Wire'] += qty
 
     def new_purchase(self):
 
@@ -98,6 +102,14 @@ class Purchase(Inventory):
         self.pur_rate()
 
         self.set_id()
+
+        add_list = [self.purchase_id, self.product_id, self.purchased_quantity, self.rate_of_purchase,\
+         self.amount, self.purchase_date, self.purchase_time]
+
+        self.last_added = add_list
+        print(self.last_added)
+        self.all_added.append(self.last_added)
+        print(self.all_added)
         return print("\n\nOne Purchase added!")
 
 
@@ -106,12 +118,11 @@ class Purchase(Inventory):
 
         handle = open(file, 'a')
 
-        DELIM = ', '
         #order_of_col: Purchase_Date, Purchase_Time, Product_ID, Purchase_Quantity, Rate_of_Purchase, Amount
-        text = f"\n{DELIM.join(self.purchases['Purchase_Date'])}, {DELIM.join(self.purchases['Purchase_Time'])}, {DELIM.join(self.purchases['Product_ID'])}, {DELIM.join(self.purchases['Purchased_Quantity'])}, {DELIM.join(self.purchases['Rate_of_Purchase'])}, {DELIM.join(self.purchases['Amount'])}"
+        text = f"\n{[new for new in self.all_added]}"
 
         handle.write(text)
 
         handle.close()
 
-        print('New Purchase Detail Saved!')
+        print('\n\nPurchase Details Saved!')

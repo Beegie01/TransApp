@@ -4,7 +4,7 @@ from datetime import datetime, date, time
 
 from datareservoir_cls import *
 
-class Accounts(DataReservoir):
+class Accounts:
 
     def __init__(self):
         self.today = datetime.today()
@@ -15,7 +15,7 @@ class Accounts(DataReservoir):
         self.debit = None
         self.credit = None
         self.balance = None
-        self.last_added = []
+        self.last_added = None
         self.all_added = []
 
 
@@ -102,7 +102,7 @@ class Accounts(DataReservoir):
         self.set_id()
 
         add_list = [self.account_id, self.customer_id, self.debit,\
-        self.credit, self.balance, self.transaction_date, self.transaction_time]
+        self.credit, self.balance, str(self.transaction_date), str(self.transaction_time)]
 
         self.last_added = add_list
         print(self.last_added)
@@ -124,4 +124,4 @@ class Accounts(DataReservoir):
 
         handle.close()
 
-        print('Transaction Detail Saved!')
+        print('\n\nTransaction Details Saved!')

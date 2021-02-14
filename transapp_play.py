@@ -32,3 +32,5 @@ running_app = True
 while running_app:
     # enter new customer details
     app_menu(customers_today, purchases_today, sales_today, transact_today, inventory_today)
+
+    play_on()

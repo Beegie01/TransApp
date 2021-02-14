@@ -1,35 +1,48 @@
-from datareservoir_cls import *
+import datetime
+from datetime import datetime, date, time
+import string
 
-class Inventory(DataReservoir):
+class Inventory:
+
+    products = {'Product_ID': [1, 2, 3, 4, 5], \
+    'Product_Name': ['Iron Rods', 'Nails', 'Steel Pipes', 'Angle Bars', 'Binding Wire'], \
+    'Stock': {'Iron Rods': 0, 'Nails': 0, 'Steel Pipes': 0, 'Angle Bars': 0, 'Binding Wire': 0}}
 
     def __init__ (self):
-        self.inventory_date = datetime.date(datetime.now())
-        self.inventory_time = datetime.time(datetime.now())
+        self.today = datetime.today()
+        self.inventory_date = datetime.date(self.today)
+        self.inventory_time = datetime.time(self.today)
+        self.new_product_id = None
+        self.new_product_name = None
+        self.new_product_stock = 0
+        self.last_added = None
+        self.all_added = []
 
 
     def __str__(self):
         return f"\nSTOCK AS OF {self.inventory_date}, AT {self.inventory_time}:\
-        \n{self.inventory['Product_ID'][0]}. {self.inventory['Product_Name'][0]}: {self.inventory['Stock']['Iron Rods']} units\
-        \n{self.inventory['Product_ID'][1]}. {self.inventory['Product_Name'][1]}: {self.inventory['Stock']['Nails']} units\
-        \n{self.inventory['Product_ID'][2]}. {self.inventory['Product_Name'][2]}: {self.inventory['Stock']['Steel Pipes']} units\
-        \n{self.inventory['Product_ID'][3]}. {self.inventory['Product_Name'][3]}: {self.inventory['Stock']['Angle Bars']} units\
-        \n{self.inventory['Product_ID'][4]}. {self.inventory['Product_Name'][4]}: {self.inventory['Stock']['Binding Wire']} units"
+        \n{self.products['Product_ID'][0]}. {self.products['Product_Name'][0]}: {self.products['Stock']['Iron Rods']} units\
+        \n{self.products['Product_ID'][1]}. {self.products['Product_Name'][1]}: {self.products['Stock']['Nails']} units\
+        \n{self.products['Product_ID'][2]}. {self.products['Product_Name'][2]}: {self.products['Stock']['Steel Pipes']} units\
+        \n{self.products['Product_ID'][3]}. {self.products['Product_Name'][3]}: {self.products['Stock']['Angle Bars']} units\
+        \n{self.products['Product_ID'][4]}. {self.products['Product_Name'][4]}: {self.products['Stock']['Binding Wire']} units"
 
     def new_prod_id(self):
-        p_id = self.inventory['Product_ID'][-1] + 1
-        self.inventory['Product_ID'].append(p_id)
-        print("New Product ID Entered!")
+        p_id = self.products['Product_ID'][-1] + 1
+        self.new_product_id = p_id
+        self.products['Product_ID'].append(p_id)
+        print("\nNew Product ID has been set up!")
 
     def prod_name_inp(self):
         while True:
             val = input('\nProduct Name:   ')
 
-            if val.isdigit():
+            if val.isdigit() or val.title() in self.products['Product_Name']:
                 print(f'{val} is invalid!')
                 continue
 
             for char in val:
-                if char not in string.ascii_letters:
+                if char in string.punctuation:
                     counter += 1
 
             if counter > 0:
@@ -40,7 +53,8 @@ class Inventory(DataReservoir):
     def new_prod_name(self):
         p_name_inp = self.prod_name_inp()
 
-        self.inventory['Product_Name'].append(p_name_inp)
+        self.new_product_name = p_name_inp
+        self.products['Product_Name'].append(p_name_inp)
         print("New Product Name Entered!")
 
     def stock_qty(self):
@@ -57,9 +71,9 @@ class Inventory(DataReservoir):
 
         acc_range = range(1,6)
         prompt = f"What Product Stock Do You Want To Update?\
-        \n1 for {self.inventory['Product_Name'][0]}\n2 for {self.inventory['Product_Name'][1]}\
-        \n3 for {self.inventory['Product_Name'][2]}\n4 for {self.inventory['Product_Name'][3]}\
-        \n5 for {self.inventory['Product_Name'][4]}\nEnter 1-5:    "
+        \n1 for {self.products['Product_Name'][0]}\n2 for {self.products['Product_Name'][1]}\
+        \n3 for {self.products['Product_Name'][2]}\n4 for {self.products['Product_Name'][3]}\
+        \n5 for {self.products['Product_Name'][4]}\nEnter between 1-5:    "
         while True:
             val = input(prompt)
 
@@ -80,23 +94,25 @@ class Inventory(DataReservoir):
 
         prod = self.prod_prompt()
 
-        if prod == self.inventory['Product_ID'][0]:
-            self.inventory['Stock']['Iron Rods'] += qty
-        elif prod == self.inventory['Product_ID'][1]:
-            self.inventory['Stock']['Nails'] += qty
-        elif prod == self.inventory['Product_ID'][2]:
-            self.inventory['Stock']['Steel Pipes'] += qty
-        elif prod == self.inventory['Product_ID'][3]:
-            self.inventory['Stock']['Angle Bars'] += qty
-        elif prod == self.inventory['Product_ID'][4]:
-            self.inventory['Stock']['Binding Wire'] += qty
+        if prod == self.products['Product_ID'][0]:
+            self.products['Stock']['Iron Rods'] += qty
+            self.new_product_stock += qty
+        elif prod == self.products['Product_ID'][1]:
+            self.products['Stock']['Nails'] += qty
+            self.new_product_stock += qty
+        elif prod == self.products['Product_ID'][2]:
+            self.products['Stock']['Steel Pipes'] += qty
+            self.new_product_stock += qty
+        elif prod == self.products['Product_ID'][3]:
+            self.products['Stock']['Angle Bars'] += qty
+            self.new_product_stock += qty
+        elif prod == self.products['Product_ID'][4]:
+            self.products['Stock']['Binding Wire'] += qty
+            self.new_product_stock += qty
 
         print("\nStock Updated!")
 
     def new_inventory(self):
-
-        # Product ID
-        self.new_prod_id()
 
         # Product Name
         self.new_prod_name()
@@ -104,7 +120,16 @@ class Inventory(DataReservoir):
         # Stock
         self.update_stock()
 
-        print("New Inventory Added!")
+        # Product ID
+        self.new_prod_id()
+
+        add_list = [self.new_product_id, self.new_product_name, self.new_product_stock, str(self.inventory_date), str(self.inventory_time)]
+
+        self.last_added = add_list
+        print(self.last_added)
+        self.all_added.append(self.last_added)
+        print(self.all_added)
+        print("\nNew Inventory Added!")
 
 
     def commit_to_file(self):
@@ -112,12 +137,11 @@ class Inventory(DataReservoir):
 
         handle = open(file, 'a')
 
-        DELIM = ', '
         # Order of col: Inventory_ID, Product_Name, Stock, Date
-        text = f"{DELIM.join(self.inventory['Product_ID'])}, {DELIM.join(self.inventory['Product_Name'])}, {DELIM.join(self.inventory['Stock'])}"
+        text = f"\n{[new for new in self.all_added]}"
 
         handle.write(text)
 
         handle.close()
 
-        print('Inventory Detail Saved!')
+        print('\n\nInventory Details Saved!')

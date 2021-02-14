@@ -2,10 +2,8 @@ import string
 import datetime
 from datetime import datetime, date, time
 
-from datareservoir_cls import *
 
-
-class Customer(DataReservoir):
+class Customer:
 
     def __init__(self):
         self.today = datetime.today()
@@ -20,7 +18,7 @@ class Customer(DataReservoir):
         self.country = None
         self.region = None
         self.office_addr = None
-        self.last_added = []
+        self.last_added = None
         self.all_added = []
 
 
@@ -48,6 +46,7 @@ class Customer(DataReservoir):
 
 
     def fname(self):
+        not_allowed = string.punctuation + string.digits
         while True:
             counter = 0
             val = input("\nFirst Name:    ")
@@ -57,7 +56,7 @@ class Customer(DataReservoir):
                 continue
 
             for char in val:
-                if char not in string.ascii_letters:
+                if char in not_allowed:
                     counter += 1
 
             if counter > 0:
@@ -70,6 +69,7 @@ class Customer(DataReservoir):
             break
 
     def lname(self):
+        not_allowed = string.punctuation + string.digits
         while True:
             counter = 0
             val = input("\nLast Name:    ")
@@ -79,7 +79,7 @@ class Customer(DataReservoir):
                 continue
 
             for char in val:
-                if char not in string.ascii_letters:
+                if char in not_allowed:
                     counter += 1
 
             if counter > 0:
@@ -202,6 +202,7 @@ class Customer(DataReservoir):
             D = False
 
     def ctr(self):
+        not_allowed = string.punctuation + string.digits
         while True:
             counter = 0
             val = input("\nCountry:    ")
@@ -211,7 +212,7 @@ class Customer(DataReservoir):
                 continue
 
             for char in val:
-                if char not in string.ascii_letters:
+                if char in not_allowed:
                     counter += 1
 
             if counter > 0:
@@ -233,7 +234,7 @@ class Customer(DataReservoir):
                 continue
 
             for char in val:
-                if char not in string.ascii_letters:
+                if char not in string.printable:
                     counter += 1
 
             if counter > 0:
@@ -306,4 +307,4 @@ class Customer(DataReservoir):
 
         handle.close()
 
-        print('Customer Detail Saved!')
+        print('\n\nCustomer Details Saved!')
