@@ -9,7 +9,8 @@ c. CUSTOMERS - for customer bio records
 d. SALES - to record orders placed by customers
 e. ACCOUNTS - to record amounts deposited and withdrawn by customers
 
-Each section has 3 important functionalities:
+Each section has 4 important functionalities:
 a. ADD new records
 b. VIEW newly added records
 c. SAVE all newly added records to file
+d. DELETE the record last added
