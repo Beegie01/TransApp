@@ -4,6 +4,7 @@ import string
 
 class Inventory:
 
+
     products = {'Product_ID': [1, 2, 3, 4, 5], \
     'Product_Name': ['Iron Rods', 'Nails', 'Steel Pipes', 'Angle Bars', 'Binding Wire'], \
     'Stock': {'Iron Rods': 0, 'Nails': 0, 'Steel Pipes': 0, 'Angle Bars': 0, 'Binding Wire': 0}}
@@ -15,7 +16,8 @@ class Inventory:
         self.new_product_id = None
         self.new_product_name = None
         self.new_product_stock = 0
-        self.last_added = None
+        self.count = 5
+        self.last_added = []
         self.all_added = []
 
 
@@ -25,16 +27,21 @@ class Inventory:
         \n{self.products['Product_ID'][1]}. {self.products['Product_Name'][1]}: {self.products['Stock']['Nails']} units\
         \n{self.products['Product_ID'][2]}. {self.products['Product_Name'][2]}: {self.products['Stock']['Steel Pipes']} units\
         \n{self.products['Product_ID'][3]}. {self.products['Product_Name'][3]}: {self.products['Stock']['Angle Bars']} units\
-        \n{self.products['Product_ID'][4]}. {self.products['Product_Name'][4]}: {self.products['Stock']['Binding Wire']} units"
+        \n{self.products['Product_ID'][4]}. {self.products['Product_Name'][4]}: {self.products['Stock']['Binding Wire']} units\
+        \n{self.all_added}"
 
     def new_prod_id(self):
-        p_id = self.products['Product_ID'][-1] + 1
+        self.count += 1
+        p_id = self.count
+
         self.new_product_id = p_id
         self.products['Product_ID'].append(p_id)
         print("\nNew Product ID has been set up!")
 
     def prod_name_inp(self):
         while True:
+            counter = 0
+
             val = input('\nProduct Name:   ')
 
             if val.isdigit() or val.title() in self.products['Product_Name']:
@@ -42,7 +49,7 @@ class Inventory:
                 continue
 
             for char in val:
-                if char in string.punctuation:
+                if char not in string.printable:
                     counter += 1
 
             if counter > 0:
@@ -74,6 +81,7 @@ class Inventory:
         \n1 for {self.products['Product_Name'][0]}\n2 for {self.products['Product_Name'][1]}\
         \n3 for {self.products['Product_Name'][2]}\n4 for {self.products['Product_Name'][3]}\
         \n5 for {self.products['Product_Name'][4]}\nEnter between 1-5:    "
+
         while True:
             val = input(prompt)
 
@@ -86,29 +94,18 @@ class Inventory:
             if prd not in acc_range:
                 print(f"{prd} is out of range!")
                 continue
-        return prd
+
+            return prd
 
 
-    def update_stock(self, inp):
+    def stock_up(self):
         qty = self.stock_qty()
 
-        prod = self.prod_prompt()
+        #prod = self.prod_prompt()
 
-        if prod == self.products['Product_ID'][0]:
-            self.products['Stock']['Iron Rods'] += qty
-            self.new_product_stock += qty
-        elif prod == self.products['Product_ID'][1]:
-            self.products['Stock']['Nails'] += qty
-            self.new_product_stock += qty
-        elif prod == self.products['Product_ID'][2]:
-            self.products['Stock']['Steel Pipes'] += qty
-            self.new_product_stock += qty
-        elif prod == self.products['Product_ID'][3]:
-            self.products['Stock']['Angle Bars'] += qty
-            self.new_product_stock += qty
-        elif prod == self.products['Product_ID'][4]:
-            self.products['Stock']['Binding Wire'] += qty
-            self.new_product_stock += qty
+        #if prod == self.products['Product_ID'][0]:
+        self.products['Stock'][self.new_product_name] = qty
+        self.new_product_stock += qty
 
         print("\nStock Updated!")
 
@@ -118,7 +115,7 @@ class Inventory:
         self.new_prod_name()
 
         # Stock
-        self.update_stock()
+        self.stock_up()
 
         # Product ID
         self.new_prod_id()
@@ -130,6 +127,16 @@ class Inventory:
         self.all_added.append(self.last_added)
         print(self.all_added)
         print("\nNew Inventory Added!")
+
+    def clear_last_entry(self):
+        if len(self.last_added) > 0:
+            self.last_added.clear()
+        if len(self.all_added) > 0:
+            rec = self.all_added.pop()
+            self.products['Product_Name'].pop()
+            print(f"{rec}\nHas Been Deleted!")
+        else:
+            print('\n\nNo new record to delete!')
 
 
     def commit_to_file(self):

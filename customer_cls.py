@@ -5,6 +5,8 @@ from datetime import datetime, date, time
 
 class Customer:
 
+    count = 0
+
     def __init__(self):
         self.today = datetime.today()
         self.date_opened = datetime.date(self.today)
@@ -18,13 +20,17 @@ class Customer:
         self.country = None
         self.region = None
         self.office_addr = None
-        self.last_added = None
+        self.last_added = []
         self.all_added = []
 
 
     def set_id(self):
+
+        self.count += 1
+
         cust_id = str(self.date_opened.year) + str(self.date_opened.month)\
-        + self.last_name[:2].upper() + self.gender[0].upper() + self.first_name[:2].upper()
+        + self.last_name[:2].upper() + self.gender[0].upper() + self.first_name[:2].upper()\
+        + str(self.count)
 
         self.customer_id = cust_id
         #self.customers['Customer_ID'].append(cust_id)
@@ -201,7 +207,7 @@ class Customer:
             print("Date of Birth Entered!")
             D = False
 
-    def ctr(self):
+    def ctry(self):
         not_allowed = string.punctuation + string.digits
         while True:
             counter = 0
@@ -274,7 +280,7 @@ class Customer:
         self.dob()
 
         # COUNTRY
-        self.ctr()
+        self.ctry()
 
         # REGION
         self.regn()
@@ -293,6 +299,16 @@ class Customer:
         self.all_added.append(self.last_added)
         #print(self.all_added)
         print("\n\nOne Customer Added!")
+
+
+    def clear_last_entry(self):
+        if len(self.last_added) > 0:
+            self.last_added.clear()
+        if len(self.all_added) > 0:
+            rec = self.all_added.pop()
+            print(f"{rec}\nHas Been Deleted!")
+        else:
+            print('\n\nNo new record to delete!')
 
     def commit_to_file(self):
         file = "C:\\Users\\welcome\\Desktop\\Transapp\\customers.txt"

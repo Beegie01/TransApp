@@ -2,9 +2,9 @@ import string
 import datetime
 from datetime import datetime, date, time
 
-from datareservoir_cls import *
-
 class Accounts:
+
+    count = 0
 
     def __init__(self):
         self.today = datetime.today()
@@ -15,7 +15,7 @@ class Accounts:
         self.debit = None
         self.credit = None
         self.balance = None
-        self.last_added = None
+        self.last_added = []
         self.all_added = []
 
 
@@ -30,9 +30,12 @@ class Accounts:
         \nTRANSACTION TIME: {[n[6] for n in self.all_added]}"
 
     def set_id(self):
+
+        self.count += 1
+
         acct_id = str(self.transaction_date.year) + str(self.transaction_time.hour)\
          + str(self.transaction_time.minute) + str(self.transaction_time.second)\
-        + self.customer_id[-3:]
+        + self.customer_id[-3:] + str(self.count)
 
         self.account_id = acct_id
         print("Account ID has been set!")
@@ -109,6 +112,16 @@ class Accounts:
         self.all_added.append(self.last_added)
         print(self.all_added)
         print("\n\nOne Transaction Added!")
+
+
+    def clear_last_entry(self):
+        if len(self.last_added) > 0:
+            self.last_added.clear()
+        if len(self.all_added) > 0:
+            rec = self.all_added.pop()
+            print(f"{rec}\nHas Been Deleted!")
+        else:
+            print('\n\nNo new record to delete!')
 
 
     def commit_to_file(self):

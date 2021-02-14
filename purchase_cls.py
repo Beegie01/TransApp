@@ -2,6 +2,8 @@ from inventory_cls import *
 
 class Purchase(Inventory):
 
+    count = 0
+
     def __init__(self):
         Inventory.__init__(self)
         self.today = datetime.today()
@@ -12,15 +14,18 @@ class Purchase(Inventory):
         self.purchased_quantity = None
         self.rate_of_purchase = None
         self.amount = None
-        self.last_added = None
+        self.last_added = []
         self.all_added = []
 
     def set_id(self):
+
+        self.count += 1
         pur_id = str(self.purchase_date.year) + str(self.purchase_date.month)\
-        + str(self.purchase_id) + str(self.purchase_time.hour) + str(self.purchase_time.minute)
+        + str(self.product_id) + str(self.purchase_time.hour) + str(self.purchase_time.minute)\
+        + str(self.count)
 
         self.purchase_id = pur_id
-        print("Purchase_ID has been set!")
+        print("Purchase ID has been set!")
 
 
     def prod_id(self):
@@ -111,6 +116,16 @@ class Purchase(Inventory):
         self.all_added.append(self.last_added)
         print(self.all_added)
         return print("\n\nOne Purchase added!")
+
+
+    def clear_last_entry(self):
+        if len(self.last_added) > 0:
+            self.last_added.clear()
+        if len(self.all_added) > 0:
+            rec = self.all_added.pop()
+            print(f"{rec}\nHas Been Deleted!")
+        else:
+            print('\n\nNo new record to delete!')
 
 
     def commit_to_file(self):

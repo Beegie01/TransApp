@@ -7,6 +7,8 @@ from accounts_cls import *
 
 class Sales(Inventory, Accounts):
 
+    count = 0
+
     def __init__(self):
         Inventory.__init__(self)
         Accounts.__init__(self)
@@ -23,12 +25,13 @@ class Sales(Inventory, Accounts):
         self.balance = None
         self.payment_status = None
         self.date_of_completion = None
-        self.last_added = None
+        self.last_added = []
         self.all_added = []
 
     def set_id(self):
+        self.count += 1
         order_id = str(self.product_id) + self.customer_id[:2] + str(self.order_date.year) + str(self.order_time.hour)\
-        + str(self.order_time.minute)
+        + str(self.order_time.minute) + str(self.count)
         self.order_id = order_id
         print("\nOrder ID has been set!")
 
@@ -222,6 +225,17 @@ class Sales(Inventory, Accounts):
         self.all_added.append(self.last_added)
         print(self.all_added)
         print("\n\nOne Order Added!")
+
+
+    def clear_last_entry(self):
+        if len(self.last_added) > 0:
+            self.last_added.clear()
+        if len(self.all_added) > 0:
+            rec = self.all_added.pop()
+            print(f"{rec}\nHas Been Deleted!")
+        else:
+            print('\n\nNo new record to delete!')
+
 
     def commit_to_file(self):
         file = "C:\\Users\\welcome\\Desktop\\Transapp\\sales.txt"

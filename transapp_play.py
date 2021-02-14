@@ -1,5 +1,4 @@
 from inventory_cls import *
-from datareservoir_cls import *
 from customer_cls import *
 from accounts_cls import *
 from purchase_cls import *
@@ -10,8 +9,7 @@ from transapp_funcs import *
 # welcome screen
 welc_scr()
 
-# create datareservoir object
-data = DataReservoir()
+
 # create inventory object
 inventory_today = Inventory()
 

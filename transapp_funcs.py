@@ -147,6 +147,10 @@ def inventory_scr(inventory_obj):
             play_on()
             continue
 
+        elif ans == 'd':
+            inventory_obj.clear_last_entry()
+            continue
+
         elif ans == 'b':
             break
 
@@ -159,12 +163,13 @@ def inventory_inp():
     CONSTANT = 'inventory'
 
     prompt = f"\nTo add new {CONSTANT} records, enter 'n'.\
-    \nTo save new {CONSTANT} records, enter 's'\
-    \nTo view updates, enter 'v'\
+    \nTo save added {CONSTANT} records, enter 's'\
+    \nTo view added records, enter 'v'\
+    \nTo delete added records, enter 'd'\
     \nTo return to the main menu, enter 'b'\
     \nTo exit, enter 'e'\n"
 
-    acc_range = ['n', 'e', 's', 'v', 'b']
+    acc_range = ['n', 'e', 's', 'v', 'd', 'b']
 
     while True:
         inp = input(prompt)
@@ -178,7 +183,7 @@ def adding_inventory(inventory_obj):
     # enter new customer details
     ADDING = True
     while ADDING:
-        inventory_obj.new_customer()
+        inventory_obj.new_inventory()
 
         if add_more():
             continue
@@ -211,6 +216,10 @@ def customers_scr(customer_obj):
             print(customer_obj)
             play_on()
 
+        elif ans == 'd':
+            customer_obj.clear_last_entry()
+            continue
+
         elif ans == 'b':
             break
 
@@ -222,12 +231,13 @@ def customers_inp():
     CONSTANT = 'customer'
 
     prompt = f"\nTo add new {CONSTANT} records, enter 'n'.\
-    \nTo save new {CONSTANT} records, enter 's'\
-    \nTo view updates, enter 'v'\
+    \nTo save added {CONSTANT} records, enter 's'\
+    \nTo view added records, enter 'v'\
+    \nTo delete added records, enter 'd'\
     \nTo return to the main menu, enter 'b'\
     \nTo exit, enter 'e'\n"
 
-    acc_range = ['n', 'e', 's', 'v', 'b']
+    acc_range = ['n', 'e', 's', 'v', 'd', 'b']
 
     while True:
         inp = input(prompt)
@@ -276,6 +286,10 @@ def purchase_scr(purchase_obj):
             print(purchase_obj)
             play_on()
 
+        elif ans == 'd':
+            purchase_obj.clear_last_entry()
+            continue
+
         elif ans == 'b':
             break
 
@@ -287,12 +301,13 @@ def purchase_inp():
     CONSTANT = 'purchase'
 
     prompt = f"\nTo add new {CONSTANT} records, enter 'n'.\
-    \nTo save new {CONSTANT} records, enter 's'\
-    \nTo view updates, enter 'v'\
+    \nTo save added {CONSTANT} records, enter 's'\
+    \nTo view added records, enter 'v'\
+    \nTo delete added records, enter 'd'\
     \nTo return to the main menu, enter 'b'\
     \nTo exit, enter 'e'\n"
 
-    acc_range = ['n', 'e', 's', 'v', 'b']
+    acc_range = ['n', 'e', 's', 'v', 'd', 'b']
     while True:
         inp = input(prompt)
 
@@ -340,6 +355,10 @@ def sales_scr(sales_obj):
             print(sales_obj)
             play_on()
 
+        elif ans == 'd':
+            sales_obj.clear_last_entry()
+            continue
+
         elif ans == 'b':
             break
 
@@ -352,12 +371,13 @@ def sales_inp():
     CONSTANT = 'sales'
 
     prompt = f"\nTo add new {CONSTANT} records, enter 'n'.\
-    \nTo save new {CONSTANT} records, enter 's'\
-    \nTo view updates, enter 'v'\
+    \nTo save added {CONSTANT} records, enter 's'\
+    \nTo view added records, enter 'v'\
+    \nTo delete added records, enter 'd'\
     \nTo return to the main menu, enter 'b'\
     \nTo exit, enter 'e'\n"
 
-    acc_range = ['n', 'e', 's', 'v', 'b']
+    acc_range = ['n', 'e', 's', 'v', 'd', 'b']
 
     while True:
         inp = input(prompt)
@@ -409,6 +429,10 @@ def acct_scr(accounts_obj):
             print(accounts_obj)
             play_on()
 
+        elif ans == 'd':
+            accounts_obj.clear_last_entry()
+            continue
+
         elif ans == 'b':
             break
 
@@ -421,8 +445,9 @@ def acct_inp():
     CONSTANT = 'acct'
 
     prompt = f"\nTo add new {CONSTANT} records, enter 'n'.\
-    \nTo save new {CONSTANT} records, enter 's'\
-    \nTo view updates, enter 'v'\
+    \nTo save added {CONSTANT} records, enter 's'\
+    \nTo view added records, enter 'v'\
+    \nTo delete added records, enter 'd'\
     \nTo return to the main menu, enter 'b'\
     \nTo exit, enter 'e'\n"
 
