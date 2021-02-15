@@ -1,6 +1,7 @@
 import string
 import datetime
 from datetime import datetime, date, time
+import mydict_funcs as mdf
 
 class Accounts:
 
@@ -45,7 +46,7 @@ class Accounts:
         while True:
             inp = input("\nCustomer ID:    ")
 
-            if inp.isdigit() or len(inp) != 10:
+            if inp.isdigit() or len(inp) != 11:
                 print(f"Error: {inp} is invalid!")
                 continue
             self.customer_id = inp
@@ -113,6 +114,26 @@ class Accounts:
         print(self.all_added)
         print("\n\nOne Transaction Added!")
 
+    def ask_view(self):
+
+        acc_range = ['last', 'l', 'a', 'all']
+
+        while True:
+            inp = input("To View:\nAll added records, enter 'a'\nOnly last added entry, enter 'l'\n")
+
+            if inp.lower() not in acc_range:
+                print(f'Error: {inp} is invalid!')
+                continue
+            return inp.lower()
+
+    def view_rec(self):
+        ans = self.ask_view()
+
+        if ans in ['last', 'l']:
+            print(self.last_added)
+
+        elif ans in ['all', 'a']:
+            print(self)
 
     def clear_last_entry(self):
         if len(self.last_added) > 0:
@@ -129,12 +150,17 @@ class Accounts:
 
         handle = open(file, 'a')
 
-        #order_of_col: Account_ID, Customer_ID, Debit, Credit, Balance, Transaction_Date, Transaction_Time
+        #order_of_col: {row_num: [Account_ID, Customer_ID, Debit, Credit, Balance, Transaction_Date, Transaction_Time]}
+        text = f"\n{str(mdf.index_row(self.all_added))}"
 
-        text = f"\n{[new for new in self.all_added]}"
+        # Ensuring that empty rows are not saved
+        if len(self.all_added) > 0:
 
-        handle.write(text)
+            handle.write(text)
 
-        handle.close()
+            handle.close()
 
-        print('\n\nTransaction Details Saved!')
+            print('\n\nTransaction Details Saved!')
+
+        else:
+            print("\n\nNo New Record To Save!")

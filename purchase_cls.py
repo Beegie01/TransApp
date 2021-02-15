@@ -1,4 +1,5 @@
 from inventory_cls import *
+import mydict_funcs as mdf
 
 class Purchase(Inventory):
 
@@ -109,7 +110,7 @@ class Purchase(Inventory):
         self.set_id()
 
         add_list = [self.purchase_id, self.product_id, self.purchased_quantity, self.rate_of_purchase,\
-         self.amount, self.purchase_date, self.purchase_time]
+         self.amount, str(self.purchase_date), str(self.purchase_time)]
 
         self.last_added = add_list
         print(self.last_added)
@@ -117,6 +118,26 @@ class Purchase(Inventory):
         print(self.all_added)
         return print("\n\nOne Purchase added!")
 
+    def ask_view(self):
+
+        acc_range = ['last', 'l', 'a', 'all']
+
+        while True:
+            inp = input("To View:\nAll added records, enter 'a'\nOnly last added entry, enter 'l'\n")
+
+            if inp.lower() not in acc_range:
+                print(f'Error: {inp} is invalid!')
+                continue
+            return inp.lower()
+
+    def view_rec(self):
+        ans = self.ask_view()
+
+        if ans in ['last', 'l']:
+            print(self.last_added)
+
+        elif ans in ['all', 'a']:
+            print(self)
 
     def clear_last_entry(self):
         if len(self.last_added) > 0:
@@ -129,15 +150,22 @@ class Purchase(Inventory):
 
 
     def commit_to_file(self):
+
         file = "C:\\Users\\welcome\\Desktop\\Transapp\\purchases.txt"
 
         handle = open(file, 'a')
 
-        #order_of_col: Purchase_Date, Purchase_Time, Product_ID, Purchase_Quantity, Rate_of_Purchase, Amount
-        text = f"\n{[new for new in self.all_added]}"
+        #order_of_col: {row_num: [Purchase_Date, Purchase_Time, Product_ID, Purchase_Quantity, Rate_of_Purchase, Amount]}
+        text = f"\n{str(mdf.index_row(self.all_added))}"
 
-        handle.write(text)
+        # Ensuring that empty rows are not saved
+        if len(self.all_added) > 0:
 
-        handle.close()
+            handle.write(text)
 
-        print('\n\nPurchase Details Saved!')
+            handle.close()
+
+            print('\n\nPurchase Details Saved!')
+
+        else:
+            print("\n\nNo New Record To Save!")

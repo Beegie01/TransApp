@@ -1,6 +1,7 @@
 import datetime
 from datetime import datetime, date, time
 import string
+import mydict_funcs as mdf
 
 class Inventory:
 
@@ -128,6 +129,28 @@ class Inventory:
         print(self.all_added)
         print("\nNew Inventory Added!")
 
+    def ask_view(self):
+
+        acc_range = ['last', 'l', 'a', 'all']
+
+        while True:
+            inp = input("To View:\nAll added records, enter 'a'\nOnly last added entry, enter 'l'\n")
+
+            if inp.lower() not in acc_range:
+                print(f'Error: {inp} is invalid!')
+                continue
+            return inp.lower()
+
+    def view_rec(self):
+        ans = self.ask_view()
+
+        if ans in ['last', 'l']:
+            print(self.last_added)
+
+        elif ans in ['all', 'a']:
+            print(self)
+
+            
     def clear_last_entry(self):
         if len(self.last_added) > 0:
             self.last_added.clear()
@@ -144,11 +167,17 @@ class Inventory:
 
         handle = open(file, 'a')
 
-        # Order of col: Inventory_ID, Product_Name, Stock, Date
-        text = f"\n{[new for new in self.all_added]}"
+        # Order of col: {row_num: [Inventory_ID, Product_Name, Stock, Date]}
+        text = f"\n{str(mdf.index_row(self.all_added))}"
 
-        handle.write(text)
+        # Ensuring that empty rows are not saved
+        if len(self.all_added) > 0:
 
-        handle.close()
+            handle.write(text)
 
-        print('\n\nInventory Details Saved!')
+            handle.close()
+
+            print('\n\nNew Inventory Details Saved!')
+
+        else:
+            print("\n\nNo New Record To Save!")

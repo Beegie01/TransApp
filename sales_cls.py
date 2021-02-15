@@ -4,6 +4,7 @@ from datetime import datetime, date, time
 
 from inventory_cls import *
 from accounts_cls import *
+import mydict_funcs as mdf
 
 class Sales(Inventory, Accounts):
 
@@ -71,7 +72,7 @@ class Sales(Inventory, Accounts):
         while C:
             inp = input("\nCustomer ID:    ")
 
-            if inp.isdigit() or (len(inp) != 10) or (inp in string.punctuation):
+            if inp.isdigit() or (len(inp) != 11) or (inp in string.punctuation):
                 print(f"Error: {inp} is invalid!")
                 continue
             self.customer_id = inp
@@ -226,6 +227,26 @@ class Sales(Inventory, Accounts):
         print(self.all_added)
         print("\n\nOne Order Added!")
 
+    def ask_view(self):
+
+        acc_range = ['last', 'l', 'a', 'all']
+
+        while True:
+            inp = input("To View:\nAll added records, enter 'a'\nOnly last added entry, enter 'l'\n")
+
+            if inp.lower() not in acc_range:
+                print(f'Error: {inp} is invalid!')
+                continue
+            return inp.lower()
+
+    def view_rec(self):
+        ans = self.ask_view()
+
+        if ans in ['last', 'l']:
+            print(self.last_added)
+
+        elif ans in ['all', 'a']:
+            print(self)
 
     def clear_last_entry(self):
         if len(self.last_added) > 0:
@@ -242,11 +263,15 @@ class Sales(Inventory, Accounts):
 
         handle = open(file, 'a')
 
-        #order_of_col: Order_ID, Order_Date, Order_Time, Product_ID, Customer_ID, Ordered_Quantity, Rate, Amount_Due, Amount_Deposited, Payment_Status, Date_of_Completion
-        text = f"\n{[new for new in self.all_added]}"
+        #order_of_col: {row_num: [Order_ID, Order_Date, Order_Time, Product_ID, Customer_ID, Ordered_Quantity, Rate, Amount_Due, Amount_Deposited, Payment_Status, Date_of_Completion]}
+        # Ensuring that empty rows are not saved
+        if len(self.all_added) > 0:
 
-        handle.write(text)
+            handle.write(text)
 
-        handle.close()
+            handle.close()
 
-        print('\n\nOrder Details Saved!')
+            print('\n\nOrder Details Saved!')
+
+        else:
+            print("\n\nNo New Record To Save!")

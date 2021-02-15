@@ -1,6 +1,7 @@
 import string
 import datetime
 from datetime import datetime, date, time
+import mydict_funcs as mdf
 
 
 class Customer:
@@ -300,6 +301,27 @@ class Customer:
         #print(self.all_added)
         print("\n\nOne Customer Added!")
 
+    def ask_view(self):
+
+        acc_range = ['last', 'l', 'a', 'all']
+
+        while True:
+            inp = input("To View:\nAll added records, enter 'a'\nOnly last added entry, enter 'l'\n")
+
+            if inp.lower() not in acc_range:
+                print(f'Error: {inp} is invalid!')
+                continue
+            return inp.lower()
+
+    def view_rec(self):
+        ans = self.ask_view()
+
+        if ans in ['last', 'l']:
+            print(self.last_added)
+
+        elif ans in ['all', 'a']:
+            print(self)
+
 
     def clear_last_entry(self):
         if len(self.last_added) > 0:
@@ -315,12 +337,17 @@ class Customer:
 
         handle = open(file, 'a')
 
-        #DELIM = ', '
-        #order_of_col: Customer_ID, First_Name, Last_Name, Gender, Date_of_Birth, Birthday, Country, Region, Office_Address, Date_Opened, Time_Opened
-        text = f"\n{[new for new in self.all_added]}"
+        #order_of_col: {row_num: [Customer_ID, First_Name, Last_Name, Gender, Date_of_Birth, Birthday, Country, Region, Office_Address, Date_Opened, Time_Opened]}
+        text = f"\n{str(mdf.index_row(self.all_added))}"
 
-        handle.write(text)
+        # Ensuring that empty rows are not saved
+        if len(self.all_added) > 0:
 
-        handle.close()
+            handle.write(text)
 
-        print('\n\nCustomer Details Saved!')
+            handle.close()
+
+            print('\n\nNew Customer Details Saved!')
+
+        else:
+            print("\n\nNo New Record To Save!")

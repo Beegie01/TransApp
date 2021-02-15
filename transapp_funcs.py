@@ -91,9 +91,8 @@ def quick_check():
                 return exit_play()
 
 def exit_play():
-    print(f"\n\nThanks for playing!")
+    print(f"\n\nTRANSAPP CLOSING\n\nThanks for using TransApp!")
     quit()
-
 
 def app_menu(customer_obj, purchase_obj, sales_obj, accounts_obj, inventory_obj):
 	'''
@@ -143,9 +142,8 @@ def inventory_scr(inventory_obj):
             continue
 
         elif ans == 'v':
-            print(inventory_obj)
+            inventory_obj.view_rec()
             play_on()
-            continue
 
         elif ans == 'd':
             inventory_obj.clear_last_entry()
@@ -193,7 +191,6 @@ def adding_inventory(inventory_obj):
 def commit_inv_data(inventory_obj):
     # save new customer entries
     inventory_obj.commit_to_file()
-    play_on()
 
 
 
@@ -213,7 +210,7 @@ def customers_scr(customer_obj):
             continue
 
         elif ans == 'v':
-            print(customer_obj)
+            customer_obj.view_rec()
             play_on()
 
         elif ans == 'd':
@@ -262,7 +259,6 @@ def adding_customers(customer_obj):
 def commit_cust_data(customer_obj):
     # save new customer entries
     customer_obj.commit_to_file()
-    play_on()
 
 
 
@@ -283,7 +279,7 @@ def purchase_scr(purchase_obj):
             continue
 
         elif ans == 'v':
-            print(purchase_obj)
+            purchase_obj.view_rec()
             play_on()
 
         elif ans == 'd':
@@ -330,7 +326,6 @@ def adding_purchases(purchase_obj):
 def commit_pur_data(purchase_obj):
     # save new customer entries
     purchase_obj.commit_to_file()
-    play_on()
 
 
 
@@ -352,7 +347,7 @@ def sales_scr(sales_obj):
             continue
 
         elif ans == 'v':
-            print(sales_obj)
+            sales_obj.view_rec()
             play_on()
 
         elif ans == 'd':
@@ -404,7 +399,6 @@ def adding_saless(sales_obj):
 def commit_sales_data(sales_obj):
     # save new customer entries
     sales_obj.commit_to_file()
-    play_on()
 
 
 
@@ -426,7 +420,7 @@ def acct_scr(accounts_obj):
             continue
 
         elif ans == 'v':
-            print(accounts_obj)
+            accounts_obj.view_rec()
             play_on()
 
         elif ans == 'd':
@@ -451,7 +445,7 @@ def acct_inp():
     \nTo return to the main menu, enter 'b'\
     \nTo exit, enter 'e'\n"
 
-    acc_range = ['n', 'e', 's', 'v', 'b']
+    acc_range = ['n', 'e', 's', 'v', 'b', 'd']
 
     while True:
         inp = input(prompt)
@@ -477,4 +471,3 @@ def adding_accts(accounts_obj):
 def commit_acct_data(accounts_obj):
     # save new customer entries
     accounts_obj.commit_to_file()
-    play_on()
