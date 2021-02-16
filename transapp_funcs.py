@@ -1,22 +1,19 @@
+from colorama import init, Back, Fore
+init()
+
+
 def welc_scr():
     '''
     this is the start of the app
     '''
+    print('\n'*10,\
+    Back.LIGHTWHITE_EX, Fore.CYAN+\
+    '\n**************************\
+    \nWELCOME\nTO\nSAGE ABE\nTRANSACTIONS\nAPP\nPROJECT', \
+    '\n**************************', '\n'*5,\
+    '\n**************************\nTHE\nTRANS\nAPP\
+    \nFEBRUARY\n2021\n**************************', Back.RESET, Fore.RESET)
 
-    print('WELCOME')
-    print('TO')
-    print('SAGE ABE')
-    print('TRANSACTIONS')
-    print('APP')
-    print('PROJECT')
-    print('**************************')
-    print('THE')
-    print('TRANS')
-    print('APP')
-    print('**************************')
-    print('FEBRUARY\n2021')
-    print('**************************')
-    print()
 
 def player_decide():
     '''
@@ -27,7 +24,9 @@ def player_decide():
     next = '_null_'
     accepted_range = ['c', 'i', 'p', 'a', 's', 'e']
 
-    print("\n"*5, "MAIN\n TRANSAPP\n MENU")
+    print("\n"*5)
+    print(Back.LIGHTWHITE_EX, Fore.CYAN)
+    print(" MAIN\n TRANSAPP\n MENU")
     prompt = "\n'c' for customers,\
     \n'i' for inventory,\
     \n'a' for accounts, \
@@ -52,9 +51,10 @@ def player_decide():
 
 
 def ask_inp():
+    prompt = "\nTo add more enter yes \nTo stop enter no"
     acc_range = ['yes', 'y', 'no', 'n']
     while True:
-        inp = input("\nTo add more enter yes \nTo stop enter no\n")
+        inp = input(prompt)
 
         if inp.lower() not in acc_range:
             print(f'Error: {inp} is invalid!')
@@ -74,8 +74,10 @@ def play_on():
         pass
 
 def quick_check():
+    print("\n", Back.LIGHTWHITE_EX + Fore.GREEN + "Press Enter to continue, or 'e' to exit game:", Back.RESET, Fore.RESET)
+    prompt = "\n"
     while True:
-        val = input("\nPress Enter to continue, or 'e' to exit game:\n")
+        val = input(prompt)
 
         acc_range = ['', 'e', 'exit']
         if val.lower() not in acc_range:
@@ -91,14 +93,16 @@ def quick_check():
                 return exit_play()
 
 def exit_play():
-    print(f"\n\nTRANSAPP CLOSING\n\nThanks for using TransApp!")
+    print(Fore.RED, f"\n\nTRANSAPP CLOSING\n\nThanks for using TransApp!", Fore.RESET)
     quit()
 
 def app_menu(customer_obj, purchase_obj, sales_obj, accounts_obj, inventory_obj):
 	'''
 	here player chooses an avatar and decides on who goes first
 	'''
-	print("\n"*25,"To visit the inventory section, enter 'i'.\
+
+	print("\n"*25, Back.LIGHTWHITE_EX, Fore.CYAN,"\
+    \nTo visit the inventory section, enter 'i'.\
 	\nTo visit the customer section, enter 'c'.\
 	\nTo visit the accounts section, enter 'a'.\
     \nTo visit the sales section, enter 's'.\
@@ -128,6 +132,7 @@ def app_menu(customer_obj, purchase_obj, sales_obj, accounts_obj, inventory_obj)
 
 # inventory functions
 def inventory_scr(inventory_obj):
+    print(Back.LIGHTWHITE_EX, Fore.MAGENTA)
     while True:
         print("\n"*5, "INVENTORY RECORD\n\tMENU")
         # inventory menu
@@ -197,6 +202,7 @@ def commit_inv_data(inventory_obj):
 # customers functions
 def customers_scr(customer_obj):
 
+    print(Back.LIGHTWHITE_EX, Fore.BLUE)
     while True:
         print("\n"*5, "CUSTOMER RECORD\n\tMENU")
         ans = customers_inp()
@@ -266,6 +272,7 @@ def commit_cust_data(customer_obj):
 
 # purchases functions
 def purchase_scr(purchase_obj):
+    print(Back.LIGHTWHITE_EX, Fore.YELLOW)
     while True:
         print("\n"*5, "PURCHASE RECORD\n\tMENU")
         ans = purchase_inp()
@@ -333,6 +340,7 @@ def commit_pur_data(purchase_obj):
 # saless functions
 def sales_scr(sales_obj):
 
+    print(Back.LIGHTWHITE_EX, Fore.LIGHTGREEN_EX)
     while True:
         print("\n"*5, "SALES RECORD\n\tMENU")
 
@@ -406,6 +414,7 @@ def commit_sales_data(sales_obj):
 # accts functions
 def acct_scr(accounts_obj):
 
+    print(Back.LIGHTWHITE_EX, Fore.GREEN)
     while True:
         print("\n"*5, "ACCOUNT RECORD\n\t MENU")
 
