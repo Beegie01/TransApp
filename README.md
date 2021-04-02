@@ -4,7 +4,7 @@ This is an application for entering records from daily business operations.
 
 The app consists of 5 main sections (menus): 
 a. INVENTORY - for products records
-b. PURCHASES - to record purchases made
+b. PURCHASES - to record purchases made (only in the CLI app)
 c. CUSTOMERS - for customer bio records
 d. SALES - to record orders placed by customers
 e. ACCOUNTS - to record amounts deposited and withdrawn by customers
