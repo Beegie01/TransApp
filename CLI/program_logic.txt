@@ -1,0 +1,7 @@
+THIS IS A PROGRAM FOR ENTERING TRANSACTION DETAILS
+
+Customer database
+
+Transaction database
+
+Supply-chain database
