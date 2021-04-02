@@ -11,6 +11,6 @@ e. ACCOUNTS - to record amounts deposited and withdrawn by customers
 
 Each section has 4 important functionalities:
 a. ADD new records
-b. VIEW newly added records
-c. SAVE all newly added records to file
-d. DELETE the record last added
+b. VIEW existing records
+c. UPDATE & SAVE records to file
+d. DELETE existing record from file
