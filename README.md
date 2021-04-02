@@ -1,4 +1,4 @@
-# TRANSAPP - An application for multifaceted transactions
+# TRANSAPP (CLI & GUI) - An application for multifaceted transactions
 
 This is an application for entering records from daily business operations. 
 
