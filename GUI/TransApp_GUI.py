@@ -1,6 +1,9 @@
 import tkinter as tk, datetime, random, os
 from tkinter import messagebox
 from inventory_cls import Inventory
+from customer_cls import Customer
+from sales_cls import Sales
+
 
 dir_path = 'C:\\Users\\welcome\\Desktop\\MyFuncs'
 
@@ -11,9 +14,14 @@ from mydict_funcs import del_item
 
 class TransApp:
 
-    def __init__(self, master, inventory_obj):
+    def __init__(self, master): #, inventory_obj, customer_obj, sales_obj):
         self.master = master
-        self.inv_obj = inventory_obj
+        # create an object of inventory
+        self.inv_obj = Inventory()
+        # create an object of customer
+        self.cust_obj = Customer()
+        # create an object of sales
+        self.sales_obj = Sales()
 
         # menu bar section
         self.menu_bar = tk.Menu(self.master)
@@ -118,7 +126,7 @@ class TransApp:
         self.inventoryb = tk.Button(self.frame2, text="INVENTORY", fg='white', bg='purple',
                                     font=('arial black', 14), command=lambda: self.invenpage())
         self.customerb = tk.Button(self.frame2, text="CUSTOMERS", fg='white', bg='blue',
-                                   font=('arial black', 14), )
+                                   font=('arial black', 14), command=lambda: self.custpage())
         self.salesb = tk.Button(self.frame2, text="SALES", fg='white', bg='brown',
                                 font=('arial black', 14), )
         self.accountb = tk.Button(self.frame2, text="ACCOUNTS", fg='white', bg='green',
@@ -178,6 +186,176 @@ class TransApp:
 
         self.frameinv.grid(row=1, rowspan=4, column=0, columnspan=5, sticky='nsew')
 
+    def custpage(self):
+        # frame for customer page containing three rows and one column
+        self.frameinv = tk.LabelFrame(master=self.master, text='CUSTOMER', font=('arial black', 12), bg='blue',
+                                      fg='white')
+        self.frameinv.rowconfigure([0, 1, 2, 3], weight=1)
+        self.frameinv.columnconfigure(0, weight=1)
+
+        self.create = tk.Button(self.frameinv, text='ADD NEW CUSTOMER', bg='white', fg='blue',
+                                font=('arial black', 14), command=self.new_cust)
+        self.edit = tk.Button(self.frameinv, text='UPDATE CUSTOMER RECORD', bg='white', fg='orange',
+                              font=('arial black', 14), command=self.edit_cust)
+        self.dele = tk.Button(self.frameinv, text='DELETE CUSTOMER RECORD', bg='white', fg='red',
+                              font=('arial black', 14), command=self.delete_cust)
+        self.view = tk.Button(self.frameinv, text='VIEW CUSTOMER RECORDS', bg='white', fg='green',
+                              font=('arial black', 14), command=lambda: self.display_cust())
+
+        # display inventory options
+        self.view.grid(row=0, padx=40, pady=10, sticky='nsew')
+        self.create.grid(row=1, padx=60, pady=10, sticky='nsew')
+        self.edit.grid(row=2, padx=80, pady=10, sticky='nsew')
+        self.dele.grid(row=3, padx=100, pady=10, sticky='nsew')
+
+        # display inventory page's frame
+        if self.display_frame is not None:
+            self.display_frame.grid_forget()
+        if self.new_prod_frame is not None:
+            self.new_prod_frame.grid_forget()
+        if self.frame2 is not None:
+            self.frame2.grid_forget()
+
+        self.frameinv.grid(row=1, rowspan=4, column=0, columnspan=5, sticky='nsew')
+
+    def new_cust(self):
+        bg, fg = 'blue', 'white'
+
+        # frame for input of new inventory
+        self.new_prod_frame = tk.LabelFrame(self.master, text='NEW CUSTOMER REGISTRATION', fg=fg, font=('arial black', 12),
+                                            bg=bg)
+        self.new_prod_frame.rowconfigure(list(range(9)), weight=1)
+        self.new_prod_frame.columnconfigure(list(range(5)), weight=1)
+
+        # place new customer form
+        # customer Name
+        tk.Label(self.new_prod_frame, text='Customer', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nsew')
+        # first name
+        tk.Label(self.new_prod_frame, text='First Name', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=1, stick='nw')
+        self.fnameEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'))
+        self.fnameEntry.grid(row=0, column=1, padx=2, pady=30, stick='sw')
+        # middle name
+        tk.Label(self.new_prod_frame, text='Middle Name', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=2, stick='nw')
+        self.midnameEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'))
+        self.midnameEntry.grid(row=0, column=2, padx=2, pady=30, stick='sw')
+        # last name
+        tk.Label(self.new_prod_frame, text='Last Name', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=3, stick='nw')
+        self.lnameEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'))
+        self.lnameEntry.grid(row=0, column=3, padx=2, pady=30, stick='sw')
+
+        # customer Gender
+        tk.Label(self.new_prod_frame, text='Gender:', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=1, column=0, padx=10, stick='nsew')
+        gend = tk.StringVar(value='None')
+        # gend.set("")
+        maleRadio = tk.Radiobutton(self.new_prod_frame, text='Male', val='Male', variable=gend,
+                                   bg=bg, fg=fg, command=lambda: self.sel_gender(gend.get()), state='normal')
+        maleRadio.grid(row=1, column=1, padx=2, sticky='w')
+        femaleRadio = tk.Radiobutton(self.new_prod_frame, text='Female', val='Female', variable=gend,
+                                     bg=bg, fg=fg, command=lambda: self.sel_gender(gend.get()), state='normal')
+        femaleRadio.grid(row=1, column=2, padx=2, sticky='w')
+
+        # customer date of birth
+        tk.Label(self.new_prod_frame, text='Date of Birth:', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=2, column=0, padx=10, stick='nsew')
+        # day
+        tk.Label(self.new_prod_frame, text='Day', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=2, column=1, padx=5, stick='nw')
+        self.regdayEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.regdayEntry.insert(0, str(datetime.date.today().day))
+        self.regdayEntry.grid(row=2, column=1, padx=5, pady=30, stick='sw')
+        # month
+        tk.Label(self.new_prod_frame, text='Month', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=2, column=2, padx=5, stick='nw')
+        self.regmonthEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.regmonthEntry.insert(0, str(datetime.date.today().month))
+        self.regmonthEntry.grid(row=2, column=2, padx=5, pady=30, stick='sw')
+        # year
+        tk.Label(self.new_prod_frame, text='Year', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=2, column=3, stick='nw')
+        self.regyrEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.regyrEntry.insert(0, str(datetime.date.today().year))
+        self.regyrEntry.grid(row=2, column=3, pady=30, stick='sw')
+
+        # nationality
+        tk.Label(self.new_prod_frame, text='Nationality:', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=3, column=0, padx=10, stick='nsew')
+        tk.Label(self.new_prod_frame, text='Country', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=3, column=1, padx=10, stick='nw')
+        self.natEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.natEntry.grid(row=3, column=1, padx=5, pady=30, stick='sw')
+
+        # state of origin
+        tk.Label(self.new_prod_frame, text='State of Origin:', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=3, column=2, padx=0, pady=0, stick='nw')
+        self.stateEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.stateEntry.grid(row=3, column=2, padx=5, pady=30, stick='sw')
+
+        # Office address
+        tk.Label(self.new_prod_frame, text='Office Address:', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=4, column=0, padx=5, stick='nsew')
+        self.off_addrText = tk.Text(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10, height=3)
+        self.off_addrText.grid(row=4, column=1, padx=5, pady=30, sticky='ew')
+
+        # date of registration
+        tk.Label(self.new_prod_frame, text='As of Date:', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=5, column=0, padx=5, pady=0, sticky='nsew')
+        # day
+        tk.Label(self.new_prod_frame, text='Day', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=5, column=1, padx=5, sticky='nw')
+        self.regdayEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.regdayEntry.insert(0, str(datetime.date.today().day))
+        self.regdayEntry.grid(row=5, column=1, padx=5, pady=30, sticky='sw')
+        # month
+        tk.Label(self.new_prod_frame, text='Month', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=5, column=2, padx=5, sticky='nw')
+        self.regmonthEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.regmonthEntry.insert(0, str(datetime.date.today().month))
+        self.regmonthEntry.grid(row=5, column=2, padx=5, pady=30, sticky='sw')
+        # year
+        tk.Label(self.new_prod_frame, text='Year', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=5, column=3, sticky='nw')
+        self.regyrEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.regyrEntry.insert(0, str(datetime.date.today().year))
+        self.regyrEntry.grid(row=5, column=3, pady=30, sticky='sw')
+
+        submitButton = tk.Button(self.new_prod_frame, text='Submit', font=("Calibri", 14, 'bold'),
+                                 fg='white', bg='green', width=10, height=2, command=self.submitcust)
+        submitButton.grid(row=7, column=2, padx=10, sticky='se')
+
+        custpageb = tk.Button(self.new_prod_frame, text='Customer Page', font=("Calibri", 14, 'bold'),
+                             fg='blue', bg='white', height=2, width=15, command=self.custpage)
+        custpageb.grid(row=7, column=0, padx=15, stick='se')
+
+        # display inventory page's frame
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.frameinv is not None:
+            self.frameinv.grid_forget()
+
+        self.new_prod_frame.grid(row=1, rowspan=8, column=0, columnspan=3, sticky='nsew')
+
+    def sel_gender(self, selected_gender):
+        self.cust_obj.gender = selected_gender
+        print(self.cust_obj.gender)
+
+    def submitcust(self):
+        pass
+
+    def edit_cust(self):
+        pass
+
+    def delete_cust(self):
+        pass
+
+    def display_cust(self):
+        pass
+
+
     def new_prod(self):
         # frame for input of new inventory
         self.new_prod_frame = tk.LabelFrame(self.master, text='NEW PRODUCT', fg='white', font=('arial black', 12),
@@ -186,46 +364,52 @@ class TransApp:
         self.new_prod_frame.columnconfigure(list(range(3)), weight=1)
 
         # place new inventory form
-        prod_nameLabel = tk.Label(self.new_prod_frame, text='Product Name:', font=('calibri', 16), bg='purple', fg='white', height=1)
-        prod_nameLabel.grid(row=0, column=0, padx=5, pady=50, sticky='ew')
+        tk.Label(self.new_prod_frame, text='Product Name:', font=('calibri', 16),
+                 bg='purple', fg='white', height=1).grid(row=0, column=0, padx=5, pady=50, sticky='ew')
         self.pnameEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'))
-        self.pnameEntry.grid(row=0, column=1, columnspan=2, padx=5, pady=50, sticky='ew')
+        self.pnameEntry.grid(row=0, column=1, padx=5, pady=50, sticky='ew')
 
-        stockLabel = tk.Label(self.new_prod_frame, text='New Stock:', font=('calibri', 16), bg='purple', fg='white', height=1)
-        stockLabel.grid(row=1, column=0, padx=5, pady=50, sticky='ew')
-        self.stockEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
-        self.stockEntry.grid(row=1, column=1, padx=5, pady=50, sticky='ew')
-        unitLabel = tk.Label(self.new_prod_frame, text='Units', font=('calibri', 16), bg='purple', fg='white',
-                              height=1)
-        unitLabel.grid(row=1, column=2, padx=0, pady=50, sticky='w')
+        # stock entries
+        tk.Label(self.new_prod_frame, text='New Stock:', font=('calibri', 16),
+                 bg='purple', fg='white', height=1).grid(row=1, column=0, padx=5, pady=50, sticky='sew')
+        tk.Label(self.new_prod_frame, text='Quantity (in figures)', font=('calibri', 16),
+                 bg='purple', fg='white', height=1).grid(row=1, column=1, padx=5, sticky='nw')
+        self.qtyEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.qtyEntry.grid(row=1, column=1, padx=5, pady=50, sticky='sw')
 
-        dateLabel = tk.Label(self.new_prod_frame, text='As of Date:', font=('calibri', 16), bg='purple', fg='white', height=1)
-        dateLabel.grid(row=2, column=0, padx=5, pady=50, sticky='sew')
+        tk.Label(self.new_prod_frame, text='Unit of Measurement', font=('calibri', 16),
+                 bg='purple', fg='white', height=1).grid(row=1, column=2, padx=0, sticky='nw')
+        self.unitEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.unitEntry.grid(row=1, column=2, padx=5, pady=50, sticky='sw')
 
-        dayLabel = tk.Label(self.new_prod_frame, text='Day', font=('calibri', 16), bg='purple', fg='white',
-                             height=1)
-        dayLabel.grid(row=2, column=1, padx=5, sticky='nw')
+        # date entries
+        tk.Label(self.new_prod_frame, text='As of Date:', font=('calibri', 16),
+                 bg='purple', fg='white', height=1).grid(row=2, column=0, padx=5, pady=50, sticky='sew')
+        # day
+        tk.Label(self.new_prod_frame, text='Day', font=('calibri', 16),
+                 bg='purple', fg='white', height=1).grid(row=2, column=1, padx=5, sticky='nw')
         self.dayEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
         self.dayEntry.insert(0, str(datetime.date.today().day))
         self.dayEntry.grid(row=2, column=1, padx=5, pady=50, sticky='sw')
-        monthLabel = tk.Label(self.new_prod_frame, text='Month', font=('calibri', 16), bg='purple', fg='white',
-                            height=1)
-        monthLabel.grid(row=2, column=2, padx=5, sticky='nw')
+        # month
+        tk.Label(self.new_prod_frame, text='Month', font=('calibri', 16),
+                 bg='purple', fg='white', height=1).grid(row=2, column=2, padx=5, sticky='nw')
         self.monthEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
         self.monthEntry.insert(0, str(datetime.date.today().month))
         self.monthEntry.grid(row=2, column=2, padx=5, pady=50, sticky='sw')
-        yrLabel = tk.Label(self.new_prod_frame, text='Year', font=('calibri', 16), bg='purple', fg='white',
-                              height=1)
-        yrLabel.grid(row=2, column=2, sticky='n')
+        # year
+        tk.Label(self.new_prod_frame, text='Year', font=('calibri', 16),
+                 bg='purple', fg='white', height=1).grid(row=2, column=2, sticky='n')
         self.yrEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
         self.yrEntry.insert(0, str(datetime.date.today().year))
         self.yrEntry.grid(row=2, column=2, pady=50, sticky='s')
 
+        # submit and inventory page buttons
         submitButton = tk.Button(self.new_prod_frame, text='Submit', font=("Calibri", 14, 'bold'),
                                  fg='white', bg='green', width=3, height=2, command=self.submitinv)
         submitButton.grid(row=3, column=2, padx=350, sticky='ew')
         invpageb = tk.Button(self.new_prod_frame, text='Inventory Page', font=("Calibri", 14, 'bold'),
-                             bg='blue', fg='white', height=2, width=15, command=self.invenpage)
+                             fg='purple', bg='white', height=2, width=15, command=self.invenpage)
         invpageb.grid(row=3, column=1, padx=5, stick='w')
 
         # display inventory page's frame
@@ -250,10 +434,25 @@ class TransApp:
         self.submit_frame.rowconfigure([0, 1], weight=1)
         self.submit_frame.columnconfigure(list(range(4)), weight=1)
 
+        # check for data integrity
+        entries = [self.pnameEntry.get(), self.qtyEntry.get(), self.unitEntry.get(), self.yrEntry.get(),
+                            self.monthEntry.get(), self.dayEntry.get()]
+        cond = [None, '', ' ']
+        # any of the field is empty
+        if [True for entry in entries if entry in cond]:
+            return messagebox.showerror(title='Blank Field', message='Blank field detected!')
+        # product name and units cannot be numbers
+        if [entry for entry in [self.pnameEntry.get(), self.unitEntry.get()] if entry.isdigit()]:
+            return messagebox.showerror(title='Invalid Data Type', message='Product name,\nUnit of measurement\n\tcannot be a number!')
+        # qty, yr, month, day must be numbers
+        if [entry for entry in [self.qtyEntry.get(), self.yrEntry.get(), self.monthEntry.get(), self.dayEntry.get()] if not(entry.isdigit())]:
+            return messagebox.showerror(title='Invalid Data Type', message='Quantity,\nDay,\nMonth,\nYear\n\tmust be in figures!')
+
         # assign user input from entry to each inventory class attribute
-        self.inv_obj.prod_id = f"{self.pnameEntry.get()[:2]}{self.ID_gen()}"
-        self.inv_obj.prod_name = self.pnameEntry.get()
-        self.inv_obj.new_stock = self.stockEntry.get()
+        self.inv_obj.prod_id = f"{''.join([word[0] for word in self.pnameEntry.get().title().split()])}{self.ID_gen()}"
+        self.inv_obj.prod_name = self.pnameEntry.get().title()
+        self.inv_obj.qty = self.qtyEntry.get()
+        self.inv_obj.unit = self.unitEntry.get().title()
         self.inv_obj.entry_date = f"{self.yrEntry.get()}-{self.monthEntry.get()}-{self.dayEntry.get()}"
 
         tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='purple', fg='white',
@@ -261,7 +460,7 @@ class TransApp:
         tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='purple', fg='white',
                  text=f"PRODUCT:\n{self.inv_obj.prod_name}").grid(row=0, column=1, sticky='ew')
         tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='purple', fg='white',
-                 text=f"QTY:\n{self.inv_obj.new_stock}").grid(row=0, column=2, sticky='ew')
+                 text=f"QTY:\n{self.inv_obj.qty} {self.inv_obj.unit}").grid(row=0, column=2, sticky='ew')
         tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='purple', fg='white',
                  text=f"DATE:\n{self.inv_obj.entry_date}").grid(row=0, column=3, sticky='ew')
 
@@ -282,7 +481,6 @@ class TransApp:
     def saveinv(self):
         with open(self.inv_obj.inv_data, 'a',
                   encoding='utf8') as hand:
-            # hand.writelines(f"\n{[self.inv_obj.prod_id, self.inv_obj.prod_name, self.inv_obj.new_stock, self.inv_obj.entry_date]}")
             hand.writelines(f"{self.inv_obj.__dict__}\n")
 
         self.submit_frame = self.make_frame()
@@ -296,7 +494,7 @@ class TransApp:
         addb.grid(row=1, column=0, padx=5, stick='ew')
 
         invpageb = tk.Button(self.submit_frame, text='Inventory Page', font=("Calibri", 14, 'bold'),
-                             bg='blue', fg='white', height=5, width=15, command=self.invenpage)
+                             fg='purple', bg='white', height=5, width=15, command=self.invenpage)
         invpageb.grid(row=1, column=3, padx=5, stick='ew')
 
         self.submit_frame.rowconfigure([0, 1], weight=1)
@@ -309,7 +507,7 @@ class TransApp:
             inv_attr = hand.readlines()
             # print(inv_attr)
         return inv_attr
-    
+
     def display_inv(self):
         global inven, lines
 
@@ -317,7 +515,7 @@ class TransApp:
         lines = {}
 
         # setup display frame
-        self.display_frame = self.make_frame(page_title='VIEW INVENTORY RECORDS')
+        self.display_frame = self.make_frame(page_title='INVENTORY RECORDS VIEW')
 
         # retrieve inventory data from file
         # inven is a list of strings containing inventory records
@@ -338,7 +536,7 @@ class TransApp:
                  bg='purple', fg='white').grid(row=0, column=2, sticky='nsew')
         tk.Label(self.display_frame, text=f"DATE OF ENTRY", font=("Calibri", 14, 'bold'),
                  bg='purple', fg='white').grid(row=0, column=3, sticky='nsew')
-        
+
         for ind in range(len(inven)):
             # assign user input from stored inventory records to each inventory class attribute
             self.inv_obj.__dict__ = inven[ind]
@@ -347,13 +545,13 @@ class TransApp:
                      bg='purple', fg='white').grid(row=ind+1, column=0, sticky='e')
             tk.Label(self.display_frame, text=f"{self.inv_obj.prod_name}", font=("Calibri", 10, 'bold'),
                      bg='purple', fg='white').grid(row=ind+1, column=1, sticky='nsew')
-            tk.Label(self.display_frame, text=f"{self.inv_obj.new_stock}", font=("Calibri", 10, 'bold'),
+            tk.Label(self.display_frame, text=f"{self.inv_obj.qty} {self.inv_obj.unit}", font=("Calibri", 10, 'bold'),
                      bg='purple', fg='white').grid(row=ind+1, column=2, sticky='nsew')
             tk.Label(self.display_frame, text=f"{self.inv_obj.entry_date}", font=("Calibri", 10, 'bold'),
                      bg='purple', fg='white').grid(row=ind+1, column=3, sticky='nsew')
 
         invpageb = tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
-                             bg='blue', fg='white', height=1, width=15, command=self.invenpage)
+                             fg='purple', bg='white', height=1, width=15, command=self.invenpage)
         invpageb.grid(row=len(inven)+2, column=3, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
@@ -405,7 +603,7 @@ class TransApp:
                      bg='purple', fg='white').grid(row=ind + 1, column=0, sticky='e')
             tk.Label(self.display_frame, text=f"{self.inv_obj.prod_name}", font=("Calibri", 10, 'bold'),
                      bg='purple', fg='white').grid(row=ind + 1, column=1, sticky='nsew')
-            tk.Label(self.display_frame, text=f"{self.inv_obj.new_stock}", font=("Calibri", 10, 'bold'),
+            tk.Label(self.display_frame, text=f"{self.inv_obj.qty} {self.inv_obj.unit}", font=("Calibri", 10, 'bold'),
                      bg='purple', fg='white').grid(row=ind + 1, column=2, sticky='nsew')
             tk.Label(self.display_frame, text=f"{self.inv_obj.entry_date}", font=("Calibri", 10, 'bold'),
                      bg='purple', fg='white').grid(row=ind + 1, column=3, sticky='nsew')
@@ -415,12 +613,13 @@ class TransApp:
 
         edit_prodid_entry = tk.Entry(self.display_frame, font=("Calibri", 10, 'bold'))
         edit_prodid_entry.grid(row=len(inven) + 2, column=1, padx=2, sticky='w')
+
         # to edit the given row number (at row entry - 1)
         tk.Button(self.display_frame, text='Edit', font=("Calibri", 12, 'bold'),
-                             bg='orange', fg='white', height=1, width=5, command=self.editing).grid(row=len(inven) + 2, column=1,
+                             bg='orange', fg='white', height=1, width=10, command=self.editing).grid(row=len(inven) + 2, column=1,
                                                                                            sticky='e')
         invpageb = tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
-                             bg='blue', fg='white', height=1, width=15, command=self.invenpage)
+                             fg='purple', bg='white', height=1, width=15, command=self.invenpage)
         invpageb.grid(row=len(inven) + 2, column=3, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
@@ -449,7 +648,7 @@ class TransApp:
         if inp.lower() not in prod_ids:
             return messagebox.showerror(title='INVALID ENTRY', message=f'{inp} IS NOT VALID')
 
-
+        # get the row index of the selected product id
         for row, rec in lines.items():
             for k, v in rec.items():
                 # if valid ID is entered
@@ -457,6 +656,7 @@ class TransApp:
                     edit_row_num = row
                     # print(f"Found at {edit_row_num}")
 
+        # assign the selected record to the inventory object
         for row, rec in lines.items():
             if row == edit_row_num:
                 self.inv_obj.__dict__ = rec
@@ -468,7 +668,7 @@ class TransApp:
                  bg='purple', fg='white').grid(row=1, column=0, sticky='ew', padx=25)
         tk.Label(self.display_frame, text=f"PRODUCT NAME:\n\n{self.inv_obj.prod_name}", font=("Calibri", 10, 'bold'),
                  bg='purple', fg='white').grid(row=1, column=1, sticky='ew', padx=25)
-        tk.Label(self.display_frame, text=f"STOCK:\n\n{self.inv_obj.new_stock}", font=("Calibri", 10, 'bold'),
+        tk.Label(self.display_frame, text=f"STOCK:\n\n{self.inv_obj.qty} {self.inv_obj.unit}", font=("Calibri", 10, 'bold'),
                  bg='purple', fg='white').grid(row=1, column=2, sticky='ew', padx=25)
         tk.Label(self.display_frame, text=f"DATE:\n\n{self.inv_obj.entry_date}", font=("Calibri", 10, 'bold'),
                  bg='purple', fg='white').grid(row=1, column=3, sticky='ew', padx=25)
@@ -476,29 +676,57 @@ class TransApp:
         tk.Label(self.display_frame, text=f"ENTER NEW DATA BELOW", font=("Calibri", 14, 'bold'),
                  bg='purple', fg='white').grid(row=2, columnspan=3, sticky='ew', padx=50)
 
-        tk.Label(self.display_frame, text=f"PRODUCT NAME:", font=("Calibri", 10, 'bold'),
-                 bg='purple', fg='white').grid(row=3, column=0, sticky='n', padx=50, pady=15)
+        # product labels and entries
+        tk.Label(self.display_frame, text=f"PRODUCT:", font=("Calibri", 10, 'bold'),
+                 bg='purple', fg='white').grid(row=3, column=0, sticky='ew', padx=50, pady=15)
+
+        # product name label and entry
+        tk.Label(self.display_frame, text=f"NAME", font=("Calibri", 10, 'bold'),
+                 bg='purple', fg='white').grid(row=3, column=1, sticky='nw', padx=25, pady=15)
         self.pname_entry = tk.Entry(self.display_frame)
-        self.pname_entry.grid(row=3, column=0, sticky='ew', padx=50, pady=5)
+        self.pname_entry.grid(row=3, column=1, sticky='w', padx=25, pady=5)
 
-        tk.Label(self.display_frame, text=f"STOCK:", font=("Calibri", 10, 'bold'),
-                 bg='purple', fg='white').grid(row=3, column=1, sticky='n', padx=25, pady=15)
-        self.pstock_entry = tk.Entry(self.display_frame)
-        self.pstock_entry.grid(row=3, column=1, sticky='ew', padx=25, pady=5)
+        # product quantity label and entry
+        tk.Label(self.display_frame, text=f"QUANTITY", font=("Calibri", 10, 'bold'),
+                 bg='purple', fg='white').grid(row=3, column=2, sticky='nw', padx=25, pady=15)
+        self.pqty_entry = tk.Entry(self.display_frame)
+        self.pqty_entry.grid(row=3, column=2, sticky='w', padx=25, pady=5)
 
-        tk.Label(self.display_frame, text=f"DATE:", font=("Calibri", 10, 'bold'),
-                 bg='purple', fg='white').grid(row=3, column=2, sticky='n', padx=25, pady=15)
-        self.date_entry = tk.Entry(self.display_frame)
-        self.date_entry.grid(row=3, column=2, sticky='ew', padx=25, pady=5)
+        # unit of measurement label and entry
+        tk.Label(self.display_frame, text=f"Unit of Measurement", font=("Calibri", 10, 'bold'),
+                 bg='purple', fg='white').grid(row=3, column=3, sticky='nw', padx=25, pady=15)
+        self.punit_entry = tk.Entry(self.display_frame)
+        self.punit_entry.grid(row=3, column=3, sticky='w', padx=25, pady=5)
 
+        # date labels and entries section
+        tk.Label(self.display_frame, text=f"DATE", font=("Calibri", 10, 'bold'),
+                 bg='purple', fg='white').grid(row=4, column=0, sticky='ew', padx=25, pady=15)
+        # Year label and entry
+        tk.Label(self.display_frame, text=f"YEAR", font=("Calibri", 10, 'bold'),
+                 bg='purple', fg='white').grid(row=4, column=1, sticky='nw', padx=25, pady=15)
+        self.yr_entry = tk.Entry(self.display_frame)
+        self.yr_entry.grid(row=4, column=1, sticky='w', padx=25, pady=5)
+        # Month label and entry
+        tk.Label(self.display_frame, text=f"MONTH", font=("Calibri", 10, 'bold'),
+                 bg='purple', fg='white').grid(row=4, column=2, sticky='nw', padx=25, pady=15)
+        self.mon_entry = tk.Entry(self.display_frame)
+        self.mon_entry.grid(row=4, column=2, sticky='w', padx=25, pady=5)
+        # Day label and entry
+        tk.Label(self.display_frame, text=f"DAY", font=("Calibri", 10, 'bold'),
+                 bg='purple', fg='white').grid(row=4, column=3, sticky='nw', padx=25, pady=15)
+        self.day_entry = tk.Entry(self.display_frame)
+        self.day_entry.grid(row=4, column=3, sticky='w', padx=25, pady=5)
+
+        # update and inventory page buttons
         updateb = tk.Button(self.display_frame, text='Update', font=("Calibri", 12, 'bold'),
-                            bg='blue', fg='white', height=1, width=15, command=self.update)
-        updateb.grid(row=len(inven) + 2, column=2, padx=5, pady=5, stick='se')
+                            bg='orange', fg='white', height=1, width=15, command=self.update)
+        updateb.grid(row=len(inven) + 2, column=1, padx=5, pady=5, stick='sw')
 
         invpageb = tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
-                             bg='blue', fg='white', height=1, width=15, command=self.invenpage)
-        invpageb.grid(row=len(inven) + 2, column=3, padx=5, pady=5, stick='se')
+                             fg='purple', bg='white', height=1, width=15, command=self.invenpage)
+        invpageb.grid(row=len(inven) + 2, column=3, padx=5, pady=5, stick='sw')
 
+        # clear the frames before and after this page
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
         if self.edit_prod_frame is not None:
@@ -506,26 +734,36 @@ class TransApp:
         if self.new_prod_frame is not None:
             self.new_prod_frame.grid_forget()
 
-        self.display_frame.rowconfigure([0, 1, 2, 3], weight=1)
+        # display an adjustible frame containing the selected info
+        self.display_frame.rowconfigure([0, 1, 2, 3, 4], weight=1)
         self.display_frame.columnconfigure(list(range(4)), weight=1)
         self.display_frame.grid(row=1, rowspan=len(inven) + 2, column=0, columnspan=4, sticky='nsew')
 
     def update(self):
         global lines, edit_row_num
         # raise error alarm if any of the field is blank
-        if self.pname_entry.get() in ['', ' ', None]:
-            return messagebox.showerror(message="Product name field cannot be blank")
-        elif self.pstock_entry.get() in ['', ' ', None]:
-            return messagebox.showerror(message="Product Stock field cannot be blank")
-        elif self.date_entry.get() in ['', ' ', None]:
-            return messagebox.showerror(message="Date field cannot be blank")
+        edited_entries = [self.pname_entry.get(), self.pqty_entry.get(), self.punit_entry.get(), self.yr_entry.get(), self.mon_entry.get(), self.day_entry.get()]
+        blanks = ['', ' ']
+        # when a field is blank
+        if [True for entry in edited_entries if entry in blanks]:
+            return messagebox.showerror(message="BLANK FIELD(S) DETECTED!")
+        # when product name or unit of measurement is given in figures
+        if [True for entry in [self.pname_entry.get(), self.punit_entry.get()] if entry.isdigit()]:
+            return messagebox.showerror(message="PRODUCT NAME\nUNIT OF MEASUREMENT\n\nCannot contain only numbers")
+        # when qty, date fields is/are not given in figures
+        if [True for entry in [self.pqty_entry.get(),self.yr_entry.get(), self.mon_entry.get(), self.day_entry.get()] if not(entry.isdigit())]:
+            return messagebox.showerror(message="QUANTITY\nDAY\nMONTH\nYEAR\nMust contain numbers only")
 
+        if not(messagebox.askyesno(title='CONFIRM UPDATE', message='Do You Want to Continue?')):
+            return messagebox.showinfo(message='NO CHANGES MADE TO INVENTORY')
+
+        # when confirmation is given by user
         self.display_frame = self.make_frame()
 
-        # assign the newly entered values to the current instance of the inventory
-        self.inv_obj.prod_name = self.pname_entry.get()
-        self.inv_obj.new_stock = self.pstock_entry.get()
-        self.inv_obj.entry_date = self.date_entry.get()
+        # reassign the newly entered values to the inventory object's name, qty, unit and date
+        self.inv_obj.prod_name = self.pname_entry.get().title()
+        self.inv_obj.qty, self.inv_obj.unit = self.pqty_entry.get(), self.punit_entry.get().title()
+        self.inv_obj.entry_date = f"{self.yr_entry.get()}-{self.mon_entry.get()}-{self.day_entry.get()}"
 
         # update the retrieved data from file with the changes made
         lines[edit_row_num] = self.inv_obj.__dict__
@@ -533,7 +771,6 @@ class TransApp:
         # save updated version to file
         # print([rec for row, rec in lines.items()])
         # print(Inventory.inv_data)
-
         with open(Inventory.inv_data, 'w', encoding='utf8') as hand:
             for row, rec in lines.items():
                 hand.writelines(f"{rec}\n")
@@ -542,7 +779,7 @@ class TransApp:
                  bg='purple', fg='white').grid(row=0, column=0, sticky='nsew', padx=25, pady=15)
         tk.Label(self.display_frame, text=f"ID\n{self.inv_obj.prod_id}: ", font=("Calibri", 10, 'bold'),
                  bg='purple', fg='white').grid(row=0, column=1, sticky='nsew', padx=25)
-        tk.Label(self.display_frame, text=f"STOCK:\n{self.inv_obj.new_stock}", font=("Calibri", 10, 'bold'),
+        tk.Label(self.display_frame, text=f"STOCK:\n{self.inv_obj.qty} {self.inv_obj.unit}", font=("Calibri", 10, 'bold'),
                  bg='purple', fg='white').grid(row=0, column=2, sticky='nsew', padx=25)
         tk.Label(self.display_frame, text=f"DATE:\n{self.inv_obj.entry_date}", font=("Calibri", 10, 'bold'),
                  bg='purple', fg='white').grid(row=0, column=3, sticky='nsew', padx=25)
@@ -550,7 +787,7 @@ class TransApp:
                  bg='purple', fg='white').grid(row=1, column=1, columnspan=2, sticky='NSEW', padx=25)
 
         invpageb = tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
-                             bg='blue', fg='white', height=1, width=15, command=self.invenpage)
+                             fg='purple', bg='white', height=1, width=15, command=self.invenpage)
         invpageb.grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
@@ -601,7 +838,7 @@ class TransApp:
                      bg='purple', fg='white').grid(row=ind + 1, column=0, sticky='e')
             tk.Label(self.display_frame, text=f"{self.inv_obj.prod_name}", font=("Calibri", 10, 'bold'),
                      bg='purple', fg='white').grid(row=ind + 1, column=1, sticky='nsew')
-            tk.Label(self.display_frame, text=f"{self.inv_obj.new_stock}", font=("Calibri", 10, 'bold'),
+            tk.Label(self.display_frame, text=f"{self.inv_obj.qty} {self.inv_obj.unit}", font=("Calibri", 10, 'bold'),
                      bg='purple', fg='white').grid(row=ind + 1, column=2, sticky='nsew')
             tk.Label(self.display_frame, text=f"{self.inv_obj.entry_date}", font=("Calibri", 10, 'bold'),
                      bg='purple', fg='white').grid(row=ind + 1, column=3, sticky='nsew')
@@ -613,11 +850,11 @@ class TransApp:
         del_prodid_entry.grid(row=len(inven) + 2, column=1, padx=2, sticky='w')
         # to edit the given row number (at row entry - 1)
         tk.Button(self.display_frame, text='Delete', font=("Calibri", 12, 'bold'),
-                  bg='orange', fg='white', height=1, width=5, command=self.erase_inv).grid(row=len(inven) + 2,
+                  bg='red', fg='white', height=1, width=10, command=self.erase_inv).grid(row=len(inven) + 2,
                                                                                          column=1,
                                                                                          sticky='e')
         invpageb = tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
-                             bg='blue', fg='white', height=1, width=15, command=self.invenpage)
+                             fg='purple', bg='white', height=1, width=15, command=self.invenpage)
         invpageb.grid(row=len(inven) + 2, column=3, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
@@ -635,7 +872,7 @@ class TransApp:
         global lines, prod_ids, del_row, del_prodid_entry
         # raise error alarm if any of the field is blank
 
-        self.display_frame = self.make_frame(page_title='UPDATING INVENTORY RECORD')
+        self.display_frame = self.make_frame(page_title='RECORD DELETED')
 
         prod_ids = []
 
@@ -646,6 +883,9 @@ class TransApp:
 
         if inp.lower() not in prod_ids:
             return messagebox.showerror(title='INVALID ENTRY', message=f'{inp} IS NOT VALID')
+
+        if not(messagebox.askyesno(title='CONFIRM DELETE', message='Do You Want To Delete?')):
+            return messagebox.showinfo(message='RECORD NOT DELETED')
 
         for row, rec in lines.items():
             for k, v in rec.items():
@@ -666,7 +906,7 @@ class TransApp:
                  bg='purple', fg='white').grid(row=0, column=0, sticky='nsew', padx=25, pady=15)
         tk.Label(self.display_frame, text=f"ID\n{self.inv_obj.prod_id}: ", font=("Calibri", 10, 'bold'),
                  bg='purple', fg='white').grid(row=0, column=1, sticky='nsew', padx=25)
-        tk.Label(self.display_frame, text=f"STOCK:\n{self.inv_obj.new_stock}", font=("Calibri", 10, 'bold'),
+        tk.Label(self.display_frame, text=f"STOCK:\n{self.inv_obj.qty} {self.inv_obj.unit}", font=("Calibri", 10, 'bold'),
                  bg='purple', fg='white').grid(row=0, column=2, sticky='nsew', padx=25)
         tk.Label(self.display_frame, text=f"DATE:\n{self.inv_obj.entry_date}", font=("Calibri", 10, 'bold'),
                  bg='purple', fg='white').grid(row=0, column=3, sticky='nsew', padx=25)
@@ -674,7 +914,7 @@ class TransApp:
                  bg='purple', fg='white').grid(row=1, column=1, columnspan=2, sticky='NSEW', padx=25)
 
         invpageb = tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
-                             bg='blue', fg='white', height=1, width=15, command=self.invenpage)
+                             fg='purple', bg='white', height=1, width=15, command=self.invenpage)
         invpageb.grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         self.display_frame.rowconfigure([0, 1, 2, 3], weight=1)
@@ -685,17 +925,14 @@ win = tk.Tk()
 # selecting system's screen width height
 sw, sh = win.winfo_screenwidth(), win.winfo_screenheight()
 # app width, app height
-aw, ah = int(sw*.8), int(sh*.7)
+aw, ah = int(sw*.92), int(sh*.7)
 # starting horizontal and vertical points
-x, y = int(sw*.15), int(sh*.2)
+x, y = int(sw*(1 - 0.93)), int(sh*(1 - 0.77))
 # specifying the size of app frame
 win.geometry(f"{aw}x{ah}+{x}+{y}")
 
-# create an object of inventory
-inv_obj = Inventory()
-
 # pass inventory object into the transapp
-ta = TransApp(win, inv_obj)
+ta = TransApp(win)
 
 ta.setup_frames()
 ta.setup_status_bar()

@@ -1,7 +1,5 @@
-{'prod_id': 'Qu532Ep', 'prod_name': 'Quarter Rods', 'new_stock': '50,500', 'entry_date': '2021-4-2'}
-{'prod_id': 'Ir220Be', 'prod_name': 'Iron Rods', 'new_stock': '100000', 'entry_date': '2021-4-2'}
-{'prod_id': 'Wi869Pd', 'prod_name': 'Wire Mesh', 'new_stock': '30000', 'entry_date': '2021-4-2'}
-{'prod_id': 'Co816Qu', 'prod_name': 'Coil Wires', 'new_stock': '50000', 'entry_date': '2021-4-2'}
-{'prod_id': 'Bi471Uo', 'prod_name': 'Binding Wires', 'new_stock': '40000', 'entry_date': '2021-4-2'}
-{'prod_id': 'Sq856Bu', 'prod_name': 'Square Pipes', 'new_stock': '45000', 'entry_date': '2021-4-2'}
-{'prod_id': 'Na142Pf', 'prod_name': 'Nails', 'new_stock': '150000', 'entry_date': '2021-4-2'}
+{'prod_id': 'BW346Qe', 'prod_name': 'Binding Wires', 'qty': '50000', 'unit': '20Kg', 'entry_date': '2021-4-3'}
+{'prod_id': 'IR730Oy', 'prod_name': 'Iron Rods', 'qty': '15000', 'unit': 'Tons', 'entry_date': '2021-4-3'}
+{'prod_id': 'WM795Yp', 'prod_name': 'Wire Mesh', 'qty': '40000', 'unit': 'Sheets', 'entry_date': '2021-4-3'}
+{'prod_id': 'SP807Dr', 'prod_name': 'Square Pipes', 'qty': '50000', 'unit': 'Bars', 'entry_date': '2021-4-2'}
+{'prod_id': 'CW499Nq', 'prod_name': 'Coil Wires', 'qty': '5000', 'unit': 'Tons', 'entry_date': '2021-4-3'}

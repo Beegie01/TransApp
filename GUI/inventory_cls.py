@@ -5,5 +5,6 @@ class Inventory:
     def __init__(self):
         self.prod_id = None
         self.prod_name = None
-        self.new_stock = None
+        self.qty = None
+        self.unit = None
         self.entry_date = None
