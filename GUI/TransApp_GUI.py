@@ -1,5 +1,5 @@
-import tkinter as tk, datetime, random, os
-from tkinter import messagebox
+import tkinter as tk, datetime, random, os, string, re
+from tkinter import messagebox, scrolledtext
 from inventory_cls import Inventory
 from customer_cls import Customer
 from sales_cls import Sales
@@ -252,11 +252,11 @@ class TransApp:
                  bg=bg, fg=fg, height=1).grid(row=1, column=0, padx=10, stick='nsew')
         gend = tk.StringVar(value='None')
         # gend.set("")
-        maleRadio = tk.Radiobutton(self.new_prod_frame, text='Male', val='Male', variable=gend,
-                                   bg=bg, fg=fg, command=lambda: self.sel_gender(gend.get()), state='normal')
+        maleRadio = tk.Radiobutton(self.new_prod_frame, text='Male', val='Male', variable=gend, font=('calibri', 16),
+                                   bg='blue', fg='black', command=lambda: self.sel_gender(gend.get()), state='normal')
         maleRadio.grid(row=1, column=1, padx=2, sticky='w')
-        femaleRadio = tk.Radiobutton(self.new_prod_frame, text='Female', val='Female', variable=gend,
-                                     bg=bg, fg=fg, command=lambda: self.sel_gender(gend.get()), state='normal')
+        femaleRadio = tk.Radiobutton(self.new_prod_frame, text='Female', val='Female', variable=gend, font=('calibri', 16),
+                                     bg='blue', fg='black', command=lambda: self.sel_gender(gend.get()), state='normal')
         femaleRadio.grid(row=1, column=2, padx=2, sticky='w')
 
         # customer date of birth
@@ -265,33 +265,33 @@ class TransApp:
         # day
         tk.Label(self.new_prod_frame, text='Day', font=('calibri', 16), bg=bg, fg=fg,
                  height=1).grid(row=2, column=1, padx=5, stick='nw')
-        self.regdayEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
-        self.regdayEntry.insert(0, str(datetime.date.today().day))
-        self.regdayEntry.grid(row=2, column=1, padx=5, pady=30, stick='sw')
+        self.bdayEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.bdayEntry.insert(0, str(datetime.date.today().day))
+        self.bdayEntry.grid(row=2, column=1, padx=5, pady=30, stick='sw')
         # month
         tk.Label(self.new_prod_frame, text='Month', font=('calibri', 16), bg=bg, fg=fg,
                  height=1).grid(row=2, column=2, padx=5, stick='nw')
-        self.regmonthEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
-        self.regmonthEntry.insert(0, str(datetime.date.today().month))
-        self.regmonthEntry.grid(row=2, column=2, padx=5, pady=30, stick='sw')
+        self.bmonthEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.bmonthEntry.insert(0, str(datetime.date.today().month))
+        self.bmonthEntry.grid(row=2, column=2, padx=5, pady=30, stick='sw')
         # year
         tk.Label(self.new_prod_frame, text='Year', font=('calibri', 16), bg=bg, fg=fg,
                  height=1).grid(row=2, column=3, stick='nw')
-        self.regyrEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
-        self.regyrEntry.insert(0, str(datetime.date.today().year))
-        self.regyrEntry.grid(row=2, column=3, pady=30, stick='sw')
+        self.byrEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
+        self.byrEntry.insert(0, str(datetime.date.today().year))
+        self.byrEntry.grid(row=2, column=3, pady=30, stick='sw')
 
         # nationality
         tk.Label(self.new_prod_frame, text='Nationality:', font=('calibri', 16), bg=bg, fg=fg,
                  height=1).grid(row=3, column=0, padx=10, stick='nsew')
-        tk.Label(self.new_prod_frame, text='Country', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=3, column=1, padx=10, stick='nw')
+        tk.Label(self.new_prod_frame, text='Country of Origin', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=3, column=1, stick='nw')
         self.natEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
         self.natEntry.grid(row=3, column=1, padx=5, pady=30, stick='sw')
 
         # state of origin
-        tk.Label(self.new_prod_frame, text='State of Origin:', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=3, column=2, padx=0, pady=0, stick='nw')
+        tk.Label(self.new_prod_frame, text='State of Origin', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=3, column=2, stick='nw')
         self.stateEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
         self.stateEntry.grid(row=3, column=2, padx=5, pady=30, stick='sw')
 
@@ -303,16 +303,16 @@ class TransApp:
 
         # date of registration
         tk.Label(self.new_prod_frame, text='As of Date:', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=5, column=0, padx=5, pady=0, sticky='nsew')
+                 bg=bg, fg=fg, height=1).grid(row=5, column=0, padx=5, sticky='nsew')
         # day
         tk.Label(self.new_prod_frame, text='Day', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=5, column=1, padx=5, sticky='nw')
+                 bg=bg, fg=fg, height=1).grid(row=5, column=1, sticky='nw')
         self.regdayEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
         self.regdayEntry.insert(0, str(datetime.date.today().day))
         self.regdayEntry.grid(row=5, column=1, padx=5, pady=30, sticky='sw')
         # month
         tk.Label(self.new_prod_frame, text='Month', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=5, column=2, padx=5, sticky='nw')
+                 height=1).grid(row=5, column=2, sticky='nw')
         self.regmonthEntry = tk.Entry(self.new_prod_frame, font=('calibri', 16, 'bold'), width=10)
         self.regmonthEntry.insert(0, str(datetime.date.today().month))
         self.regmonthEntry.grid(row=5, column=2, padx=5, pady=30, sticky='sw')
@@ -344,16 +344,502 @@ class TransApp:
         print(self.cust_obj.gender)
 
     def submitcust(self):
-        pass
+        # frame for submission status
+        self.submit_frame = tk.LabelFrame(self.master, text='DO YOU WANT TO SAVE?', fg='white',
+                                          font=('arial black', 12), bg='blue')
+        self.submit_frame.rowconfigure(list(range(5)), weight=1)
+        self.submit_frame.columnconfigure(list(range(4)), weight=1)
+
+        fname, midname, lname = self.fnameEntry.get(), self.midnameEntry.get(), self.lnameEntry.get()
+        gender = self.cust_obj.gender
+        bday, bmon, byr = self.bdayEntry.get(), self.bmonthEntry.get(), self.byrEntry.get()
+        natn, orig_state = self.natEntry.get(), self.stateEntry.get()
+        off_addr = self.off_addrText.get(index1='1.0', index2='end')
+        regday, regmon, regyr = self.regdayEntry.get(), self.regmonthEntry.get(), self.regyrEntry.get()
+
+        # collection of entry fields
+        mandatory_entries = [fname, lname, gender, bday, bmon, byr, natn, orig_state, off_addr, regday, regmon, regyr]
+        num_type_entries = [bday, bmon, byr, regday, regmon, regyr]
+        str_type_entries = [fname, midname, lname, gender, natn, orig_state, off_addr]
+        wspace = string.whitespace    #['', ' ', '\n', '\t']
+        puncs = string.punctuation
+
+        # check for empty field
+        if [True for entry in mandatory_entries if (entry in wspace)]:
+            return messagebox.showerror(title='Blank Field', message='BLANK FIELD(S) DETECTED!')
+        # check for fields with punctuations
+        if [True for entry in mandatory_entries if (entry in puncs)]:
+            return messagebox.showerror(title='Punctuation Error', message='FIELD(S) CANNOT CONTAIN PUNCTUATION MARK(S)!')
+
+        # check for fields with invalid data types
+        for entry in str_type_entries:
+            try:
+                float(entry)
+                # figures have been entered, if no error was raised
+                return messagebox.showerror(title='Invalid Data Type', message=f'Number {entry} is not allowed here!')
+            except ValueError as VE:
+                continue
+
+        for entry in num_type_entries:
+            try:
+                int(entry)
+            except ValueError as VE:
+                # figures have not been entered, if error was raised
+                return messagebox.showerror(title='Invalid Data Type', message=f'Character {entry} is not allowed here!')
+
+        # numerical constraints
+        if int(byr) not in range(1900, 2021) or (int(regyr) not in range(2010, 2022)) or [True for mon in [regmon, bmon] if int(mon) not in range(13)] or [True for day in [bday, regday] if int(day) not in range(32)]:
+            return messagebox.showerror(title='OUT OF RANGE ENTRY', message=f'OUT OF RANGE VALUE(S) HAS BEEN DETECTED!\n\nPlease Check the REGISTRATION DATE\nDATE OF BIRTH entries')
+
+        # string constraints
+        if [True for entry in [fname, lname, natn, orig_state,] if not (entry.isalnum)] or [True for entry in [fname, lname, natn, orig_state] for char in
+                                                                        entry if char in string.punctuation]:
+            return messagebox.showerror(title='INVALID CHARACTER',
+                                        message=f'INVALID CHARACTER HAS BEEN ENTERED!\n\nPlease Check entries:\nFIRST NAME\nLAST NAME\nNATIONALITY')
+
+        self.cust_obj.customer_id = f'{natn[0].upper()}{orig_state[:2]}{self.ID_gen()}'
+        self.cust_obj.first_name, self.cust_obj.last_name = fname, lname
+        if midname not in wspace:
+            self.cust_obj.mid_name = midname
+        self.cust_obj.gender, self.cust_obj.date_of_birth = gender, f"{byr}-{bmon}-{bday}"
+        self.cust_obj.country, self.cust_obj.state_of_origin = natn, orig_state
+        self.cust_obj.office_addr, self.cust_obj.date_opened = off_addr, f"{regyr}-{regmon}-{regday}"
+
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='blue', fg='white',
+                 text=f"ID:\n{self.cust_obj.customer_id}").grid(row=0, column=0, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='blue', fg='white',
+                 text=f"FIRST NAME\n{self.cust_obj.first_name}").grid(row=0, column=1, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='blue', fg='white',
+                 text=f"MIDDLE NAME\n{self.cust_obj.mid_name}").grid(row=0, column=2, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='blue', fg='white',
+                 text=f"LAST NAME\n{self.cust_obj.last_name}").grid(row=0, column=3, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='blue', fg='white',
+                 text=f"GENDER\n{self.cust_obj.gender}").grid(row=1, column=0, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='blue', fg='white',
+                 text=f"DATE OF BIRTH\n{self.cust_obj.date_of_birth}").grid(row=1, column=1, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='blue', fg='white',
+                 text=f"NATIONALITY\n{self.cust_obj.country}").grid(row=1, column=2, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='blue', fg='white',
+                 text=f"STATE OF ORIGIN\n{self.cust_obj.state_of_origin}").grid(row=1, column=3, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='blue', fg='white',
+                 text=f"OFFICE ADDRESS\n{self.cust_obj.office_addr}").grid(row=2, column=0, columnspan=2, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg='blue', fg='white',
+                 text=f"DATE OPENED\n{self.cust_obj.date_opened}").grid(row=2, column=2, sticky='ew')
+
+        # save and cancel buttons
+        saveb = tk.Button(self.submit_frame, text='Save', font=("Calibri", 14, 'bold'),
+                          bg='green', fg='white', height=3, width=10, command=self.savecust)
+        saveb.grid(row=4, column=0, padx=5, stick='ew')
+        cancelb = tk.Button(self.submit_frame, text='Cancel', font=("Calibri", 14, 'bold'),
+                            bg='red', fg='white', height=3, width=10, command=self.new_cust)
+        cancelb.grid(row=4, column=3, padx=5, stick='ew')
+
+        # if self.display_frame is not None:
+        #     self.display_frame.grid_forget()
+        # if self.new_prod_frame is not None:
+        #     self.new_prod_frame.grid_forget()
+
+        self.submit_frame.grid(row=1, sticky='nsew')
+
+    def savecust(self):
+        with open(self.cust_obj.cust_data, 'a',
+                  encoding='utf8') as hand:
+            hand.writelines(f"{self.cust_obj.__dict__}\n")
+
+        self.submit_frame = self.make_frame(background_color='blue')
+
+        saved = tk.Label(self.submit_frame, text='NEW CUSTOMER HAS BEEN ADDED!', font=("arial", 14, 'bold'),
+                         bg='blue', fg='white')
+        saved.grid(row=0, column=0, columnspan=4, sticky='nsew')
+
+        addb = tk.Button(self.submit_frame, text='Add Another', font=("Calibri", 14, 'bold'),
+                         fg='blue', bg='white', height=5, width=15, command=self.new_cust)
+        addb.grid(row=1, column=0, padx=5, stick='ew')
+
+        custpageb = tk.Button(self.submit_frame, text='Customer Page', font=("Calibri", 14, 'bold'),
+                             bg='blue', fg='white', height=5, width=15, command=self.custpage)
+        custpageb.grid(row=1, column=3, padx=5, stick='ew')
+
+        self.submit_frame.rowconfigure([0, 1], weight=1)
+        self.submit_frame.columnconfigure(list(range(4)), weight=1)
+        self.submit_frame.grid(row=1, sticky='nsew')
+        
+    def read_cust(self):
+        with open(self.cust_obj.cust_data, 'r', encoding='utf8') as hand:
+            # customer attributes is a list of record strings
+            cust_attr = hand.readlines()
+        return cust_attr
+
+    def display_cust(self):
+        global cust, lines
+        cust = []
+        lines = {}
+
+        # setup display frame
+        self.display_frame = self.make_frame(page_title='CUSTOMER RECORDS VIEW', background_color='blue')
+
+        # retrieve customer data from file
+        # cust is a list of strings containing customer records
+        cust_rec = self.read_cust()
+
+        for ind in range(len(cust_rec)):
+            # labelled format of saved customer record
+            lines['Row_' + str(ind)] = eval(cust_rec[ind])
+            # cust is a list of saved customer instances
+            cust.append(eval(cust_rec[ind]))
+
+        # display headings for customer records
+        tk.Label(self.display_frame, text="CUSTOMER ID", font=("Calibri", 14, 'bold'),
+                 bg='blue', fg='white').grid(row=0, column=0, sticky='e')
+        tk.Label(self.display_frame, text="CUSTOMER NAME", font=("Calibri", 14, 'bold'),
+                 bg='blue', fg='white').grid(row=0, column=1, sticky='nsew')
+        tk.Label(self.display_frame, text="GENDER", font=("Calibri", 14, 'bold'),
+                 bg='blue', fg='white').grid(row=0, column=2, sticky='nsew')
+        tk.Label(self.display_frame, text="DATE OF BIRTH", font=("Calibri", 14, 'bold'),
+                 bg='blue', fg='white').grid(row=0, column=3, sticky='nsew')
+        tk.Label(self.display_frame, text="NATIONALITY", font=("Calibri", 14, 'bold'),
+                 bg='blue', fg='white').grid(row=0, column=4, sticky='nsew')
+        tk.Label(self.display_frame, text="STATE OF ORIGIN", font=("Calibri", 14, 'bold'),
+                 bg='blue', fg='white').grid(row=0, column=5, sticky='nsew')
+        tk.Label(self.display_frame, text="OFFICE ADDRESS", font=("Calibri", 14, 'bold'),
+                 bg='blue', fg='white').grid(row=0, column=6, sticky='nsew')
+        tk.Label(self.display_frame, text="DATE OPENED", font=("Calibri", 14, 'bold'),
+                 bg='blue', fg='white').grid(row=0, column=7, sticky='nsew')
+
+        for ind in range(len(cust)):
+            # assign user input from stored customer records to each customer class attribute
+            self.cust_obj.__dict__ = cust[ind]
+
+            tk.Label(self.display_frame, text=f"{self.cust_obj.customer_id}", font=("Calibri", 10, 'bold'),
+                     bg='blue', fg='white').grid(row=ind + 1, column=0, sticky='e')
+            tk.Label(self.display_frame, text=f"{self.cust_obj.first_name} {self.cust_obj.mid_name} {self.cust_obj.last_name}", font=("Calibri", 10, 'bold'),
+                     bg='blue', fg='white').grid(row=ind + 1, column=1, sticky='nsew')
+            tk.Label(self.display_frame, text=f"{self.cust_obj.gender}", font=("Calibri", 10, 'bold'),
+                     bg='blue', fg='white').grid(row=ind + 1, column=2, sticky='nsew')
+            tk.Label(self.display_frame, text=f"{self.cust_obj.date_of_birth}", font=("Calibri", 10, 'bold'),
+                     bg='blue', fg='white').grid(row=ind + 1, column=3, sticky='nsew')
+            tk.Label(self.display_frame, text=f"{self.cust_obj.country}", font=("Calibri", 10, 'bold'),
+                     bg='blue', fg='white').grid(row=ind + 1, column=4, sticky='nsew')
+            tk.Label(self.display_frame, text=f"{self.cust_obj.state_of_origin}", font=("Calibri", 10, 'bold'),
+                     bg='blue', fg='white').grid(row=ind + 1, column=5, sticky='nsew')
+            tk.Label(self.display_frame, text=f"{self.cust_obj.office_addr}", font=("Calibri", 10, 'bold'),
+                     bg='blue', fg='white').grid(row=ind + 1, column=6, sticky='nsew')
+            tk.Label(self.display_frame, text=f"{self.cust_obj.date_opened}", font=("Calibri", 10, 'bold'),
+                     bg='blue', fg='white').grid(row=ind + 1, column=7, sticky='nsew')
+
+        custpageb = tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'),
+                             fg='blue', bg='white', height=1, width=15, command=self.custpage)
+        custpageb.grid(row=len(cust) + 2, column=3, padx=5, pady=5, stick='se')
+
+        # if self.submit_frame is not None:
+        #     self.submit_frame.grid_forget()
+        # if self.edit_prod_frame is not None:
+        #     self.edit_prod_frame.grid_forget()
+        # if self.new_prod_frame is not None:
+        #     self.new_prod_frame.grid_forget()
+
+        self.display_frame.rowconfigure(list(range(len(cust) + 2)), weight=1)
+        self.display_frame.columnconfigure(list(range(9)), weight=1)
+        self.display_frame.grid(row=1, rowspan=len(cust) + 2, column=0, columnspan=4, sticky='nsew')
 
     def edit_cust(self):
-        pass
+        global edit_custid_entry, cust, lines
+        cust = []
+        lines = {}
+
+        # setup display frame
+        self.display_frame = self.make_frame(page_title='CUSTOMER RECORDS VIEW', background_color='blue')
+
+        # retrieve customer data from file
+        # cust is a list of strings containing customer records
+        cust_rec = self.read_cust()
+
+        for ind in range(len(cust_rec)):
+            # labelled format of saved customer record
+            lines['Row_' + str(ind)] = eval(cust_rec[ind])
+            # cust is a list of saved customer instances
+            cust.append(eval(cust_rec[ind]))
+
+        # display headings for customer records
+        # create scrolled text field to display customer records
+        st = scrolledtext.ScrolledText(self.display_frame, bg='blue', fg='white', wrap='word', font=("Calibri", 14, 'bold'))
+        st.grid(row=0, column=0, rowspan=len(cust), columnspan=8, sticky='nsew')
+        # display headings for customer records
+        st.insert(index='end',
+                  chars='CUSTOMER ID, FIRST NAME, MIDDLE NAME, LAST NAME, GENDER, DATE OF BIRTH, NATIONALITY, STATE OF ORIGIN, OFFICE ADDRESS, DATE OPENED\n\n')
+
+
+        for ind in range(len(cust)):
+            # assign user input from stored customer records to each customer class attribute
+            self.cust_obj.__dict__ = cust[ind]
+
+            st.insert(index='end', chars=f"{self.cust_obj.customer_id}, {self.cust_obj.first_name}, {self.cust_obj.mid_name}, {self.cust_obj.last_name}, {self.cust_obj.gender}, {self.cust_obj.date_of_birth}, {self.cust_obj.country}, {self.cust_obj.state_of_origin}, {' '.join(self.cust_obj.office_addr.split())}, {self.cust_obj.date_opened}\n\n")
+        # make text field read-only
+        st.config(state='disabled')
+        # ensure that text can be copied to clipboard
+        st.bind('<1>', lambda event: st.focus_set())
+
+        # to edit the given row number (at row entry - 1)
+        tk.Label(self.display_frame, text='ENTER CUSTOMER ID:', font=("Calibri", 12, 'bold'), bg='blue',
+                 fg='white').grid(row=len(cust) + 2, column=0, padx=2, sticky='e')
+        # custid entry
+        edit_custid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'), relief='sunken')
+        edit_custid_entry.grid(row=len(cust) + 2, column=1, padx=2, sticky='ew')
+        # edit button
+        tk.Button(self.display_frame, text='Edit', font=("Calibri", 12, 'bold'),
+                  bg='orange', fg='white', height=1, width=10, command=self.editing_cust).grid(row=len(cust) + 2,
+                                                                                               padx=5, column=2, sticky='w')
+
+        custpageb = tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'),
+                              fg='blue', bg='white', height=1, width=15, command=self.custpage)
+        custpageb.grid(row=len(cust) + 2, column=6, padx=5, pady=5, stick='se')
+
+        # if self.submit_frame is not None:
+        #     self.submit_frame.grid_forget()
+        # if self.edit_prod_frame is not None:
+        #     self.edit_prod_frame.grid_forget()
+        # if self.new_prod_frame is not None:
+        #     self.new_prod_frame.grid_forget()
+
+        self.display_frame.rowconfigure(list(range(len(cust) + 2)), weight=1)
+        self.display_frame.columnconfigure(list(range(9)), weight=1)
+        self.display_frame.grid(row=1, rowspan=len(cust) + 2, column=0, columnspan=4, sticky='nsew')
+
+    def editing_cust(self):
+        global edit_custid_entry, cust, lines, edit_row
+
+        self.display_frame = self.make_frame(page_title='UPDATING CUSTOMER RECORD', background_color='blue', foreground_color='white')
+
+        customer_ids = []
+
+        for rec in cust:
+            # list of all existing customer ids (converted to lower case)
+            customer_ids.extend([v.lower() for k, v in rec.items() if k.lower() == 'customer_id'])
+        print(customer_ids)
+
+        inp = edit_custid_entry.get()
+
+        if inp.lower() not in customer_ids:
+            return messagebox.showerror(title='INVALID ENTRY', message=f'{inp} IS NOT VALID')
+
+        # get the row index of the selected customer id
+        for row, rec in lines.items():
+            for k, v in rec.items():
+                # if valid ID is entered
+                if k.lower() == 'customer_id' and v.lower() == inp.lower():
+                    edit_row = row
+                    # print(f"Found at {edit_row}")
+
+        # assign the selected record to the customer object
+        for row, rec in lines.items():
+            if row == edit_row:
+                self.cust_obj.__dict__ = rec
+        print(self.cust_obj.__dict__)
+
+        # entry fields for new data
+        tk.Label(self.display_frame, text=f"ENTER NEW DATA BELOW", font=("Calibri", 14, 'bold'),
+                 bg='blue', fg='white').grid(row=0, columnspan=3, sticky='ew', padx=50)
+
+        # customer labels and entries
+        # customer name labels and entries
+        tk.Label(self.display_frame, text="FIRST NAME", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=1, column=0, sticky='sw', padx=25, pady=15)
+        self.fname_entry = tk.Entry(self.display_frame)
+        self.fname_entry.insert(0, string=f'{self.cust_obj.first_name}')
+        self.fname_entry.grid(row=2, column=0, sticky='ew', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="MIDDLE NAME", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=1, column=1, sticky='sw', padx=25, pady=15)
+        self.mname_entry = tk.Entry(self.display_frame)
+        self.mname_entry.insert(0, f'{self.cust_obj.mid_name}')
+        self.mname_entry.grid(row=2, column=1, sticky='ew', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="LAST NAME", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=1, column=2, sticky='sw', padx=25, pady=15)
+        self.lname_entry = tk.Entry(self.display_frame)
+        self.lname_entry.insert(0, f'{self.cust_obj.last_name}')
+        self.lname_entry.grid(row=2, column=2, sticky='ew', padx=25, pady=5)
+        # gender
+        tk.Label(self.display_frame, text="GENDER", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=1, column=3, sticky='sw', padx=25, pady=15)
+        self.gender_entry = tk.Entry(self.display_frame)
+        self.gender_entry.insert(0, f'{self.cust_obj.gender}')
+        self.gender_entry.grid(row=2, column=3, sticky='ew', padx=25, pady=5)
+
+        # date of birth labels and entries
+        tk.Label(self.display_frame, text="DATE OF BIRTH", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=1, column=4, sticky='sw', padx=25, pady=15)
+        self.bdate_entry = tk.Entry(self.display_frame)
+        self.bdate_entry.insert(0, f'{self.cust_obj.date_of_birth}')
+        self.bdate_entry.grid(row=2, column=4, sticky='ew', padx=25, pady=5)
+
+        # nationality
+        tk.Label(self.display_frame, text="NATIONALITY", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=3, column=0, sticky='sw', padx=25, pady=15)
+        self.natn_entry = tk.Entry(self.display_frame)
+        self.natn_entry.insert(0, f'{self.cust_obj.country}')
+        self.natn_entry.grid(row=4, column=0, sticky='ew', padx=25, pady=5)
+
+        # state of origin
+        tk.Label(self.display_frame, text="STATE OF ORIGIN", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=3, column=1, sticky='sw', padx=25, pady=15)
+        self.ori_state_entry = tk.Entry(self.display_frame)
+        self.ori_state_entry.insert(0, f'{self.cust_obj.state_of_origin}')
+        self.ori_state_entry.grid(row=4, column=1, sticky='ew', padx=25, pady=5)
+
+        # office address
+        tk.Label(self.display_frame, text="OFFICE ADDRESS", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=3, column=2, sticky='sw', padx=25, pady=15)
+        self.off_entry = tk.Text(self.display_frame, font=('calibri', 16, 'bold'), width=10, height=3)
+        self.off_entry.insert(0, f'{self.cust_obj.office_addr}')
+        self.off_entry.grid(row=4, column=2, sticky='ew', padx=25, pady=5)
+
+        # update and customer page buttons
+        tk.Button(self.display_frame, text='Update', font=("Calibri", 12, 'bold'),
+                            bg='orange', fg='white', height=1, width=15, command=self.update_cust).grid(row=8, column=1, padx=5, pady=5, stick='sw')
+
+        tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'),
+                             bg='blue', fg='white', height=1, width=15, command=self.custpage).grid(row=8, column=3, padx=5, pady=5, stick='sw')
+
+        # clear the frames before and after this page
+        # if self.submit_frame is not None:
+        #     self.submit_frame.grid_forget()
+        # if self.edit_prod_frame is not None:
+        #     self.edit_prod_frame.grid_forget()
+        # if self.new_prod_frame is not None:
+        #     self.new_prod_frame.grid_forget()
+
+        # display an adjustible frame containing the selected info
+        self.display_frame.rowconfigure(list(range(12)), weight=1)
+        self.display_frame.columnconfigure(list(range(12)), weight=1)
+        self.display_frame.grid(row=1, rowspan=len(cust) + 2, column=0, columnspan=4, sticky='nsew')
+
+    def update_cust(self):
+        global lines, edit_row
+        # raise error alarm if any of the field is blank
+        fname, mname, lname, gender = self.fname_entry.get(), self.mname_entry.get(), self.lname_entry.get(), self.gender_entry.get()
+        bdate, natn, orig_state, off_addr = self.bdate_entry.get(), self.natn_entry.get(), self.ori_state_entry.get(), self.off_entry.get()
+        byr, bmon, bday = re.findall(r'(\d{4})-(\d{2})-(\d{1,2})', bdate)[0][0], re.findall(r'(\d{4})-(\d{2})-(\d{1,2})', bdate)[0][1], re.findall(r'(\d{4})-(\d{2})-(\d{1,2})', bdate)[0][2]
+
+        wspace = string.whitespace
+        puncs = string.punctuation
+
+        # collection of entry fields
+        mandatory_entries = [fname, lname, gender, bdate, natn, orig_state, off_addr]
+        punc_entries = [fname, lname,natn, orig_state, mname]
+        num_type_entries = [byr, bmon, bday]
+        str_type_entries = [fname, mname, lname, natn, orig_state]
+
+
+        # check for empty field
+        if [True for entry in mandatory_entries if (entry in wspace)]:
+            return messagebox.showerror(title='Blank Field', message='BLANK FIELD(S) DETECTED!')
+
+        # check for fields with punctuations (excluding date field)
+        if [True for entry in punc_entries if  entry in puncs]:
+            return messagebox.showerror(title='Punctuation Error',
+                                        message='FIELD(S) CANNOT CONTAIN PUNCTUATION MARK(S)!')
+
+        # check for fields with invalid data types
+        for entry in str_type_entries:
+            try:
+                float(entry)
+                # figures have been entered, if no error was raised
+                return messagebox.showerror(title='Invalid Data Type', message=f'Number {entry} is not allowed here!')
+            except ValueError as VE:
+                continue
+
+        for entry in num_type_entries:
+            try:
+                int(entry)
+            except ValueError as VE:
+                # figures have not been entered, if error was raised
+                return messagebox.showerror(title='Invalid Data Type',
+                                            message=f'Character {entry} is not allowed here!')
+
+        # numerical constraints
+        if int(byr) not in range(1921, 2021) or int(bmon) not in range(13) or int(bday) not in range(32):
+            return messagebox.showerror(title='OUT OF RANGE ENTRY',
+                                        message=f'OUT OF RANGE VALUE(S) HAS BEEN DETECTED!\n\nPlease Check the REGISTRATION DATE\nDATE OF BIRTH entries')
+
+        # string constraints
+        if [True for entry in str_type_entries if not (entry.isalnum)] or [True for entry in
+                                                                                             str_type_entries for char in
+                                                                                             entry if
+                                                                                             char in string.punctuation]:
+            return messagebox.showerror(title='INVALID CHARACTER',
+                                        message=f'INVALID CHARACTER HAS BEEN ENTERED!\n\nPlease Check entries:\nFIRST NAME\nLAST NAME\nNATIONALITY')
+
+        # when confirmation is given by user
+        self.display_frame = self.make_frame(background_color='blue')
+
+        # reassign the newly entered values to the inventory object's name, qty, unit and date
+        self.cust_obj.first_name, self.cust_obj.mid_name, self.cust_obj.last_name, self.cust_obj.gender = fname.capitalize(), mname.capitalize(), lname.capitalize(), gender.capitalize()
+        self.cust_obj.date_of_birth, self.cust_obj.country, self.cust_obj.state_of_origin = f'{byr}-{bmon}-{bday}', natn.capitalize(), orig_state.capitalize()
+        self.cust_obj.office_addr = ' '.join([line.capitalize() for line in off_addr.split()])
+        
+
+        # update the retrieved data from file with the changes made
+        lines[edit_row] = self.cust_obj.__dict__
+
+
+        tk.Label(self.display_frame, text=f"ID\n{self.cust_obj.customer_id}", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=0, column=0, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text=f"CUSTOMER NAME\n{self.cust_obj.first_name} {self.cust_obj.mid_name} {self.cust_obj.last_name}", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=0, column=1, sticky='nsew', padx=25, pady=15)
+
+        tk.Label(self.display_frame, text=f"GENDER\n{self.cust_obj.gender}",
+                 font=("Calibri", 10, 'bold'), bg='blue', fg='white').grid(row=0, column=2, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text=f"DATE OF BIRTH\n{self.cust_obj.date_of_birth}", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=0, column=3, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text=f"NATIONALITY\n{self.cust_obj.country} ", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=1, column=0, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text=f"STATE OF ORIGIN\n{self.cust_obj.state_of_origin} ", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=1, column=1, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text=f"OFFICE ADDRESS\n{self.cust_obj.office_addr}", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=1, column=2, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text=f"ID\n{self.cust_obj.date_opened}", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=1, column=3, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text="HAS BEEN UPDATED!!", font=("Calibri", 10, 'bold'),
+                 bg='blue', fg='white').grid(row=2, column=1, columnspan=2, sticky='NSEW', padx=25)
+
+        tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'),
+                             fg='blue', bg='white', height=1, width=15, command=self.custpage).grid(row=2, column=3, padx=5, pady=5, stick='se')
+
+        if not(messagebox.askyesno(message='Do You Want To Save Changes Made?')):
+            messagebox.showinfo(message='No Changes Made')
+            return self.edit_cust()
+
+        # save updated version to file
+        # print([rec for row, rec in lines.items()])
+        # print(Inventory.cust_data)
+        with open(Customer.cust_data, 'w', encoding='utf8') as hand:
+            for row, rec in lines.items():
+                hand.writelines(f"{rec}\n")
+
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.edit_prod_frame is not None:
+            self.edit_prod_frame.grid_forget()
+        if self.new_prod_frame is not None:
+            self.new_prod_frame.grid_forget()
+
+        self.display_frame.rowconfigure([0, 1, 2, 3], weight=1)
+        self.display_frame.columnconfigure(list(range(4)), weight=1)
+        self.display_frame.grid(row=1, rowspan=4, column=0, columnspan=4, sticky='nsew')
+
 
     def delete_cust(self):
         pass
 
-    def display_cust(self):
-        pass
+    
 
 
     def new_prod(self):
@@ -434,19 +920,52 @@ class TransApp:
         self.submit_frame.rowconfigure([0, 1], weight=1)
         self.submit_frame.columnconfigure(list(range(4)), weight=1)
 
-        # check for data integrity
-        entries = [self.pnameEntry.get(), self.qtyEntry.get(), self.unitEntry.get(), self.yrEntry.get(),
-                            self.monthEntry.get(), self.dayEntry.get()]
-        cond = [None, '', ' ']
-        # any of the field is empty
-        if [True for entry in entries if entry in cond]:
-            return messagebox.showerror(title='Blank Field', message='Blank field detected!')
-        # product name and units cannot be numbers
-        if [entry for entry in [self.pnameEntry.get(), self.unitEntry.get()] if entry.isdigit()]:
-            return messagebox.showerror(title='Invalid Data Type', message='Product name,\nUnit of measurement\n\tcannot be a number!')
-        # qty, yr, month, day must be numbers
-        if [entry for entry in [self.qtyEntry.get(), self.yrEntry.get(), self.monthEntry.get(), self.dayEntry.get()] if not(entry.isdigit())]:
-            return messagebox.showerror(title='Invalid Data Type', message='Quantity,\nDay,\nMonth,\nYear\n\tmust be in figures!')
+        pname, qty, unit = self.pnameEntry.get(), self.qtyEntry.get(), self.unitEntry.get()
+        eyr, emon, eday = self.yrEntry.get(), self.monthEntry.get(), self.dayEntry.get()
+
+        # collection of entry fields
+        mandatory_entries = [pname, qty, unit, eyr,
+                            emon, eday]
+        str_type_entries = [pname, unit]
+        num_type_entries = [qty, eyr, emon, eday]
+
+        # conditionals
+        wspace = string.whitespace   #['', ' ', '\n', '\t']
+        puncs = string.punctuation
+
+        # check for empty field
+        if [True for entry in mandatory_entries if (entry in wspace)]:
+            return messagebox.showerror(title='Blank Field', message='BLANK FIELD(S) DETECTED!')
+        # check for fields with punctuations
+        if [True for entry in mandatory_entries if (entry in puncs)]:
+            return messagebox.showerror(title='Punctuation Error',
+                                        message='FIELD(S) CANNOT CONTAIN PUNCTUATION MARK(S)!')
+
+        # check for fields with invalid data types
+        for entry in str_type_entries:
+            try:
+                float(entry)
+                # figures have been entered, if no error was raised
+                return messagebox.showerror(title='Invalid Data Type', message=f'Number {entry} is not allowed here!')
+            except ValueError as VE:
+                continue
+
+        for entry in num_type_entries:
+            try:
+                int(entry)
+            except ValueError as VE:
+                # figures have not been entered, if error was raised
+                return messagebox.showerror(title='Invalid Data Type',
+                                            message=f'Character {entry} is not allowed here!')
+
+        # numeric constraints
+        if (int(eyr) not in range(2010, 2022)) or (int(emon) not in range(13)) or (int(eday) not in range(32)):
+            return messagebox.showerror(title='OUT OF RANGE ENTRY', message=f'OUT OF RANGE ENTRY(S) DETECTED!\n\nPlease Check the REGISTRATION DATE\nDATE OF BIRTH entries')
+
+        # string constraints
+        if [True for entry in [pname, unit] if not(entry.isalnum)] or [True for entry in [pname, unit] for char in entry if char in string.punctuation]:
+            return messagebox.showerror(title='OUT OF RANGE ENTRY',
+                                        message=f'OUT OF RANGE ENTRY(S) DETECTED!\n\nPlease Check entries:\nPRODUCT NAME\nand\or\nUNIT OF MEASUREMENT')
 
         # assign user input from entry to each inventory class attribute
         self.inv_obj.prod_id = f"{''.join([word[0] for word in self.pnameEntry.get().title().split()])}{self.ID_gen()}"
@@ -479,7 +998,7 @@ class TransApp:
         self.submit_frame.grid(row=1, sticky='nsew')
 
     def saveinv(self):
-        with open(self.inv_obj.inv_data, 'a',
+        with open(self.inv_obj.cust_data, 'a',
                   encoding='utf8') as hand:
             hand.writelines(f"{self.inv_obj.__dict__}\n")
 
@@ -505,7 +1024,6 @@ class TransApp:
         with open(self.inv_obj.inv_data, 'r', encoding='utf8') as hand:
             # inventory attributes is a list of record strings
             inv_attr = hand.readlines()
-            # print(inv_attr)
         return inv_attr
 
     def display_inv(self):
@@ -527,32 +1045,29 @@ class TransApp:
             # inven is a list of saved inventory instances
             inven.append(eval(inven_rec[ind]))
 
-        # display headings for inventory records
-        tk.Label(self.display_frame, text=f"PRODUCT ID", font=("Calibri", 14, 'bold'),
-                 bg='purple', fg='white').grid(row=0, column=0, sticky='e')
-        tk.Label(self.display_frame, text=f"PRODUCT NAME", font=("Calibri", 14, 'bold'),
-                 bg='purple', fg='white').grid(row=0, column=1, sticky='nsew')
-        tk.Label(self.display_frame, text=f"STOCK (in units)", font=("Calibri", 14, 'bold'),
-                 bg='purple', fg='white').grid(row=0, column=2, sticky='nsew')
-        tk.Label(self.display_frame, text=f"DATE OF ENTRY", font=("Calibri", 14, 'bold'),
-                 bg='purple', fg='white').grid(row=0, column=3, sticky='nsew')
+        st = scrolledtext.ScrolledText(self.display_frame, bg='purple', fg='white', wrap='word',
+                                       font=("Calibri", 14, 'bold'), relief='flat')
+        st.grid(row=0, column=1, columnspan=2, sticky='nsew')
+
+        # display headings for customer records
+        st.insert(index='end',
+                  chars='PRODUCT ID, PRODUCT NAME, QUANTITY, UNIT, DATE OPENED\n\n')
 
         for ind in range(len(inven)):
             # assign user input from stored inventory records to each inventory class attribute
             self.inv_obj.__dict__ = inven[ind]
+            # insert each data column into text field one after the other
+            st.insert(index='end',
+                      chars=f"{self.inv_obj.prod_id}, {self.inv_obj.prod_name}, {self.inv_obj.qty}, {self.inv_obj.unit}, {self.inv_obj.entry_date}\n\n")
 
-            tk.Label(self.display_frame, text=f"{self.inv_obj.prod_id}", font=("Calibri", 10, 'bold'),
-                     bg='purple', fg='white').grid(row=ind+1, column=0, sticky='e')
-            tk.Label(self.display_frame, text=f"{self.inv_obj.prod_name}", font=("Calibri", 10, 'bold'),
-                     bg='purple', fg='white').grid(row=ind+1, column=1, sticky='nsew')
-            tk.Label(self.display_frame, text=f"{self.inv_obj.qty} {self.inv_obj.unit}", font=("Calibri", 10, 'bold'),
-                     bg='purple', fg='white').grid(row=ind+1, column=2, sticky='nsew')
-            tk.Label(self.display_frame, text=f"{self.inv_obj.entry_date}", font=("Calibri", 10, 'bold'),
-                     bg='purple', fg='white').grid(row=ind+1, column=3, sticky='nsew')
+        # make the text field read-only
+        st.config(state='disabled')
+        # ensure that text can be copied to clipboard
+        st.bind('<1>', lambda event: st.focus_set())
 
         invpageb = tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
                              fg='purple', bg='white', height=1, width=15, command=self.invenpage)
-        invpageb.grid(row=len(inven)+2, column=3, padx=5, pady=5, stick='se')
+        invpageb.grid(row=1, column=2, padx=5, stick='e')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -561,9 +1076,9 @@ class TransApp:
         if self.new_prod_frame is not None:
             self.new_prod_frame.grid_forget()
 
-        self.display_frame.rowconfigure(list(range(len(inven) + 2)), weight=1)
-        self.display_frame.columnconfigure(list(range(4)), weight=1)
-        self.display_frame.grid(row=1, rowspan=len(inven)+2, column=0, columnspan=4, sticky='nsew')
+        self.display_frame.rowconfigure(list(range(3)), weight=1)
+        self.display_frame.columnconfigure(list(range(3)), weight=1)
+        self.display_frame.grid(row=1, rowspan=3, column=0, columnspan=3, sticky='nsew')
 
     def edit_prod(self):
         global edit_prodid_entry, inven, lines
@@ -585,42 +1100,39 @@ class TransApp:
             # inven is a list of saved inventory instances
             inven.append(eval(inven_rec[ind]))
 
-        # display headings for inventory records
-        tk.Label(self.display_frame, text=f"PRODUCT ID", font=("Calibri", 14, 'bold'),
-                 bg='purple', fg='white').grid(row=0, column=0, sticky='e')
-        tk.Label(self.display_frame, text=f"PRODUCT NAME", font=("Calibri", 14, 'bold'),
-                 bg='purple', fg='white').grid(row=0, column=1, sticky='nsew')
-        tk.Label(self.display_frame, text=f"STOCK (in units)", font=("Calibri", 14, 'bold'),
-                 bg='purple', fg='white').grid(row=0, column=2, sticky='nsew')
-        tk.Label(self.display_frame, text=f"DATE OF ENTRY", font=("Calibri", 14, 'bold'),
-                 bg='purple', fg='white').grid(row=0, column=3, sticky='nsew')
+        st = scrolledtext.ScrolledText(self.display_frame, bg='purple', fg='white', wrap='word',
+                                       font=("Calibri", 14, 'bold'))
+        st.grid(row=0, column=1, rowspan=2, columnspan=2, sticky='nsew')
+
+        # display headings for customer records
+        st.insert(index='end',
+                  chars='PRODUCT ID, PRODUCT NAME, QUANTITY, UNIT, DATE OPENED\n\n')
 
         for ind in range(len(inven)):
             # assign user input from stored inventory records to each inventory class attribute
             self.inv_obj.__dict__ = inven[ind]
+            # insert each data column into text field one after the other
+            st.insert(index='end',
+                      chars=f"{self.inv_obj.prod_id}, {self.inv_obj.prod_name}, {self.inv_obj.qty}, {self.inv_obj.unit}, {self.inv_obj.entry_date}\n\n")
 
-            tk.Label(self.display_frame, text=f"{self.inv_obj.prod_id}", font=("Calibri", 10, 'bold'),
-                     bg='purple', fg='white').grid(row=ind + 1, column=0, sticky='e')
-            tk.Label(self.display_frame, text=f"{self.inv_obj.prod_name}", font=("Calibri", 10, 'bold'),
-                     bg='purple', fg='white').grid(row=ind + 1, column=1, sticky='nsew')
-            tk.Label(self.display_frame, text=f"{self.inv_obj.qty} {self.inv_obj.unit}", font=("Calibri", 10, 'bold'),
-                     bg='purple', fg='white').grid(row=ind + 1, column=2, sticky='nsew')
-            tk.Label(self.display_frame, text=f"{self.inv_obj.entry_date}", font=("Calibri", 10, 'bold'),
-                     bg='purple', fg='white').grid(row=ind + 1, column=3, sticky='nsew')
-
-        tk.Label(self.display_frame, text='ENTER PRODUCT ID:', font=("Calibri", 10, 'bold'), bg='purple',
-                 fg='white').grid(row=len(inven) + 2, column=0, padx=2, sticky='e')
-
-        edit_prodid_entry = tk.Entry(self.display_frame, font=("Calibri", 10, 'bold'))
-        edit_prodid_entry.grid(row=len(inven) + 2, column=1, padx=2, sticky='w')
+        # make the text field read-only
+        st.config(state='disabled')
+        # ensure that text can be copied to clipboard
+        st.bind('<1>', lambda event: st.focus_set())
 
         # to edit the given row number (at row entry - 1)
-        tk.Button(self.display_frame, text='Edit', font=("Calibri", 12, 'bold'),
-                             bg='orange', fg='white', height=1, width=10, command=self.editing).grid(row=len(inven) + 2, column=1,
-                                                                                           sticky='e')
+        tk.Label(self.display_frame, text='ENTER PRODUCT ID:', font=("Calibri", 14, 'bold'), bg='purple',
+                 fg='white').grid(row=2, column=0, padx=2, sticky='e')
+        # prodid entry
+        edit_prodid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'), relief='sunken')
+        edit_prodid_entry.grid(row=2, column=1, pady=0, sticky='w')
+        # edit button
+        tk.Button(self.display_frame, text='Edit', font=("Calibri", 13, 'bold'), bg='orange', fg='white',
+                  height=1, width=10, command=self.editing_inv).grid(row=2, column=2, sticky='w')
+        # inventory page button
         invpageb = tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
                              fg='purple', bg='white', height=1, width=15, command=self.invenpage)
-        invpageb.grid(row=len(inven) + 2, column=3, padx=5, pady=5, stick='se')
+        invpageb.grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -629,11 +1141,11 @@ class TransApp:
         if self.new_prod_frame is not None:
             self.new_prod_frame.grid_forget()
 
-        self.display_frame.rowconfigure(list(range(len(inven)+2)), weight=1)
+        self.display_frame.rowconfigure(list(range(5)), weight=1)
         self.display_frame.columnconfigure(list(range(4)), weight=1)
-        self.display_frame.grid(row=1, rowspan=len(inven)+2, column=0, columnspan=4, sticky='nsew')
+        self.display_frame.grid(row=1, rowspan=3, column=0, columnspan=4, sticky='nsew')
 
-    def editing(self):
+    def editing_inv(self):
         global edit_prodid_entry, inven, lines, edit_row_num
 
         self.display_frame = self.make_frame(page_title='UPDATING INVENTORY RECORD')
@@ -719,7 +1231,7 @@ class TransApp:
 
         # update and inventory page buttons
         updateb = tk.Button(self.display_frame, text='Update', font=("Calibri", 12, 'bold'),
-                            bg='orange', fg='white', height=1, width=15, command=self.update)
+                            bg='orange', fg='white', height=1, width=15, command=self.update_inv)
         updateb.grid(row=len(inven) + 2, column=1, padx=5, pady=5, stick='sw')
 
         invpageb = tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
@@ -739,11 +1251,11 @@ class TransApp:
         self.display_frame.columnconfigure(list(range(4)), weight=1)
         self.display_frame.grid(row=1, rowspan=len(inven) + 2, column=0, columnspan=4, sticky='nsew')
 
-    def update(self):
+    def update_inv(self):
         global lines, edit_row_num
         # raise error alarm if any of the field is blank
         edited_entries = [self.pname_entry.get(), self.pqty_entry.get(), self.punit_entry.get(), self.yr_entry.get(), self.mon_entry.get(), self.day_entry.get()]
-        blanks = ['', ' ']
+        blanks = ['', ' ', '\n', '\t']
         # when a field is blank
         if [True for entry in edited_entries if entry in blanks]:
             return messagebox.showerror(message="BLANK FIELD(S) DETECTED!")
@@ -770,8 +1282,8 @@ class TransApp:
 
         # save updated version to file
         # print([rec for row, rec in lines.items()])
-        # print(Inventory.inv_data)
-        with open(Inventory.inv_data, 'w', encoding='utf8') as hand:
+        # print(Inventory.cust_data)
+        with open(Inventory.cust_data, 'w', encoding='utf8') as hand:
             for row, rec in lines.items():
                 hand.writelines(f"{rec}\n")
 
@@ -894,7 +1406,7 @@ class TransApp:
                     del_row = row
                     # print(f"Found at {del_row}")
 
-        with open(Inventory.inv_data, 'w', encoding='utf8') as hand:
+        with open(Inventory.cust_data, 'w', encoding='utf8') as hand:
             for row, rec in lines.items():
                 if row == del_row:
                     # assign the selected row
