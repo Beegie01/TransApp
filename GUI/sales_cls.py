@@ -1,7 +1,8 @@
 class Sales:
     sales_data = 'C:\\Users\\welcome\\Desktop\\Personal Python Projects\\GUI\\TransApp\\sales_data.txt'
 
-    def __init__(self):
+    def __init__(self):#, master):
+        # self.master = master
         self.order_date = None
         self.order_time = None
         self.order_id = None
