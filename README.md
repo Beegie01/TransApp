@@ -1,6 +1,8 @@
-# TRANSAPP (CLI & GUI) - An application for multifaceted transactions
+# TRANSAPP (CLI & GUI) - An application for multifaceted business transactions
 
 This is an application for entering records from daily business operations. 
+Users can only use the app through user account(s)
+Through user authentication, records are better organized per user
 
 The app consists of 5 main sections (menus): 
 a. INVENTORY - for products records
