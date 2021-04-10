@@ -1,9 +1,9 @@
-import tkinter as tk, datetime, random, os, string
-from tkinter import messagebox, scrolledtext
+# import tkinter as tk, datetime, random, os, string
+# from tkinter import messagebox, scrolledtext
 
 class Inventory:
 
-    inv_data = 'C:\\Users\\welcome\\Desktop\\Personal Python Projects\\GUI\\TransApp\\inv_data.txt'
+    inv_data = None
 
     def __init__(self):#, master):
         # self.master = master

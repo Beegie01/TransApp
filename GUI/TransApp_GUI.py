@@ -1,7 +1,8 @@
 import tkinter as tk, datetime, random, os, string, re
-from tkinter import messagebox, scrolledtext
+from tkinter import messagebox, scrolledtext, ttk
 from inventory_cls import Inventory
 from customer_cls import Customer
+from account_cls import Account
 from sales_cls import Sales
 from user_login import User
 
@@ -34,6 +35,8 @@ class TransApp:
         self.inv_obj = Inventory()
         # create an object of customer
         self.cust_obj = Customer()
+        # create an object of account
+        self.acct_obj = Account()
         # create an object of sales
         self.sales_obj = Sales()
         
@@ -70,7 +73,7 @@ class TransApp:
 
     def setup_frames(self):
         # status bar frame
-        self.status_bar_frame = tk.Frame(master=self.master, bg='gold')
+        self.status_bar_frame = tk.LabelFrame(master=self.master, bg='gold')
         self.status_bar_frame.rowconfigure(0, weight=1)
         self.status_bar_frame.columnconfigure([0, 1, 2, 3, 4], weight=1)
         self.status_bar_frame.grid(row=0, column=0, columnspan=5, sticky='we')
@@ -113,19 +116,24 @@ class TransApp:
 
     def setup_status_bar(self):
         # status bar
-        self.status_date = tk.Label(master=self.status_bar_frame, font=('arial black', 12), fg='black', bg='gold',
-                                    text=f"{datetime.datetime.date(datetime.datetime.today())}")
-        self.status_date.grid(row=0, column=4, sticky='ew')
-        self.status_appname = tk.Label(master=self.status_bar_frame, font=('arial black', 12), fg='black', bg='gold',
-                                       text=f"TransApp March 2021")
-        self.status_appname.grid(row=0, column=3, sticky='nsew')
+        tk.Label(master=self.status_bar_frame, font=('arial black', 10), fg='black', bg='gold',
+                                    text=f"{datetime.datetime.date(datetime.datetime.today())}"
+                 ).grid(row=0, column=4, sticky='ew')
+        tk.Label(master=self.status_bar_frame, font=('arial black', 10), fg='black', bg='gold',
+                 text="TransApp-2021").grid(row=0, column=3, sticky='nsew')
         
     def firstpage(self):
 
         self.display_frame = tk.LabelFrame(master=self.master, text='SETUP', bg='gold', font=('arial black', 12))
-        menu=tk.Menu()
+
+        menu = tk.Menu()
 
         self.master.config(menu=menu)
+
+        # status bar frame
+        # make status bar reflect logged in user name
+        tk.Label(master=self.status_bar_frame, font=('arial black', 10), fg='black', bg='gold',
+                 text="").grid(row=0, column=0, sticky='nsew')
 
         # signup button
         tk.Button(self.display_frame, text='New User', bg='green', fg='white', command=self.signup_page).grid(row=0,
@@ -140,7 +148,6 @@ class TransApp:
                                                                                                         sticky='nsew')
 
         # exit button
-        # login button
         tk.Button(self.display_frame, text='Exit App', bg='red', fg='white', command=self.master.destroy).grid(row=2,
                                                                                                        columnspan=3,
                                                                                                        padx=20, pady=5,
@@ -162,16 +169,16 @@ class TransApp:
 
         tk.Label(self.display_frame, text='Company Name', fg='black', bg='gold', font=('calibri', 12, 'bold')).grid(row=0,
                                                                                                             sticky='e')
-        ce = tk.Entry(self.display_frame, font=('calibri', 12))
+        ce = tk.Entry(self.display_frame, font=('calibri', 12), width=30)
         ce.grid(row=0, column=1, sticky='w', padx=3, pady=5)
 
         tk.Label(self.display_frame, text='Email', fg='black', bg='gold', font=('calibri', 12, 'bold')).grid(row=1, sticky='e')
-        eme = tk.Entry(self.display_frame, font=('calibri', 12))
+        eme = tk.Entry(self.display_frame, font=('calibri', 12), width=30)
         eme.grid(row=1, column=1, sticky='w', padx=3, pady=5)
 
         tk.Label(self.display_frame, text='Password', fg='black', bg='gold', font=('calibri', 12, 'bold')).grid(row=2,
                                                                                                         sticky='e')
-        pe = tk.Entry(self.display_frame, font=('calibri', 12), show='*')
+        pe = tk.Entry(self.display_frame, font=('calibri', 12), show='*', width=30)
         pe.grid(row=2, column=1, sticky='w', padx=3, pady=5)
 
         # radio button to show and hide password entries
@@ -183,7 +190,7 @@ class TransApp:
 
         tk.Label(self.display_frame, text='Confirm Password', fg='black', bg='gold', font=('calibri', 12, 'bold')).grid(row=4,
                                                                                                                 sticky='e')
-        cpe = tk.Entry(self.display_frame, font=('calibri', 12), show='*')
+        cpe = tk.Entry(self.display_frame, font=('calibri', 12), show='*', width=30)
         cpe.grid(row=4, column=1, sticky='w', padx=3, pady=5)
         # passw = tk.StringVar(self.display_frame, value=None)
         tk.Radiobutton(self.display_frame, text='Show', fg='black', bg='gold', font=('calibri', 10, 'bold'),
@@ -197,7 +204,7 @@ class TransApp:
                                                                                                      sticky='e')
 
         # front page
-        tk.Button(self.display_frame, text='App Menu', fg='gold', bg='white', command=self.firstpage).grid(row=6, column=0,
+        tk.Button(self.display_frame, text='Back', fg='blue', bg='white', command=self.firstpage).grid(row=6, column=0,
                                                                                                     sticky='e')
 
         self.display_frame.rowconfigure(list(range(8)), weight=1)
@@ -319,12 +326,12 @@ class TransApp:
         self.display_frame = tk.LabelFrame(master=self.master, text='LOGIN USER', bg='gold', font=('arial black', 12))
 
         tk.Label(self.display_frame, text='Email', fg='black', bg='gold', font=('calibri', 12, 'bold')).grid(row=0, sticky='e')
-        eme = tk.Entry(self.display_frame, font=('calibri', 12))
+        eme = tk.Entry(self.display_frame, font=('calibri', 12), width=30)
         eme.grid(row=0, column=1, sticky='w', padx=3, pady=5)
 
         tk.Label(self.display_frame, text='Password', fg='black', bg='gold', font=('calibri', 12, 'bold')).grid(row=1,
                                                                                                         sticky='e')
-        pe = tk.Entry(self.display_frame, font=('calibri', 12), show='*')
+        pe = tk.Entry(self.display_frame, font=('calibri', 12), show='*', width=30)
         pe.grid(row=1, column=1, sticky='w', padx=3, pady=5)
 
         # radio button to show and hide password entries
@@ -336,8 +343,7 @@ class TransApp:
 
         # login/signin button
         tk.Button(self.display_frame, text="Sign in", command=lambda: login(self, self.login_user), fg='blue', bg='white',
-                  font=('calibri', 12, 'bold')
-                  ).grid(row=5, column=1, sticky='e')
+                  font=('calibri', 12, 'bold')).grid(row=5, column=1, sticky='e')
 
         # front page
         tk.Button(self.display_frame, text='App Menu', bg='green', fg='white', command=self.firstpage).grid(row=5, column=1,
@@ -367,22 +373,42 @@ class TransApp:
         self.homeFrame.rowconfigure([0, 1, 2, 3], weight=1)
         self.homeFrame.columnconfigure(0, weight=1)
 
+        # make status bar reflect logged in user name
+        tk.Label(master=self.status_bar_frame, font=('arial black', 10), fg='black', bg='gold',
+                 text=f"Logged-in: {self.login_user.company_name}").grid(row=0, column=0, sticky='nsew')
+
+        # make menu bar reflect
         self.master.config(menu=self.menu_bar)
 
         # menu sections
         self.inventoryb = tk.Button(self.homeFrame, text="INVENTORY", fg='white', bg='purple',
                                     font=('arial black', 14), command=lambda: self.invenpage())
+        
         self.customerb = tk.Button(self.homeFrame, text="CUSTOMERS", fg='white', bg='blue',
                                    font=('arial black', 14), command=lambda: self.custpage())
+
+        self.accountb = tk.Button(self.homeFrame, text="ACCOUNTS", fg='white', bg='green',
+                                  font=('arial black', 14), command=lambda: self.acctpage())
+
         self.salesb = tk.Button(self.homeFrame, text="SALES", fg='white', bg='brown',
                                 font=('arial black', 14), command=lambda: self.salepage())
-        self.accountb = tk.Button(self.homeFrame, text="ACCOUNTS", fg='white', bg='green',
-                                  font=('arial black', 14), )
+
+
+        # set current user's data files
+        self.inv_obj.inv_data = f'{self.login_user.filepath}\\inv_data.txt'
+        print(self.inv_obj.inv_data)
+        self.cust_obj.cust_data = f'{self.login_user.filepath}\\cust_data.txt'
+        print(self.cust_obj.cust_data)
+        self.sales_obj.sales_data = f'{self.login_user.filepath}\\sales_data.txt'
+        print(self.sales_obj.sales_data)
+        # self.acct_obj.acct_data = f'{self.login_user.filepath}\\acct_data.txt'
+        # print(self.acct_obj.acct_data)
+
         # menu sections
         self.inventoryb.grid(row=0, padx=40, sticky='nsew')
         self.customerb.grid(row=1, padx=30, sticky='nsew')
-        self.salesb.grid(row=2, padx=20, sticky='nsew')
-        self.accountb.grid(row=3, padx=10, sticky='nsew')
+        self.accountb.grid(row=2, padx=20, sticky='nsew')
+        self.salesb.grid(row=3, padx=10, sticky='nsew')
 
         # display frame of menupage
         # clear frame space
@@ -429,7 +455,30 @@ class TransApp:
         self.sectionFrame.grid(row=1, rowspan=4, column=0, columnspan=5, sticky='nsew')
 
     def new_sale(self):
+        global customer_ids, product_ids
         bg, fg = 'brown', 'white'
+
+        # create a list of existing customers
+        customer_ids = None
+        with open(self.cust_obj.cust_data, 'r', encoding='utf8') as hand:
+            for line in hand.readlines():
+                customer_ids = [v for k, v in eval(line).items() if k == 'customer_id']
+
+        # create a list of existing products
+        product_ids = None
+        with open(self.inv_obj.inv_data, 'r', encoding='utf8') as hand:
+            for line in hand.readlines():
+                product_ids = [v for k, v in eval(line).items() if k == 'prod_id']
+
+        # when no customer account exists
+        if customer_ids is None:
+            return messagebox.showerror(message='No Record of Existing Customers')
+        print(customer_ids)
+
+        # when no product account exists
+        if product_ids is None:
+            return messagebox.showerror(message='No Record of Existing Products')
+        print(product_ids)
 
         # frame for input of new inventory
         self.new_frame = tk.LabelFrame(self.master, text='NEW CUSTOMER ORDER', fg=fg, font=('arial black', 12),
@@ -443,28 +492,40 @@ class TransApp:
                  bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nsew')
         
         # ordered quantity
-        tk.Label(self.new_frame, text='Ordered Quantity', font=('calibri', 16),
+        tk.Label(self.new_frame, text='Quantity', font=('calibri', 16),
                  bg=bg, fg=fg, height=1).grid(row=0, column=1, stick='nw')
         self.ord_qtyEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
         self.ord_qtyEntry.grid(row=0, column=1, padx=2, pady=30, stick='sw')
+
+        # unit of measurement
+        tk.Label(self.new_frame, text='Unit', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=2, stick='nw')
+        self.ord_unitEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
+        self.ord_unitEntry.grid(row=0, column=2, padx=2, pady=30, stick='sw')
         
         # rate of order
         tk.Label(self.new_frame, text='Rate of Order', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=2, stick='nw')
-        self.ord_rateEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
-        self.ord_rateEntry.grid(row=0, column=2, padx=2, pady=30, stick='sw')
-        
-        # amount due
-        tk.Label(self.new_frame, text='Amount Due', font=('calibri', 16),
                  bg=bg, fg=fg, height=1).grid(row=0, column=3, stick='nw')
-        self.amountEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
-        self.amountEntry.grid(row=0, column=3, padx=2, pady=30, stick='sw')
+        self.ord_rateEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
+        self.ord_rateEntry.grid(row=0, column=3, padx=2, pady=30, stick='sw')
+        
+        # price
+        tk.Label(self.new_frame, text='Price', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=4, stick='nw')
+        self.ord_priceEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
+        self.ord_priceEntry.grid(row=0, column=4, padx=2, pady=30, stick='sw')
+
+        # currency
+        tk.Label(self.new_frame, text='Currency', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=5, stick='nw')
+        self.currEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
+        self.currEntry.grid(row=0, column=5, padx=2, pady=30, stick='sw')
 
         # customer Gender
         tk.Label(self.new_frame, text='Gender:', font=('calibri', 16),
                  bg=bg, fg=fg, height=1).grid(row=1, column=0, padx=10, stick='nsew')
         gend = tk.StringVar(value='None')
-        # gend.set("")
+
         maleRadio = tk.Radiobutton(self.new_frame, text='Male', val='Male', variable=gend, font=('calibri', 16),
                                    bg='blue', fg='black', command=lambda: self.sel_gender(gend.get()), state='normal')
         maleRadio.grid(row=1, column=1, padx=2, sticky='w')
@@ -495,52 +556,55 @@ class TransApp:
         self.ordyrEntry.grid(row=2, column=3, pady=30, stick='sw')
 
         # customer amount deposited
-        tk.Label(self.new_frame, text='Amount Deposited', font=('calibri', 16), bg=bg, fg=fg,
+        tk.Label(self.new_frame, text='Deposit', font=('calibri', 16), bg=bg, fg=fg,
                  height=1).grid(row=3, column=0, padx=10, stick='nsew')
         self.depEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
         self.depEntry.grid(row=3, column=0, padx=5, pady=30, stick='sw')
 
-        # customer balance
-        tk.Label(self.new_frame, text='Balance', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=3, column=2, stick='nw')
-        self.balEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
-        self.balEntry.grid(row=3, column=2, padx=5, pady=30, stick='sw')
-
         # payment status
         tk.Label(self.new_frame, text='Payment Status', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=4, column=0, padx=5, stick='nsew')
-        self.off_addrText = tk.Text(self.new_frame, font=('calibri', 16, 'bold'), width=10, height=3)
-        self.off_addrText.grid(row=4, column=1, padx=5, pady=30, sticky='ew')
+                 height=1).grid(row=3, column=1, padx=5, stick='nsew')
+        self.pay_statText = tk.Text(self.new_frame, font=('calibri', 16, 'bold'), width=10, height=3)
+        self.pay_statText.grid(row=3, column=1, padx=5, pady=30, sticky='ew')
+
+        payment = tk.StringVar(value='None')
+
+        complRadio = tk.Radiobutton(self.new_frame, text='Complete', val='Complete', variable=gend, font=('calibri', 16),
+                                   bg='blue', fg='black', command=lambda: self.sel_paystat(payment.get()), state='normal')
+        complRadio.grid(row=1, column=1, padx=2, sticky='w')
+        incomplRadio = tk.Radiobutton(self.new_frame, text='Incomplete', val='Incomplete', variable=gend, font=('calibri', 16),
+                                     bg='blue', fg='black', command=lambda: self.sel_paystat(payment.get()), state='normal')
+        incomplRadio.grid(row=1, column=2, padx=2, sticky='w')
 
         # date of completion
         tk.Label(self.new_frame, text='Date of Completion', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=5, column=0, padx=5, sticky='nsew')
+                 bg=bg, fg=fg, height=1).grid(row=4, column=0, padx=5, sticky='nsew')
         # day
         tk.Label(self.new_frame, text='Day', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=5, column=1, sticky='nw')
+                 bg=bg, fg=fg, height=1).grid(row=4, column=1, sticky='nw')
         self.compdayEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
         self.compdayEntry.insert(0, str(datetime.date.today().day))
-        self.compdayEntry.grid(row=5, column=1, padx=5, pady=30, sticky='sw')
+        self.compdayEntry.grid(row=4, column=1, padx=5, pady=30, sticky='sw')
         # month
         tk.Label(self.new_frame, text='Month', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=5, column=2, sticky='nw')
+                 height=1).grid(row=4, column=2, sticky='nw')
         self.compmonthEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
         self.compmonthEntry.insert(0, str(datetime.date.today().month))
-        self.compmonthEntry.grid(row=5, column=2, padx=5, pady=30, sticky='sw')
+        self.compmonthEntry.grid(row=4, column=2, padx=5, pady=30, sticky='sw')
         # year
         tk.Label(self.new_frame, text='Year', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=5, column=3, sticky='nw')
+                 height=1).grid(row=4, column=3, sticky='nw')
         self.compyrEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
         self.compyrEntry.insert(0, str(datetime.date.today().year))
-        self.compyrEntry.grid(row=5, column=3, pady=30, sticky='sw')
+        self.compyrEntry.grid(row=4, column=3, pady=30, sticky='sw')
 
         submitButton = tk.Button(self.new_frame, text='Submit', font=("Calibri", 14, 'bold'),
                                  fg='white', bg='green', width=10, height=2, command=self.submit_sale)
-        submitButton.grid(row=7, column=2, padx=10, sticky='se')
+        submitButton.grid(row=6, column=2, padx=10, sticky='se')
 
-        custpageb = tk.Button(self.new_frame, text='Customer Page', font=("Calibri", 14, 'bold'),
-                              fg='blue', bg='white', height=2, width=15, command=self.salepage)
-        custpageb.grid(row=7, column=0, padx=15, stick='se')
+        custpageb = tk.Button(self.new_frame, text='Back', font=("Calibri", 14, 'bold'),
+                              fg='brown', bg='white', height=2, width=15, command=self.salepage)
+        custpageb.grid(row=6, column=0, padx=15, stick='se')
 
         # display inventory page's frame
         if self.submit_frame is not None:
@@ -549,6 +613,9 @@ class TransApp:
             self.sectionFrame.grid_forget()
         self.new_frame.grid(row=1, rowspan=8, column=0, columnspan=3, sticky='nsew')
 
+    def sel_paystat(self, payment_status):
+        self.sales_obj.payment_status = payment_status
+        print(self.sales_obj.payment_status)
 
     def submit_sale(self):
         pass
@@ -575,6 +642,158 @@ class TransApp:
         pass
 
     def erase_sale(self):
+        pass
+
+    def acctpage(self):
+        # frame for customer accounts page containing three rows and one column
+        self.sectionFrame = tk.LabelFrame(master=self.master, text='ACCOUNTS', font=('arial black', 12), bg='brown',
+                                          fg='white')
+        self.sectionFrame.rowconfigure([0, 1, 2, 3], weight=1)
+        self.sectionFrame.columnconfigure(0, weight=1)
+
+        # display sales options
+        tk.Button(self.sectionFrame, text='ADD NEW ACCOUNT', bg='white', fg='blue',
+                  font=('arial black', 14), command=self.new_acct).grid(row=1, padx=60, pady=10, sticky='nsew')
+        tk.Button(self.sectionFrame, text='UPDATE ACCOUNT', bg='white', fg='orange',
+                  font=('arial black', 14), command=self.edit_acct).grid(row=2, padx=80, pady=10, sticky='nsew')
+        tk.Button(self.sectionFrame, text='DELETE ACCOUNT', bg='white', fg='red',
+                  font=('arial black', 14), command=self.delete_acct).grid(row=3, padx=100, pady=10, sticky='nsew')
+        tk.Button(self.sectionFrame, text='CUSTOMER ACCOUNTS VIEW', bg='white', fg='green',
+                  font=('arial black', 14), command=lambda: self.display_acct()).grid(row=0, padx=40, pady=10,
+                                                                                      sticky='nsew')
+
+        # display inventory page's frame
+        if self.display_frame is not None:
+            self.display_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+        if self.homeFrame is not None:
+            self.homeFrame.grid_forget()
+
+        self.sectionFrame.grid(row=1, rowspan=4, column=0, columnspan=5, sticky='nsew')
+
+    def new_acct(self):
+        global custs, cust_id
+        bg, fg = 'green', 'white'
+
+        # frame for input of new inventory
+        self.new_frame = tk.LabelFrame(self.master, text='NEW ACCOUNT REGISTRATION', fg=fg, font=('arial black', 12),
+                                       bg=bg)
+        self.new_frame.rowconfigure(list(range(9)), weight=1)
+        self.new_frame.columnconfigure(list(range(5)), weight=1)
+
+        # create a list of existing customers
+        customer_ids = None
+        with open(self.cust_obj.cust_data, 'r', encoding='utf8') as hand:
+            data = hand.readlines()
+        customer_ids = [v for line in data for k, v in eval(line).items() if k == 'customer_id']
+        fnames = [v for line in data for k, v in eval(line).items() if k == 'first_name']
+        mnames = [v for line in data for k, v in eval(line).items() if k == 'mid_name']
+        lnames = [v for line in data for k, v in eval(line).items() if k == 'last_name']
+
+        # when no customer account exists
+        if customer_ids is None:
+            return messagebox.showerror(message='No Record of Existing Customers')
+
+        print(f'{customer_ids}\n{fnames}\n{mnames}\n{lnames}')
+        # create list of tuples containing (first, mid, last names) of each customer
+        custs = [(i, f, m, l) for i, f, m, l in zip(customer_ids, fnames, mnames, lnames)]
+        cust_names = [(f, m, l) for f, m, l in zip(fnames, mnames, lnames)]
+        print(f'Customers: {custs}')
+
+        # place new account form
+        # customer ID from Company Name
+        tk.Label(self.new_frame, text='Select Customer:', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
+        cust_id = ttk.Combobox(self.new_frame, value=cust_names, font=('calibri', 13))
+        for f, m, l in cust_names:
+            cust_id.set((f, m, l))
+            break
+        cust_id.grid(row=0, column=1, padx=10, sticky='ew')
+        ttk.Button(self.new_frame, text='SELECT', command=lambda: self.popup_custid(cust_id.get())
+                   ).grid(row=0, column=2, padx=10, sticky='w')
+        # debit
+        tk.Label(self.new_frame, text='Debit', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=1, column=1, padx=10, stick='w')
+        self.debitEntry = tk.Entry(self.new_frame, font=('calibri', 13, 'bold'))
+        self.debitEntry.grid(row=1, column=1, padx=10, sticky='sw')
+
+        # credit
+        tk.Label(self.new_frame, text='Credit', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=1, column=2, padx=10, stick='w')
+        self.debitEntry = tk.Entry(self.new_frame, font=('calibri', 13, 'bold'))
+        self.debitEntry.grid(row=1, column=2, padx=10, sticky='sw')
+
+        # transaction date
+        # date of registration
+        tk.Label(self.new_frame, text='Date of Transaction:', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=2, column=0, padx=5, sticky='nse')
+        # day
+        tk.Label(self.new_frame, text='Day', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=2, column=1, sticky='w')
+        self.transdayEntry = tk.Entry(self.new_frame, font=('calibri', 13, 'bold'), width=10)
+        self.transdayEntry.insert(0, str(datetime.date.today().day))
+        self.transdayEntry.grid(row=2, column=1, padx=5, pady=30, sticky='sw')
+        # month
+        tk.Label(self.new_frame, text='Month', font=('calibri', 13), bg=bg, fg=fg,
+                 height=1).grid(row=2, column=2, sticky='w')
+        self.transmonthEntry = tk.Entry(self.new_frame, font=('calibri', 13, 'bold'), width=10)
+        self.transmonthEntry.insert(0, str(datetime.date.today().month))
+        self.transmonthEntry.grid(row=2, column=2, padx=5, pady=30, sticky='sw')
+        # year
+        tk.Label(self.new_frame, text='Year', font=('calibri', 13), bg=bg, fg=fg,
+                 height=1).grid(row=2, column=3, sticky='w')
+        self.transyrEntry = tk.Entry(self.new_frame, font=('calibri', 13, 'bold'), width=10)
+        self.transyrEntry.insert(0, str(datetime.date.today().year))
+        self.transyrEntry.grid(row=2, column=3, pady=30, sticky='sw')
+
+        # display inventory page's frame
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.sectionFrame is not None:
+            self.sectionFrame.grid_forget()
+        self.new_frame.grid(row=1, rowspan=8, column=0, columnspan=3, sticky='nsew')
+
+    def popup_custid(self, selected_customer):
+        global custs, cust_id
+        print(selected_customer.split())
+        # get corresponding customer id and display
+        fname, mname, lname = selected_customer.split()
+        for cid, f, m, l in custs:
+            if str(f) == str(fname) and str(m) == str(mname) and str(l) == str(lname):
+                print(f, m, l)
+                cust_id = ttk.Entry(self.new_frame, font=('calibri', 13))
+                cust_id.insert(0, f'{cid}')
+                cust_id.grid(row=0, column=1, padx=10, sticky='ew')
+                cust_id.config(state='disabled')
+        print(cust_id.get())
+
+
+    def submit_acct(self):
+        pass
+
+    def saveacct(self):
+        pass
+
+    def read_acct(self):
+        pass
+
+    def display_acct(self):
+        pass
+
+    def edit_acct(self):
+        pass
+
+    def editing_acct(self):
+        pass
+
+    def update_acct(self):
+        pass
+
+    def delete_acct(self):
+        pass
+
+    def erase_acct(self):
         pass
 
     def custpage(self):
@@ -750,7 +969,7 @@ class TransApp:
         puncs = string.punctuation
 
         # check for empty field
-        if [True for entry in mandatory_entries if (entry in wspace)]:
+        if [True for entry in mandatory_entries if (entry in wspace) or (entry is None)]:
             return messagebox.showerror(title='Blank Field', message='BLANK FIELD(S) DETECTED!')
         # check for fields with punctuations
         if [True for entry in mandatory_entries if (entry in puncs)]:
@@ -829,6 +1048,7 @@ class TransApp:
         self.submit_frame.grid(row=1, sticky='nsew')
 
     def savecust(self):
+
         with open(self.cust_obj.cust_data, 'a',
                   encoding='utf8') as hand:
             hand.writelines(f"{self.cust_obj.__dict__}\n")
@@ -879,7 +1099,7 @@ class TransApp:
         # create scrolled text field to display customer records
         st = scrolledtext.ScrolledText(self.display_frame, bg='blue', fg='white', wrap='word',
                                        font=("Calibri", 14, 'bold'), relief='flat')
-        st.grid(row=0, column=0, rowspan=len(cust), columnspan=8, sticky='nsew')
+        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
         # display headings for customer records
         st.insert(index='end',
                   chars='CUSTOMER ID, FIRST NAME, MIDDLE NAME, LAST NAME, GENDER, DATE OF BIRTH, NATIONALITY, STATE OF ORIGIN, OFFICE ADDRESS, DATE OPENED\n\n')
@@ -897,7 +1117,7 @@ class TransApp:
 
         custpageb = tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'),
                              fg='blue', bg='white', height=1, width=15, command=self.custpage)
-        custpageb.grid(row=len(cust) + 2, column=3, padx=5, pady=5, stick='se')
+        custpageb.grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -906,9 +1126,9 @@ class TransApp:
         if self.new_frame is not None:
             self.new_frame.grid_forget()
 
-        self.display_frame.rowconfigure(list(range(len(cust) + 2)), weight=1)
+        self.display_frame.rowconfigure(list(range(3)), weight=1)
         self.display_frame.columnconfigure(list(range(9)), weight=1)
-        self.display_frame.grid(row=1, rowspan=len(cust) + 2, column=0, columnspan=4, sticky='nsew')
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
     def edit_cust(self):
         global edit_custid_entry, cust, lines
@@ -931,7 +1151,7 @@ class TransApp:
         # display headings for customer records
         # create scrolled text field to display customer records
         st = scrolledtext.ScrolledText(self.display_frame, bg='blue', fg='white', wrap='word', font=("Calibri", 14, 'bold'))
-        st.grid(row=0, column=0, rowspan=len(cust), columnspan=8, sticky='nsew')
+        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
         # display headings for customer records
         st.insert(index='end',
                   chars='CUSTOMER ID, FIRST NAME, MIDDLE NAME, LAST NAME, GENDER, DATE OF BIRTH, NATIONALITY, STATE OF ORIGIN, OFFICE ADDRESS, DATE OPENED\n\n')
@@ -949,18 +1169,18 @@ class TransApp:
 
         # to edit the given row number (at row entry - 1)
         tk.Label(self.display_frame, text='ENTER CUSTOMER ID:', font=("Calibri", 12, 'bold'), bg='blue',
-                 fg='white').grid(row=len(cust) + 2, column=0, padx=2, sticky='e')
+                 fg='white').grid(row=2, column=0, padx=2, sticky='e')
         # custid entry
         edit_custid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'), relief='sunken')
-        edit_custid_entry.grid(row=len(cust) + 2, column=1, padx=2, sticky='ew')
+        edit_custid_entry.grid(row=2, column=1, padx=2, sticky='ew')
         # edit button
         tk.Button(self.display_frame, text='Edit', font=("Calibri", 12, 'bold'),
-                  bg='orange', fg='white', height=1, width=10, command=self.editing_cust).grid(row=len(cust) + 2,
+                  bg='orange', fg='white', height=1, width=10, command=self.editing_cust).grid(row=2,
                                                                                                padx=5, column=2, sticky='w')
 
         custpageb = tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'),
                               fg='blue', bg='white', height=1, width=15, command=self.custpage)
-        custpageb.grid(row=len(cust) + 2, column=6, padx=5, pady=5, stick='se')
+        custpageb.grid(row=2, column=6, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -969,9 +1189,9 @@ class TransApp:
         if self.new_frame is not None:
             self.new_frame.grid_forget()
 
-        self.display_frame.rowconfigure(list(range(len(cust) + 2)), weight=1)
+        self.display_frame.rowconfigure(list(range(3)), weight=1)
         self.display_frame.columnconfigure(list(range(9)), weight=1)
-        self.display_frame.grid(row=1, rowspan=len(cust) + 2, column=0, columnspan=4, sticky='nsew')
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
     def editing_cust(self):
         global edit_custid_entry, cust, lines, edit_row
@@ -1098,7 +1318,7 @@ class TransApp:
         # display an adjustible frame containing the selected info
         self.display_frame.rowconfigure(list(range(12)), weight=1)
         self.display_frame.columnconfigure(list(range(12)), weight=1)
-        self.display_frame.grid(row=1, rowspan=len(cust) + 2, column=0, columnspan=4, sticky='nsew')
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
     def update_cust(self):
         global lines, edit_row
@@ -1209,8 +1429,7 @@ class TransApp:
 
         # save updated version to file
         # print([rec for row, rec in lines.items()])
-        # print(Inventory.cust_data)
-        with open(Customer.cust_data, 'w', encoding='utf8') as hand:
+        with open(self.cust_obj.cust_data, 'w', encoding='utf8') as hand:
             for row, rec in lines.items():
                 hand.writelines(f"{rec}\n")
 
@@ -1248,7 +1467,7 @@ class TransApp:
         # create scrolled text field to display customer records
         st = scrolledtext.ScrolledText(self.display_frame, bg='blue', fg='white', wrap='word',
                                        font=("Calibri", 14, 'bold'))
-        st.grid(row=0, column=0, rowspan=len(cust), columnspan=8, sticky='nsew')
+        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
         # display headings for customer records
         st.insert(index='end',
                   chars='CUSTOMER ID, FIRST NAME, MIDDLE NAME, LAST NAME, GENDER, DATE OF BIRTH, NATIONALITY, STATE OF ORIGIN, OFFICE ADDRESS, DATE OPENED\n\n')
@@ -1266,20 +1485,17 @@ class TransApp:
 
         # to edit the given row number (at row entry - 1)
         tk.Label(self.display_frame, text='ENTER CUSTOMER ID:', font=("Calibri", 12, 'bold'), bg='blue',
-                 fg='white').grid(row=len(cust) + 2, column=0, padx=2, sticky='e')
+                 fg='white').grid(row=2, column=0, padx=2, sticky='e')
         # custid entry
         del_custid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'), relief='sunken')
-        del_custid_entry.grid(row=len(cust) + 2, column=1, padx=2, sticky='ew')
+        del_custid_entry.grid(row=2, column=1, padx=2, sticky='ew')
 
         # delete button
-        tk.Button(self.display_frame, text='Delete', font=("Calibri", 12, 'bold'),
-                  bg='red', fg='white', height=1, width=10, command=self.erase_cust).grid(row=len(cust) + 2,
-                                                                                               padx=5, column=2,
-                                                                                               sticky='w')
+        tk.Button(self.display_frame, text='Delete', font=("Calibri", 12, 'bold'), bg='red', fg='white',
+                  height=1, width=10, command=self.erase_cust).grid(row=2, column=2, padx=5, sticky='w')
 
-        custpageb = tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'),
-                              fg='blue', bg='white', height=1, width=15, command=self.custpage)
-        custpageb.grid(row=len(cust) + 2, column=6, padx=5, pady=5, stick='se')
+        tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'), fg='blue', bg='white',
+                  height=1, width=15, command=self.custpage).grid(row=2, column=6, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -1288,9 +1504,9 @@ class TransApp:
         if self.new_frame is not None:
             self.new_frame.grid_forget()
 
-        self.display_frame.rowconfigure(list(range(len(cust) + 2)), weight=1)
+        self.display_frame.rowconfigure(list(range(3)), weight=1)
         self.display_frame.columnconfigure(list(range(9)), weight=1)
-        self.display_frame.grid(row=1, rowspan=len(cust) + 2, column=0, columnspan=4, sticky='nsew')
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
     def erase_cust(self):
         global lines, cust_ids, del_row, del_custid_entry
@@ -1318,7 +1534,7 @@ class TransApp:
                     del_row = row
                     # print(f"Found at {del_row}")
 
-        with open(Customer.cust_data, 'w', encoding='utf8') as hand:
+        with open(self.cust_obj.cust_data, 'w', encoding='utf8') as hand:
             for row, rec in lines.items():
                 if row == del_row:
                     # assign the selected row
@@ -1526,8 +1742,9 @@ class TransApp:
         self.submit_frame.grid(row=1, sticky='nsew')
 
     def saveinv(self):
-        with open(self.inv_obj.inv_data, 'a',
-                  encoding='utf8') as hand:
+        # return print(self.inv_obj.inv_data)
+
+        with open(self.inv_obj.inv_data, 'a', encoding='utf8') as hand:
             hand.writelines(f"{self.inv_obj.__dict__}\n")
 
         self.submit_frame = self.make_frame()
@@ -1549,6 +1766,7 @@ class TransApp:
         self.submit_frame.grid(row=1, sticky='nsew')
 
     def read_inv(self):
+        self.inv_obj.inv_data = f'{self.login_user.filepath}\\inv_data.txt'
         with open(self.inv_obj.inv_data, 'r', encoding='utf8') as hand:
             # inventory attributes is a list of record strings
             inv_attr = hand.readlines()
@@ -1658,9 +1876,8 @@ class TransApp:
         tk.Button(self.display_frame, text='Edit', font=("Calibri", 13, 'bold'), bg='orange', fg='white',
                   height=1, width=10, command=self.editing_inv).grid(row=2, column=2, sticky='w')
         # inventory page button
-        invpageb = tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
-                             fg='purple', bg='white', height=1, width=15, command=self.invenpage)
-        invpageb.grid(row=2, column=3, padx=5, pady=5, stick='se')
+        tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'), fg='purple', bg='white',
+                  height=1, width=15, command=self.invenpage).grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -1808,8 +2025,7 @@ class TransApp:
 
         # save updated version to file
         # print([rec for row, rec in lines.items()])
-        # print(Inventory.cust_data)
-        with open(Inventory.inv_data, 'w', encoding='utf8') as hand:
+        with open(self.inv_obj.inv_data, 'w', encoding='utf8') as hand:
             for row, rec in lines.items():
                 hand.writelines(f"{rec}\n")
 
@@ -1824,9 +2040,8 @@ class TransApp:
         tk.Label(self.display_frame, text="HAS BEEN UPDATED!!", font=("Calibri", 10, 'bold'),
                  bg='purple', fg='white').grid(row=1, column=1, columnspan=2, sticky='NSEW', padx=25)
 
-        invpageb = tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
-                             fg='purple', bg='white', height=1, width=15, command=self.invenpage)
-        invpageb.grid(row=2, column=3, padx=5, pady=5, stick='se')
+        tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'), fg='purple', bg='white',
+                  height=1, width=15, command=self.invenpage).grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -1858,42 +2073,37 @@ class TransApp:
             # inven is a list of saved inventory instances
             inven.append(eval(inven_rec[ind]))
 
-        # display headings for inventory records
-        tk.Label(self.display_frame, text=f"PRODUCT ID", font=("Calibri", 14, 'bold'),
-                 bg='purple', fg='white').grid(row=0, column=0, sticky='e')
-        tk.Label(self.display_frame, text=f"PRODUCT NAME", font=("Calibri", 14, 'bold'),
-                 bg='purple', fg='white').grid(row=0, column=1, sticky='nsew')
-        tk.Label(self.display_frame, text=f"STOCK (in units)", font=("Calibri", 14, 'bold'),
-                 bg='purple', fg='white').grid(row=0, column=2, sticky='nsew')
-        tk.Label(self.display_frame, text=f"DATE OF ENTRY", font=("Calibri", 14, 'bold'),
-                 bg='purple', fg='white').grid(row=0, column=3, sticky='nsew')
+        st = scrolledtext.ScrolledText(self.display_frame, bg='purple', fg='white', wrap='word',
+                                       font=("Calibri", 14, 'bold'))
+        st.grid(row=0, column=1, rowspan=2, columnspan=2, sticky='nsew')
+
+        # display headings for customer records
+        st.insert(index='end', chars='PRODUCT ID, PRODUCT NAME, QUANTITY, UNIT, DATE\n\n')
 
         for ind in range(len(inven)):
             # assign user input from stored inventory records to each inventory class attribute
             self.inv_obj.__dict__ = inven[ind]
+            # insert each data column into text field one after the other
+            st.insert(index='end',
+                      chars=f"{self.inv_obj.prod_id}, {self.inv_obj.prod_name}, {self.inv_obj.qty}, {self.inv_obj.unit}, {self.inv_obj.entry_date}\n\n")
 
-            tk.Label(self.display_frame, text=f"{self.inv_obj.prod_id}", font=("Calibri", 10, 'bold'),
-                     bg='purple', fg='white').grid(row=ind + 1, column=0, sticky='e')
-            tk.Label(self.display_frame, text=f"{self.inv_obj.prod_name}", font=("Calibri", 10, 'bold'),
-                     bg='purple', fg='white').grid(row=ind + 1, column=1, sticky='nsew')
-            tk.Label(self.display_frame, text=f"{self.inv_obj.qty} {self.inv_obj.unit}", font=("Calibri", 10, 'bold'),
-                     bg='purple', fg='white').grid(row=ind + 1, column=2, sticky='nsew')
-            tk.Label(self.display_frame, text=f"{self.inv_obj.entry_date}", font=("Calibri", 10, 'bold'),
-                     bg='purple', fg='white').grid(row=ind + 1, column=3, sticky='nsew')
+        # make the text field read-only
+        st.config(state='disabled')
+        # ensure that text can be copied to clipboard
+        st.bind('<1>', lambda event: st.focus_set())
 
+        # user enters the selected row id to delete
         tk.Label(self.display_frame, text='ENTER PRODUCT ID:', font=("Calibri", 10, 'bold'), bg='purple',
-                 fg='white').grid(row=len(inven) + 2, column=0, padx=2, sticky='e')
+                 fg='white').grid(row=2, column=0, padx=2, sticky='e')
 
         del_prodid_entry = tk.Entry(self.display_frame, font=("Calibri", 10, 'bold'))
-        del_prodid_entry.grid(row=len(inven) + 2, column=1, padx=2, sticky='w')
+        del_prodid_entry.grid(row=2, column=1, padx=2, sticky='w')
 
         # to edit the given row number (at row entry - 1)
         tk.Button(self.display_frame, text='Delete', font=("Calibri", 12, 'bold'),
-                  bg='red', fg='white', height=1, width=10, command=self.erase_inv).grid(row=len(inven) + 2,
-                                                                                         column=1,
-                                                                                         sticky='e')
-        tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
-                             fg='purple', bg='white', height=1, width=15, command=self.invenpage).grid(row=len(inven) + 2, column=3, padx=5, pady=5, stick='se')
+                  bg='red', fg='white', height=1, width=10, command=self.erase_inv).grid(row=2, column=1, sticky='e')
+        tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'), fg='purple', bg='white',
+                  height=1, width=15, command=self.invenpage).grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -1902,9 +2112,9 @@ class TransApp:
         if self.new_frame is not None:
             self.new_frame.grid_forget()
 
-        self.display_frame.rowconfigure(list(range(len(inven) + 2)), weight=1)
+        self.display_frame.rowconfigure(list(range(3)), weight=1)
         self.display_frame.columnconfigure(list(range(4)), weight=1)
-        self.display_frame.grid(row=1, rowspan=len(inven) + 2, column=0, columnspan=4, sticky='nsew')
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
     def erase_inv(self):
         global lines, prod_ids, del_row, del_prodid_entry
@@ -1932,7 +2142,7 @@ class TransApp:
                     del_row = row
                     # print(f"Found at {del_row}")
 
-        with open(Inventory.inv_data, 'w', encoding='utf8') as hand:
+        with open(self.inv_obj.inv_data, 'w', encoding='utf8') as hand:
             for row, rec in lines.items():
                 if row == del_row:
                     # assign the selected row
@@ -1975,8 +2185,8 @@ def login(ta, user):
 
     # email constraints
     if not (re.findall(r'(.+)@(.+)[.](.+)', email)):
-        return messagebox.showerror(title='INCORRECT EMAIL', message='Incorrect email address'
-                                                                     '\n\nPlease EMAIL for @ or .')
+        return messagebox.showerror(title='INVALID EMAIL', message='Invalid email address'
+                                                                     '\n\nPlease check Email for @ or .')
     # password length
     if len(pwd) < 5:
         return messagebox.showerror(title='Password too short',
@@ -1985,8 +2195,8 @@ def login(ta, user):
     # extract username from email address
     stop = email.find("@")
     uname = email[:stop].capitalize()
-    print(email)
-    Found = False
+    # print(email)
+    pFound, eFound = False, False
 
     for path, folders, files in os.walk(user.dir_path):
         for folder in folders:
@@ -1996,19 +2206,21 @@ def login(ta, user):
             elif folder == uname:
                 print(f"Checking {uname}'s login details")
                 with open(f'{path}\\{folder}\\login_data.txt', 'r', encoding='utf8') as hand:
-                    for line in hand.readlines():
-                        attr = eval(line)
-                        print(type(attr), attr)
-                        for k, v in attr.items():
-                            # check for matching email address and password
-                            if k.lower() == 'email' and v.lower() == email.lower():
-                                print(k, v)
-                            if k.lower() == 'password' and v == pwd:
-                                print(k, v)
-                                Found = True
-                                break
+                    data = hand.readlines()
+                for line in data:
+                    attr = eval(line)
+                    print(type(attr), attr)
+                    for k, v in attr.items():
+                        # check for matching email address and password
+                        if k.lower() == 'email' and v.lower() == email.lower():
+                            print(k, v)
+                            eFound = True
+                        if k.lower() == 'password' and v == pwd:
+                            print(k, v)
+                            pFound = True
+                            break
 
-    if Found:
+    if eFound and pFound:
         user.__dict__ = attr
         print(f'Found {user.__dict__}')
 
