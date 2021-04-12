@@ -3,10 +3,16 @@ class Account:
 
     def __init__(self):
         self.date_opened = None
-        self.time_opened = None
         self.account_id = None
         self.customer_id = None
-        self.debit = None
-        self.credit = None
+        self.currency = None
         self.balance = None
-        self.transaction_date = None
+
+class AcctTrans:
+    acctrans_data = None
+
+    def __init__(self):
+        self.trans_date = None
+        self.account_id = None
+        self.trans_type = None
+        self.amount = None
