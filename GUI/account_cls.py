@@ -12,6 +12,7 @@ class AcctTrans:
     acctrans_data = None
 
     def __init__(self):
+        self.trans_id = None
         self.trans_date = None
         self.account_id = None
         self.trans_type = None

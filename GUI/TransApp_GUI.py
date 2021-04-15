@@ -1,4 +1,4 @@
-import tkinter as tk, datetime, random, os, string, re
+import tkinter as tk, datetime, random, os, string, re, itertools
 from tkinter import messagebox, scrolledtext, ttk
 from inventory_cls import Inventory
 from customer_cls import Customer
@@ -200,12 +200,11 @@ class TransApp:
         cpe.grid(row=4, column=1, sticky='w', padx=3, pady=5)
 
         # submit signup button
-        tk.Button(self.display_frame, text='Create User', bg='green', fg='white', height=3, width=15,
-                  command=self.setattr).grid(row=6, column=1, sticky='e')
+        ttk.Button(self.display_frame, text='Create User',  width=15,
+                   command=self.setattr).grid(row=6, column=1, sticky='e')
 
         # front page
-        tk.Button(self.display_frame, text='Back', fg='blue', bg='white', height=3, width=8,
-                  command=self.firstpage).grid(row=6, column=0, sticky='e')
+        ttk.Button(self.display_frame, text='Back', width=8, command=self.firstpage).grid(row=6, column=0, sticky='e')
 
         self.display_frame.rowconfigure(list(range(6)), weight=1)
         self.display_frame.columnconfigure(list(range(3)), weight=1)
@@ -308,11 +307,8 @@ class TransApp:
         self.display_frame = tk.LabelFrame(self.master, bg='gold')
 
         tk.Label(self.display_frame, text=f'New User Created!\n{self.login_user.username}', fg='black', bg='gold',
-                 font=('calibri', 12, 'bold')
-                 ).grid(row=1, columnspan=3, sticky='NSEW')
-        tk.Button(self.display_frame, text="Login Page", command=self.loginpage, fg='blue', bg='white',
-                  font=('calibri', 12, 'bold')
-                  ).grid(row=4, columnspan=3, sticky='ew')
+                 font=('calibri', 12, 'bold')).grid(row=1, columnspan=3, sticky='NSEW')
+        ttk.Button(self.display_frame, text="Login Page", command=self.loginpage).grid(row=4, columnspan=3, sticky='ew')
 
         self.display_frame.rowconfigure(list(range(8)), weight=1)
         self.display_frame.columnconfigure(list(range(3)), weight=1)
@@ -339,12 +335,10 @@ class TransApp:
                        variable=passw, command=lambda: self.showpassword(passw.get())).grid(row=1, column=1, sticky='e')
 
         # login/signin button
-        tk.Button(self.display_frame, text="Sign in", command=lambda: login(self, self.login_user), bg='green',
-                  fg='white', font=('calibri', 12, 'bold'), width=10, height=2).grid(row=2, column=1, sticky='n')
+        ttk.Button(self.display_frame, text="Sign in", command=lambda: login(self, self.login_user), width=10).grid(row=2, column=1, sticky='n')
 
         # front page
-        tk.Button(self.display_frame, text='Back', bg='blue', fg='white', width=10, height=2,
-                  font=('calibri', 12, 'bold'), command=self.firstpage).grid(row=3, column=0, sticky='e')
+        ttk.Button(self.display_frame, text='Back', width=10, command=self.firstpage).grid(row=3, column=0, sticky='e')
 
         if self.display_frame is not None:
             self.display_frame.grid_forget()
@@ -393,15 +387,15 @@ class TransApp:
 
         # set current user's data files
         self.inv_obj.inv_data = f'{self.login_user.filepath}\\inv_data.txt'
-        print(self.inv_obj.inv_data)
+        # print(self.inv_obj.inv_data)
         self.cust_obj.cust_data = f'{self.login_user.filepath}\\cust_data.txt'
-        print(self.cust_obj.cust_data)
+        # print(self.cust_obj.cust_data)
         self.sales_obj.sales_data = f'{self.login_user.filepath}\\sales_data.txt'
-        print(self.sales_obj.sales_data)
+        # print(self.sales_obj.sales_data)
         self.acct_obj.acct_data = f'{self.login_user.filepath}\\acct_data.txt'
-        print(self.acct_obj.acct_data)
+        # print(self.acct_obj.acct_data)
         self.acctrans_obj.acctrans_data = f'{self.login_user.filepath}\\acctrans_data.txt'
-        print(self.acctrans_obj.acctrans_data)
+        # print(self.acctrans_obj.acctrans_data)
 
         # menu sections
         self.inventoryb.grid(row=0, padx=40, sticky='nsew')
@@ -675,19 +669,15 @@ class TransApp:
         bg, fg = 'green', 'white'
 
         # frame for input of new inventory
-        self.new_frame = tk.LabelFrame(self.master, text='NEW CUSTOMER ACCOUNT REGISTRATION', fg=fg, font=('arial black', 12),
+        self.new_frame = tk.LabelFrame(self.master, text='REGISTER NEW ACCOUNT FOR CUSTOMER', fg=fg, font=('arial black', 12),
                                        bg=bg)
-        self.new_frame.rowconfigure(list(range(9)), weight=1)
+        self.new_frame.rowconfigure(list(range(7)), weight=1)
         self.new_frame.columnconfigure(list(range(5)), weight=1)
 
         # create a list of existing customers
         customer_ids = None
-        with open(self.cust_obj.cust_data, 'r', encoding='utf8') as hand:
-            data = hand.readlines()
-        customer_ids = [v for line in data for k, v in eval(line).items() if k == 'customer_id']
-        fnames = [v for line in data for k, v in eval(line).items() if k == 'first_name']
-        mnames = [v for line in data for k, v in eval(line).items() if k == 'mid_name']
-        lnames = [v for line in data for k, v in eval(line).items() if k == 'last_name']
+
+        customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened = self.cust_fields()
 
         # when no customer account exists
         if customer_ids is None:
@@ -701,15 +691,17 @@ class TransApp:
 
         # place new account form
         # use company name to select customer ID
-        tk.Label(self.new_frame, text='Select Customer:', font=('calibri', 13),
+        tk.Label(self.new_frame, text='Account For:', font=('calibri', 13),
                  bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
         cname_cbox = ttk.Combobox(self.new_frame, value=cust_names, font=('calibri', 13), width=24, state='readonly')
         for f, m, l in cust_names:
             cname_cbox.set((f, m, l))
             break
         cname_cbox.grid(row=0, column=1, sticky='w')
-        ttk.Button(self.new_frame, text='SELECT', command=lambda: self.popup_custid(cname_cbox.get())
+        ttk.Button(self.new_frame, text='SELECT', command=lambda: self.popup_acctform(cname_cbox.get())
                    ).grid(row=0, column=2, sticky='w')
+        ttk.Button(self.new_frame, text='ACCOUNTS MENU', width=18,
+                   command=self.acctpage).grid(row=0, column=3, padx=5, stick='e')
 
         # display inventory page's frame
         if self.submit_frame is not None:
@@ -718,7 +710,7 @@ class TransApp:
             self.sectionFrame.grid_forget()
         self.new_frame.grid(row=1, rowspan=8, column=0, columnspan=3, sticky='nsew')
 
-    def popup_custid(self, selected_customer):
+    def popup_acctform(self, selected_customer):
         global custs, cust_id, fname, lname
         bg, fg = 'green', 'white'
 
@@ -866,7 +858,7 @@ class TransApp:
         self.submit_frame.grid(row=1, sticky='nsew')
 
     def saveacct(self):
-        bg, fg = 'orange', 'white'
+        bg, fg = 'green', 'white'
 
         with open(self.acct_obj.acct_data, 'a',
                   encoding='utf8') as hand:
@@ -874,7 +866,7 @@ class TransApp:
 
         self.submit_frame = self.make_frame(background_color='green')
 
-        tk.Label(self.submit_frame, text='NEW CUSTOMER ACCOUNT HAS BEEN ADDED!', font=("arial", 14, 'bold'),
+        tk.Label(self.submit_frame, text='NEW CUSTOMER ACCOUNT CREATED!', font=("arial", 14, 'bold'),
                          bg=bg, fg=fg).grid(row=0, column=0, columnspan=4, sticky='nsew')
 
         tk.Button(self.submit_frame, text='Add Another', font=("Calibri", 14, 'bold'), bg='blue', fg=fg,
@@ -894,7 +886,7 @@ class TransApp:
         return acct_atr
 
     def display_acct(self):
-        global acct, lines
+        global acctdata, acct, lines
         bg, fg = 'green', 'white'
         acct = []
         lines = {}
@@ -902,35 +894,23 @@ class TransApp:
         # setup display frame
         self.display_frame = self.make_frame(page_title='CUSTOMER ACCOUNTS VIEW', background_color=bg)
 
-        # retrieve customer data from file
-        # acct_rec is a list of strings containing customer records
-        acct_rec = self.read_acct()
+        # create a list of existing customer accounts
+        with open(self.acct_obj.acct_data, 'r', encoding='utf8') as hand:
+            acctdata = hand.readlines()
 
-        for ind in range(len(acct_rec)):
-            # labelled format of saved customer record
-            lines['Row_' + str(ind)] = eval(acct_rec[ind])
-            # acct is a list of saved customer instances
-            acct.append(eval(acct_rec[ind]))
-
-        # display headings for customer records
-        # create scrolled text field to display customer records
-        st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, wrap='word',
-                                       font=("Calibri", 14, 'bold'), relief='flat')
-        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
-        # display headings for customer records
-        st.insert(index='end',
-                  chars='ACCOUNT ID, CUSTOMER ID, CURRENCY, BALANCE, DATE OPENED\n\n')
-
-        for ind in range(len(acct)):
-            # assign user input from stored customer records to each customer class atribute
-            self.acct_obj.__dict__ = acct[ind]
-
-            st.insert(index='end',
-                      chars=f"{self.acct_obj.account_id}, {self.acct_obj.customer_id}, {self.acct_obj.currency}, {self.acct_obj.balance}, {self.acct_obj.date_opened}\n\n")
-        # make text field read-only
-        st.config(state='disabled')
-        # ensure that text can be copied to clipboard
-        st.bind('<1>', lambda event: st.focus_set())
+        # creating a list of customer account details for each customer
+        acct_ids = [v for line in acctdata for k, v in eval(line).items() if k == 'account_id']
+        if len(acct_ids) < 1:
+            return messagebox.showinfo(message='There are no existing accounts to view'
+                                               '\n\nPlease create account(s) for customer(s)')
+        # select account id
+        tk.Label(self.display_frame, text='Select Customer Account:', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
+        cacct_Cbox = ttk.Combobox(self.display_frame, value=acct_ids, font=('calibri', 13), width=24, state='readonly')
+        cacct_Cbox.set(acct_ids[0])
+        cacct_Cbox.grid(row=0, column=1, sticky='w')
+        ttk.Button(self.display_frame, text='SELECT', command=lambda: self.pop_acctview(cacct_Cbox.get())
+                   ).grid(row=0, column=2, sticky='w')
 
         tk.Button(self.display_frame, text='Accounts Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1, 
                   width=15, command=self.acctpage).grid(row=2, column=3, padx=5, pady=5, stick='se')
@@ -945,7 +925,113 @@ class TransApp:
         self.display_frame.rowconfigure(list(range(3)), weight=1)
         self.display_frame.columnconfigure(list(range(9)), weight=1)
         self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
+
+    def pop_acctview(self, selected_acctid):
+        global acctdata
+        bg, fg = 'green', 'white'
+
+        cid, acct_curr, acct_bal, dop = None, None, None, None
+
+        for line in acctdata:
+            attr = eval(line)
+            # return print(attr)
+            for k, v in attr.items():
+                if k == 'account_id' and v == selected_acctid:
+                    acct_curr = attr['currency']
+                    cid = attr['customer_id']
+                    acct_bal = float(attr['balance'])
+                    dop = attr['date_opened']
+
+        acct = self.get_acct(selected_acctid)
+        acct_bal = self.get_bal(selected_acctid)
+        if acct_bal is None:
+            return messagebox.showinfo(
+                message=f'{selected_acctid} is an inactive account\nPlease select another account')
+
+        # display headings for customer records
+        # create scrolled text field to display customer records
+        st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, wrap='word',
+                                       font=("Calibri", 14, 'bold'), relief='flat')
+        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
+        # display headings for customer records
+        st.insert(index='end',
+                  chars='ACCOUNT ID, CUSTOMER ID, CURRENCY, BALANCE, DATE OPENED\n\n')
+
+        st.insert(index='end',
+                  chars=f"{acct['account_id']}, {acct['customer_id']}, {acct['currency']}, {acct_bal}, {acct['date_opened']}\n\n")
+        # make text field read-only
+        st.config(state='disabled')
+        # ensure that text can be copied to clipboard
+        st.bind('<1>', lambda event: st.focus_set())
         
+    def get_acct(self, selected_acctid):
+        dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
+
+        acct = {'date_opened': '', 'account_id': '', 'customer_id': '', 'currency': '', 'balance': ''}
+
+        for d, ai, cid, curr, bal in zip(dates_opened, acct_ids, cust_ids, acct_types, acct_bals):
+            if ai == selected_acctid:
+                acct['date_opened'], acct['account_id'], acct['customer_id'], acct['currency'], acct['balance'] = d, ai, cid, curr, bal
+
+        return acct
+        
+    def acct_fields(self, selected_acctid=None):
+        '''
+        to generate a tuple of lists containing transactions in separate fields
+        :return:--> (trans_dates, trans_acctids, trans_types, trans_amnts)
+        '''
+
+        with open(self.acct_obj.acct_data, 'r', encoding='utf8') as hand:
+            acctdata = hand.readlines()
+
+        if selected_acctid is not None:  # when we are interested in all accounts
+            for line in acctdata:
+                attr = eval(line)
+                # return print(attr)
+                for k, v in attr.items():
+                    if k == 'account_id' and v == selected_acctid:
+                        acct_types = attr['currency']
+                        cust_ids = attr['customer_id']
+                        acct_bals = float(attr['balance'])
+                        dates_opened = attr['date_opened']
+                        acct_ids = selected_acctid
+
+        else:  # when we are interested in just one account
+            # creating a list of customer transaction fields for each transaction
+            dates_opened = [v for line in acctdata for k, v in eval(line).items() if k == 'date_opened']
+            acct_ids = [v for line in acctdata for k, v in eval(line).items() if k == 'account_id']
+            cust_ids = [v for line in acctdata for k, v in eval(line).items() if k == 'customer_id']
+            acct_types = [v for line in acctdata for k, v in eval(line).items() if k == 'currency']
+            acct_bals = [v for line in acctdata for k, v in eval(line).items() if k == 'balance']
+
+        return dates_opened, acct_ids, cust_ids, acct_types, acct_bals
+
+    def get_bal(self, selected_acctid):
+        '''
+        return the current account balance
+        :param selected_acctid:
+        :return: --> float(acct_bal)
+        '''
+        creds, debs = [], []
+        # calculate customer's current account balance
+        trans = self.get_active_acctrans(selected_acctid)
+
+        if trans is None:
+            return None
+
+        # print(trans)
+
+        for ind in range(len([v for k, v in trans.items() if k == 'trans_date'][0])):
+            # print(ind)
+            if trans['trans_type'][ind] == 'Credit':
+                creds.append(float(trans['amount'][ind]))
+            if trans['trans_type'][ind] == 'Debit':
+                debs.append(float(trans['amount'][ind]))
+        # current balance
+        # print(f"Debits: {debs}\nCredits: {creds}")
+        acct_bal = sum(creds) - sum(debs)
+        return acct_bal
+
     def acctranspage(self):
         # frame for customer accounts page containing three rows and one column
         self.sectionFrame = tk.LabelFrame(master=self.master, text='CUSTOMER TRANSACTIONS', font=('arial black', 12),
@@ -979,32 +1065,28 @@ class TransApp:
         bg, fg = 'orange', 'white'
 
         # frame for input of new inventory
-        self.new_frame = tk.LabelFrame(self.master, text='NEW FINANCIAL TRANSACTION', fg=fg,
+        self.new_frame = tk.LabelFrame(self.master, text='REGISTER CUSTOMER TRANSACTION', fg=fg,
                                        font=('arial black', 12), bg=bg)
         self.new_frame.rowconfigure(list(range(6)), weight=1)
         self.new_frame.columnconfigure(list(range(5)), weight=1)
 
         # create a list of existing customer accounts
-        with open(self.acct_obj.acct_data, 'r', encoding='utf8') as hand:
-            data = hand.readlines()
-        # creating a list of customer account details for each customer
-        customer_ids = [v for line in data for k, v in eval(line).items() if k == 'customer_id']
-        acct_ids = [v for line in data for k, v in eval(line).items() if k == 'account_id']
-        currencies = [v for line in data for k, v in eval(line).items() if k == 'currency']
-        acct_bals = [v for line in data for k, v in eval(line).items() if k == 'balance']
-        dates_opened = [v for line in data for k, v in eval(line).items() if k == 'date_opened']
+        dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
 
-        print(f'{customer_ids}\n{acct_ids}')
+        # print(f'{customer_ids}\n{acct_ids}')
 
         # place new account form
         # use company name to select customer ID
-        tk.Label(self.new_frame, text='Select Customer Account:', font=('calibri', 13),
+        tk.Label(self.new_frame, text='Select Customer:', font=('calibri', 13),
                  bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
         cacctCbox = ttk.Combobox(self.new_frame, value=acct_ids, font=('calibri', 13), width=24, state='readonly')
         cacctCbox.set(acct_ids[0])
         cacctCbox.grid(row=0, column=1, sticky='w')
         ttk.Button(self.new_frame, text='SELECT', command=lambda: self.popform(cacctCbox.get())
                    ).grid(row=0, column=2, sticky='w')
+
+        tk.Button(self.new_frame, text='CANCEL', fg=bg, bg=fg,
+                  font=('calibri', 13), command=lambda: self.acctranspage()).grid(row=0, column=3, sticky='e')
 
         # display inventory page's frame
         if self.submit_frame is not None:
@@ -1014,7 +1096,11 @@ class TransApp:
         self.new_frame.grid(row=1, rowspan=6, column=0, columnspan=3, sticky='nsew')
         
     def popform(self, selected_acctid):
+
         bg, fg = 'orange', 'white'
+
+        acct_bal = self.get_bal(selected_acctid)
+
         # choose transaction type
         dorc = ['Debit', 'Credit']
         tk.Label(self.new_frame, text='Type: ', font=('calibri', 13),
@@ -1029,6 +1115,13 @@ class TransApp:
         self.amntEntry = tk.Entry(self.new_frame, font=('calibri', 13, 'bold'), fg='black', width=18)
         self.amntEntry.insert(0, '0')
         self.amntEntry.grid(row=2, column=1, sticky='w')
+
+        tk.Label(self.new_frame, text='Current Balance', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=2, column=2, padx=10, stick='nse')
+        self.balEntry = tk.Entry(self.new_frame, font=('calibri', 13, 'bold'), fg='black', width=18)
+        self.balEntry.insert(0, str(acct_bal))
+        self.balEntry.config(state='readonly')
+        self.balEntry.grid(row=2, column=3, sticky='w')
 
         # transaction date
         # date of registration
@@ -1056,12 +1149,12 @@ class TransApp:
         self.transyrCbox.set(str(datetime.date.today().year))
         self.transyrCbox.grid(row=3, column=3, pady=30, sticky='w')
 
-        tk.Button(self.new_frame, text='CANCEL', fg=bg, bg=fg,
-                  font=('calibri', 13), command=lambda: self.acctranspage()).grid(row=5, column=1, sticky='e')
+        ttk.Button(self.new_frame, text='ACCOUNTS MENU', width=18,
+                   command=self.acctpage).grid(row=5, column=1, padx=5, stick='e')
 
         tk.Button(self.new_frame, text='ENTER TRANSACTION', fg='green', bg='white',
                   font=('calibri', 13), command=lambda: self.submit_acctrans(selected_acctid)).grid(row=5, column=3, sticky='e')
-        
+
     def submit_acctrans(self, selected_acctid):
         global customer_ids, acct_ids, currencies, acct_bals, dates_opened
         bg, fg = 'orange', 'white'
@@ -1071,7 +1164,7 @@ class TransApp:
         self.submit_frame.rowconfigure(list(range(4)), weight=1)
         self.submit_frame.columnconfigure(list(range(4)), weight=1)
 
-        acctid, type, amnt = selected_acctid, self.deb_cred.get(), self.amntEntry.get()
+        acctid, type, amnt, bal = selected_acctid, self.deb_cred.get(), self.amntEntry.get(), self.balEntry.get()
         tdate = f'{self.transyrCbox.get()}-{self.transmonthCbox.get()}-{self.transdayCbox.get()}'
         
         wspace = string.whitespace
@@ -1086,29 +1179,47 @@ class TransApp:
             if float(amnt) <= 0:
                 return messagebox.showerror(title='Invalid number',
                                             message=f'{amnt} is not a valid number\nPlease enter a positive number!')
+            if type == 'Debit' and float(amnt) > float(bal):
+                return messagebox.showerror(title='Insufficient Funds',
+                                            message=f'DEBIT amount: {amnt} cannot exceed your current balance: {bal}')
         except ValueError as VE:
             # non-figures have been entered, if no error was raised
             return messagebox.showerror(title='Invalid Data Type',
-                                        message=f'{amnt} is not a number\nPlease enter a number!')
+                                        message=f'Amount: {amnt} and/or Balance: {bal} is not a number')
 
+        # if transaction id is existing, simply continue
+        trans = self.get_active_acctrans()
+        if trans is None:  # if no prior transaction
+            # print(trans)  # this should be None
+            start = uniqueid()  # randomly generate a ten-digit number as the starting sequence
+            seq = next(start)  # return the generator value
+        else:  # if there are existing transactions
+            print(trans)
+            seq = max([int(ind) for ind in trans['trans_id']]) + 1  # simply increment last/maximum number in the sequence by 1
+
+        self.acctrans_obj.trans_id = f'{seq}'
         self.acctrans_obj.account_id, self.acctrans_obj.trans_type = acctid, type
         self.acctrans_obj.amount, self.acctrans_obj.trans_date = amnt, tdate
         print(self.acctrans_obj.__dict__)
 
         tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
-                 text=f"ACCOUNT ID\n{self.acctrans_obj.account_id}").grid(row=0, column=0, sticky='ew')
+                 text=f"TRANSACTION ID\n{self.acctrans_obj.trans_id}").grid(row=0, column=0, sticky='ew')
         tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
-                 text=f"TRANSACTION TYPE\n{self.acctrans_obj.trans_type}").grid(row=0, column=1, sticky='ew')
+                 text=f"ACCOUNT ID\n{self.acctrans_obj.account_id}").grid(row=0, column=1, sticky='ew')
         tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
-                 text=f"AMOUNT\n{self.acctrans_obj.amount}").grid(row=0, column=2, sticky='ew')
+                 text=f"TRANSACTION TYPE\n{self.acctrans_obj.trans_type}").grid(row=0, column=2, sticky='ew')
         tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
-                 text=f"TRANSACTION DATE\n{self.acctrans_obj.trans_date}").grid(row=0, column=3, sticky='ew')
+                 text=f"AMOUNT\n{self.acctrans_obj.amount}").grid(row=0, column=3, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"TRANSACTION DATE\n{self.acctrans_obj.trans_date}").grid(row=0, column=4, sticky='ew')
 
         # save and cancel buttons
         tk.Button(self.submit_frame, text='Save', font=("Calibri", 14, 'bold'), fg='green', bg='white',
                   height=3, width=10, command=self.saveacctrans).grid(row=3, column=0, padx=5, stick='ew')
         tk.Button(self.submit_frame, text='Cancel', font=("Calibri", 14, 'bold'), bg='red', fg='white',
-                  height=3, width=10, command=self.acctranspage).grid(row=3, column=3, padx=5, stick='ew')
+                  height=3, width=10, command=self.new_acctrans).grid(row=3, column=3, padx=5, stick='ew')
+        tk.Button(self.submit_frame, text='ACCOUNTS MENU', font=("Calibri", 14, 'bold'), bg='green', fg='white',
+                  height=3, width=18, command=self.acctpage).grid(row=4, column=1, padx=5, stick='e')
 
         if self.display_frame is not None:
             self.display_frame.grid_forget()
@@ -1187,34 +1298,13 @@ class TransApp:
         # global trans_dates, trans_types, trans_acctids, trans_amnts
         bg, fg = 'orange', 'white'
 
-        for line in acctdata:
-            attr = eval(line)
-            # return print(attr)
-            for k, v in attr.items():
-                if k == 'account_id' and v == selected_acctid:
-                    acct_curr = attr['currency']
-                    cid = attr['customer_id']
+        date_opened, acct_id, cid, acct_type, acct_bal = self.acct_fields(selected_acctid)  # customer's account information
 
-        with open(self.acctrans_obj.acctrans_data, 'r', encoding='utf8') as hand:
-            acctransdata = hand.readlines()
+        trans = self.get_active_acctrans(selected_acctid)
 
-        # creating a list of customer transaction fields for each transaction
-        trans_dates = [v for line in acctransdata for k, v in eval(line).items() if k == 'trans_date']
-        trans_acctids = [v for line in acctransdata for k, v in eval(line).items() if k == 'account_id']
-        trans_types = [v for line in acctransdata for k, v in eval(line).items() if k == 'trans_type']
-        trans_amnts = [v for line in acctransdata for k, v in eval(line).items() if k == 'amount']
-        
-        trans = {'trans_date': [], 'account_id': [], 'trans_type': [], 'amount': []}
-        Empty = True
-        
-        for d, ai, tt, tamt in zip(trans_dates, trans_acctids, trans_types, trans_amnts):
-            if ai == selected_acctid:
-                trans['trans_date'].append(d), trans['account_id'].append(ai), trans['trans_type'].append(tt), trans['amount'].append(tamt)
-                Empty = False
-                
-        if Empty:
-            return messagebox.showinfo(message=f'{selected_acctid} is an inactive account\nPlease select another account')
-        
+        if trans is None:
+            return messagebox.showinfo(title='Inactive Account Selected',
+                message=f'{selected_acctid} is inactive,\nPlease activate or\n\nSelect an active account to view')
                 
         # display headings for customer records
         # create scrolled text field to display customer records
@@ -1223,21 +1313,313 @@ class TransApp:
         st.grid(row=0, column=0, columnspan=8, sticky='nsew')
         # display headings for customer records
         st.insert(index='end',
-                  chars='TRANSACTION DATE, ACCOUNT ID, CUSTOMER ID, TRANSACTION TYPE, CURRENCY, AMOUNT\n\n')
-        for ind in range(len(trans)):
+                  chars='TRANSACTION ID, TRANSACTION DATE, ACCOUNT ID, TRANSACTION TYPE, AMOUNT, BALANCE\n\n')
+        # print(len([v for k, v in trans.items() if k == 'trans_date'][0]), trans)
+        for ind in range(len([v for k, v in trans.items() if k == 'trans_date'][0])):
+            # print(ind)
+            if trans['trans_type'][ind] == 'Credit':
+                acct_bal += float(trans['amount'][ind])
+            else:  #if trans['trans_type'][ind] == 'Debit':
+                acct_bal -= float(trans['amount'][ind])
+
+            # print(acct_bal, trans['trans_type'][ind], float(trans['amount'][ind]))
+
             st.insert(index='end',
-                      chars=f"{trans['trans_date'][ind]},"
-                            f" {trans['account_id'][ind]}, {cid}, "
-                            f"{trans['trans_type'][ind]}, {acct_curr},"
-                            f" {trans['amount'][ind]}\n\n")
+                      chars=f"{trans['trans_id'][ind]},\t"
+                            f"{trans['trans_date'][ind]},\t"
+                            f" {trans['account_id'][ind]},\t"
+                            f"{trans['trans_type'][ind]},\t"
+                            f"{acct_type}{trans['amount'][ind]},\t"
+                            f"{acct_type}{acct_bal}\n\n")
 
         # make text field read-only
         st.config(state='disabled')
         # ensure that text can be copied to clipboard
         st.bind('<1>', lambda event: st.focus_set())
 
+    def get_active_acctrans(self, selected_acctid=None):
+        '''
+        to generate a dictionary of transaction fields for the same account
+        :return:
+        '''
+        trans_ids, trans_dates, trans_acctids, trans_types, trans_amnts = self.acctrans_fields()
+
+        trans = {'trans_id': [], 'trans_date': [], 'account_id': [], 'trans_type': [], 'amount': []}
+        Empty = True
+
+        for i, d, ai, tt, tamt in zip(trans_ids, trans_dates, trans_acctids, trans_types, trans_amnts):
+            if ai == selected_acctid:
+                trans['trans_id'].append(i), trans['trans_date'].append(d), trans['account_id'].append(ai), trans['trans_type'].append(tt), trans[
+                    'amount'].append(tamt)
+                Empty = False
+            elif selected_acctid is None:
+                trans['trans_id'].append(i), trans['trans_date'].append(d), trans['account_id'].append(ai), trans[
+                    'trans_type'].append(tt), trans[
+                    'amount'].append(tamt)
+                Empty = False
+
+        if Empty:
+            return None
+        return trans
+
+    def acctrans_fields(self):
+        '''
+        to generate a tuple of lists containing transactions in separate fields
+        :return:--> (trans_dates, trans_acctids, trans_types, trans_amnts)
+        '''
+        with open(self.acctrans_obj.acctrans_data, 'r', encoding='utf8') as hand:
+            acctransdata = hand.readlines()
+
+        # creating a list of customer transaction fields for each transaction
+        trans_ids = [v for line in acctransdata for k, v in eval(line).items() if k == 'trans_id']
+        trans_dates = [v for line in acctransdata for k, v in eval(line).items() if k == 'trans_date']
+        trans_acctids = [v for line in acctransdata for k, v in eval(line).items() if k == 'account_id']
+        trans_types = [v for line in acctransdata for k, v in eval(line).items() if k == 'trans_type']
+        trans_amnts = [v for line in acctransdata for k, v in eval(line).items() if k == 'amount']
+
+        return trans_ids, trans_dates, trans_acctids, trans_types, trans_amnts
+
     def edit_acctrans(self):
-        pass
+        bg, fg = 'brown', 'white'
+        # setup display frame
+        self.display_frame = self.make_frame(page_title='UPDATE CUSTOMER TRANSACTIONS', background_color=bg)
+        tk.Button(self.display_frame, text='Transactions Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
+                  width=15, command=self.acctranspage).grid(row=2, column=3, padx=5, pady=5, stick='se')
+        dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
+
+        # select account id
+        tk.Label(self.display_frame, text='Select Account:', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
+        cacct_Cbox = ttk.Combobox(self.display_frame, value=acct_ids, font=('calibri', 13), width=24, state='readonly')
+        cacct_Cbox.set(acct_ids[0])
+        cacct_Cbox.grid(row=0, column=1, sticky='w')
+        ttk.Button(self.display_frame, text='SELECT', command=lambda: self.pop_edit_acctrans_form(cacct_Cbox.get())
+                   ).grid(row=0, column=2, sticky='w')
+
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.edit_frame is not None:
+            self.edit_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+
+        self.display_frame.rowconfigure(list(range(3)), weight=1)
+        self.display_frame.columnconfigure(list(range(9)), weight=1)
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
+        
+    def pop_edit_acctrans_form(self, selected_acctid):
+        global trans, acct_bal
+        bg, fg = 'brown', 'white'
+
+        acct_bal = self.get_bal(selected_acctid)
+
+        date_opened, acct_id, cid, acct_type, acct_bal = self.acct_fields(selected_acctid)  # customer's account information
+
+        trans = self.get_active_acctrans(selected_acctid)  # customer's transactions
+
+        if trans is None:
+            return messagebox.showinfo(title='Inactive Account Selected',
+                                       message=f'{selected_acctid} is inactive,\nPlease activate or\n\nSelect an active account to view')
+
+        # display headings for customer records
+        # create scrolled text field to display customer records
+        st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, wrap='word',
+                                       font=("Calibri", 14, 'bold'), relief='flat')
+        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
+        # display headings for customer records
+        st.insert(index='end',
+                  chars='TRANSACTION ID, TRANSACTION DATE, ACCOUNT ID, TRANSACTION TYPE, AMOUNT, BALANCE\n\n')
+        # print(len([v for k, v in trans.items() if k == 'trans_date'][0]), trans)
+        for ind in range(len([v for k, v in trans.items() if k == 'trans_date'][0])):
+            print(ind)
+            if trans['trans_type'][ind] == 'Credit':
+                acct_bal += float(trans['amount'][ind])
+            else:  # if trans['trans_type'][ind] == 'Debit':
+                acct_bal -= float(trans['amount'][ind])
+
+            # print(acct_bal, trans['trans_type'][ind], float(trans['amount'][ind]))
+
+            st.insert(index='end',
+                      chars=f"{trans['trans_id'][ind]},\t"
+                            f"{trans['trans_date'][ind]},\t"
+                            f" {trans['account_id'][ind]},\t"
+                            f"{trans['trans_type'][ind]},\t"
+                            f"{acct_type}{trans['amount'][ind]},\t"
+                            f"{acct_type}{acct_bal}\n\n")
+        # make text field read-only
+        st.config(state='disabled')
+        # ensure that text can be copied to clipboard
+        st.bind('<1>', lambda event: st.focus_set())
+
+        # to edit the given row number (at row entry - 1)
+        tk.Label(self.display_frame, text='SELECT TRANSACTION ID:', font=("Calibri", 12, 'bold'), bg=bg,
+                 fg=fg).grid(row=2, column=0, padx=2, sticky='e')
+        # select transid
+        edit_transidCbox = ttk.Combobox(self.display_frame, width=12, value=trans['trans_id'], font=("Calibri", 12, 'bold'), state='readonly')
+        edit_transidCbox.set(trans['trans_id'][0])
+        edit_transidCbox.grid(row=2, column=1, sticky='w')
+
+        # edit button
+        ttk.Button(self.display_frame, text='Edit', width=10, command=lambda:
+        self.editing_acctrans(edit_transidCbox.get())).grid(row=2, column=2, sticky='w')
+
+    def editing_acctrans(self, selected_transid):
+        global trans, acct_bal
+        bg, fg = 'brown', 'white'
+        self.display_frame = self.make_frame(page_title='EDIT SELECTED TRANSACTION', background_color=bg)
+
+        trans = self.get_active_acctrans()
+        # print(trans)
+
+        for ind in range(len([v for k, v in trans.items() if k == 'trans_date'][0])):  # fetch the particular transaction for editing
+            if trans['trans_id'][ind] == selected_transid:
+                self.acctrans_obj.trans_id, self.acctrans_obj.account_id, self.acctrans_obj.trans_type, self.acctrans_obj.amount, self.acctrans_obj.trans_date = trans['trans_id'][ind], trans['account_id'][ind], trans['trans_type'][ind], trans['amount'][ind], trans['trans_date'][ind]
+
+        # print(f"Copied: {self.acctrans_obj.__dict__}")
+        # display editable fields in entries for user
+        tk.Label(self.display_frame, text="TRANSACTION ID", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=0, sticky='sw', padx=25, pady=15)
+        self.trid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.trid_entry.insert(0, string=f'{self.acctrans_obj.trans_id}')
+        self.trid_entry.config(state='disabled')
+        self.trid_entry.grid(row=2, column=0, sticky='w', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="ACCOUNT ID", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=1, sticky='sw', padx=25, pady=15)
+        self.traid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.traid_entry.insert(0, string=f'{self.acctrans_obj.trans_id}')
+        self.traid_entry.config(state='disabled')
+        self.traid_entry.grid(row=2, column=1, sticky='w', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="DATE OF TRANSACTION", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=2, sticky='sw', padx=25, pady=15)
+        self.trdate_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.trdate_entry.insert(0, string=f'{self.acctrans_obj.trans_date}')
+        self.trdate_entry.config(state='disabled')
+        self.trdate_entry.grid(row=2, column=2, sticky='w', padx=25, pady=5)
+
+        dorc = ['Debit', 'Credit']
+        tk.Label(self.display_frame, text="TYPE OF TRANSACTION", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=3, column=0, sticky='sw', padx=25, pady=15)
+        self.trtyp_Cbox = ttk.Combobox(self.display_frame, font=("Calibri", 12, 'bold'), state='readonly', value=dorc)
+        self.trtyp_Cbox.set(f'{self.acctrans_obj.trans_type}')
+        self.trtyp_Cbox.grid(row=4, column=0, sticky='w', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="AMOUNT", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=3, column=1, sticky='sw', padx=25, pady=15)
+        self.tramt_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.tramt_entry.insert(0, string=f'{self.acctrans_obj.amount}')
+        self.tramt_entry.grid(row=4, column=1, sticky='w', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="CURRENT BALANCE", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=3, column=2, sticky='sw', padx=25, pady=15)
+        self.trbal_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.trbal_entry.insert(0, string=f'{acct_bal}')
+        self.trbal_entry.grid(row=4, column=2, sticky='w', padx=25, pady=5)
+
+        # update and customer page buttons
+        tk.Button(self.display_frame, text='Update', font=("Calibri", 12, 'bold'),
+                  bg='orange', fg='white', height=1, width=15, command=self.update_acctrans).grid(row=6, column=1, padx=5,
+                                                                                              pady=5, stick='w')
+
+        tk.Button(self.display_frame, text='Transaction Page', font=("Calibri", 12, 'bold'),
+                  bg='blue', fg='white', height=1, width=15, command=self.acctranspage).grid(row=6, column=2, padx=5,
+                                                                                         pady=5, stick='e')
+
+        # clear the frames before and after this page
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.edit_frame is not None:
+            self.edit_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+
+        # display an adjustible frame containing the selected info
+        self.display_frame.rowconfigure(list(range(7)), weight=1)
+        self.display_frame.columnconfigure(list(range(4)), weight=1)
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
+
+    def update_acctrans(self):
+        global trans, acct_bal
+        bg, fg = 'brown', 'white'
+        type, amnt = self.trtyp_Cbox.get(), self.tramt_entry.get()
+
+        try:
+            if float(amnt) <= 0:
+                return messagebox.showerror(message='You have entered a bad value into the Amount fields')
+            elif type == 'Debit' and acct_bal < float(amnt):
+                return messagebox.showerror(message=f'Amount: {amnt} cannot exceed current Balance {acct_bal}')
+
+
+        except ValueError:
+            return messagebox.showerror(message='Please Check The Following Fields: \nTransaction Type, \nAmount fields')
+
+        if (type == self.acctrans_obj.trans_type) and (amnt == self.acctrans_obj.amount):
+            return messagebox.showerror(title='Same Values As Values',
+                                        message='No Changes Made!\n\nPlease Check The Following Fields: \nTransaction Type, \nAmount fields')
+
+        if type != self.acctrans_obj.trans_type:
+            self.acctrans_obj.trans_type = type
+        if amnt != self.acctrans_obj.amount:
+            self.acctrans_obj.amount = amnt
+        # print(self.acctrans_obj.__dict__)
+
+        # print(f'Old: {trans}')
+        for ind in range(len([v for k, v in trans.items() if k == 'trans_date'][0])):  # fetch the particular transaction for editing
+            if trans['trans_id'][ind] == self.acctrans_obj.trans_id:
+                trans['trans_id'][ind], trans['account_id'][ind], trans['trans_type'][ind], trans['amount'][ind], trans['trans_date'][ind] = self.acctrans_obj.trans_id, self.acctrans_obj.account_id, self.acctrans_obj.trans_type, self.acctrans_obj.amount, self.acctrans_obj.trans_date
+        # print(f'New: {trans}')
+
+        # when confirmation is given by user
+        self.display_frame = self.make_frame(background_color=bg)
+
+        tk.Label(self.display_frame, text=f"TRANSACTION STATUS", font=("Calibri", 20, 'bold'),
+                 bg=bg, fg=fg).grid(row=0, column=0, columnspan=2, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text=f"TRANSACTION ID\n{self.acctrans_obj.trans_id}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=1, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text=f"ACCOUNT ID\n{self.acctrans_obj.account_id}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=2, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text=f"TRANSACTION DATE\n{self.acctrans_obj.trans_date}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=0, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text=f"TRANSACTION TYPE\n{self.acctrans_obj.trans_type}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=2, column=0, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text=f"AMOUNT\n{self.acctrans_obj.amount}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=2, column=1, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text="HAS BEEN UPDATED!!", font=("Calibri", 20, 'bold'),
+                 bg=bg, fg=fg).grid(row=3, column=1, columnspan=2, sticky='NSEW', padx=25)
+
+        tk.Button(self.display_frame, text='Transactions Page', font=("Calibri", 12, 'bold'),
+                             fg=bg, bg=fg, height=1, width=15, command=self.acctranspage).grid(row=4, column=2, padx=5, pady=5, stick='se')
+
+        if not(messagebox.askyesno(message='Do You Want To Save Changes Made?')):
+            messagebox.showinfo(message='No Changes Made')
+            return self.edit_acctrans()
+
+        # save updated version to file
+        with open(self.acctrans_obj.acctrans_data, 'w', encoding='utf8') as hand:
+            trans_len = [len(v) for k, v in trans.items() if k == 'trans_id'][0]
+            for ind in range(trans_len):
+                curr_dict = {k: v[ind] for k, v in trans.items()}
+                # print(ind, curr_dict)
+                hand.writelines(f"{curr_dict}\n")
+
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.edit_frame is not None:
+            self.edit_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+
+        self.display_frame.rowconfigure([0, 1, 2, 3], weight=1)
+        self.display_frame.columnconfigure(list(range(4)), weight=1)
+        self.display_frame.grid(row=1, rowspan=4, column=0, columnspan=4, sticky='nsew')
+
 
     def delete_acctrans(self):
         pass
@@ -1580,6 +1962,22 @@ class TransApp:
             # customer attributes is a list of record strings
             cust_attr = hand.readlines()
         return cust_attr
+    
+    def cust_fields(self):
+        with open(self.cust_obj.cust_data, 'r', encoding='utf8') as hand:
+            custdata = hand.readlines()
+        customer_ids = [v for line in custdata for k, v in eval(line).items() if k == 'customer_id']
+        fnames = [v for line in custdata for k, v in eval(line).items() if k == 'first_name']
+        mnames = [v for line in custdata for k, v in eval(line).items() if k == 'mid_name']
+        lnames = [v for line in custdata for k, v in eval(line).items() if k == 'last_name']
+        genders = [v for line in custdata for k, v in eval(line).items() if k == 'gender']
+        dobs = [v for line in custdata for k, v in eval(line).items() if k == 'date_of_birth']
+        nationalities = [v for line in custdata for k, v in eval(line).items() if k == 'country']
+        states_of_origin = [v for line in custdata for k, v in eval(line).items() if k == 'state_of_origin']
+        office_addrs = [v for line in custdata for k, v in eval(line).items() if k == 'office_addr']
+        dates_opened = [v for line in custdata for k, v in eval(line).items() if k == 'date_opened']
+        
+        return customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened
 
     def display_cust(self):
         global edit_custid_entry, cust, lines
@@ -1699,7 +2097,7 @@ class TransApp:
     def editing_cust(self):
         global edit_custid_entry, cust, lines, edit_row
 
-        self.display_frame = self.make_frame(page_title='UPDATING CUSTOMER RECORD', background_color='blue', foreground_color='white')
+        self.display_frame = self.make_frame(page_title='UPDATING CUSTOMER RECORD', background_color='blue')
 
         customer_ids = []
 
@@ -2691,33 +3089,32 @@ def login(ta, user):
                 continue
 
             elif folder == uname:
-                print(f"Checking {uname}'s login details")
+                # print(f"Checking {uname}'s login details")
                 with open(f'{path}\\{folder}\\login_data.txt', 'r', encoding='utf8') as hand:
                     data = hand.readlines()
                 for line in data:
                     attr = eval(line)
-                    print(type(attr), attr)
+                    # print(type(attr), attr)
                     for k, v in attr.items():
                         # check for matching email address and password
                         if k.lower() == 'email' and v.lower() == email.lower():
                             print(k, v)
                             eFound = True
                         if k.lower() == 'password' and v == pwd:
-                            print(k, v)
+                            # print(k, v)
                             pFound = True
                             break
 
     if eFound and pFound:
         user.__dict__ = attr
-        print(f'Found {user.__dict__}')
+        # print(f'Found {user.__dict__}')
 
         tk.Label(ta.display_frame, text=f"{user.username}'s Login Successful",
                  font=("Calibri", 10, 'bold'),
                  bg='gold', fg='black').grid(row=0, column=1, columnspan=2, sticky='NSEW', padx=25)
 
-        tk.Button(ta.display_frame, text=f"Go to {user.company_name}'s Menu", command=ta.menupage,
-                  font=("Calibri", 10, 'bold'),
-                  bg='white', fg='blue').grid(row=1, column=1, columnspan=2, sticky='NSEW', padx=25)
+        ttk.Button(ta.display_frame, text=f"Go to {user.company_name}'s Menu", width=30,
+                   command=ta.menupage).grid(row=1, column=0, columnspan=3, sticky='NSEW', padx=25)
 
         if ta.display_frame is not None:
             ta.display_frame.grid_forget()
@@ -2760,6 +3157,16 @@ def save_obj(user):
         os.rmdir(f'{user.filepath}')
         print('Error: Something Went wrong')
         quit()
+
+def uniqueid():
+    '''
+    randomly generates a ten-digits integer
+    :return: a generator that increments by 1
+    '''
+    start = random.getrandbits(32)  # return a random number of ten digits
+    while True:
+        yield start  # return the random ten-digits
+        start += 1  # increment the random ten-digit number by 1
 
 win = tk.Tk()
 # selecting system's screen width height
