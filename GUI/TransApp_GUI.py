@@ -19,7 +19,8 @@ eme, pe = None, None
 
 class TransApp:
     # create general folder for users' data
-    # create initialize file for python at specified path
+    #  make each folder a package by
+    # creating an initialize file for each of our folders at specified path
     with open(f'{os.getcwd()}\\__init__.py', 'w', encoding='utf8') as hand:
         hand.writelines('')
     os.makedirs(f'{os.getcwd()}\\TransAppUsers', exist_ok=True)
@@ -302,6 +303,12 @@ class TransApp:
 
         self.login_user.filepath = f'{self.login_user.dir_path}\\{self.login_user.username}'
 
+        os.makedirs(f'{self.login_user.filepath}\\Inventory', exist_ok=True)
+        os.makedirs(f'{self.login_user.filepath}\\Accounts', exist_ok=True)
+        os.makedirs(f'{self.login_user.filepath}\\AccTransactions', exist_ok=True)
+        os.makedirs(f'{self.login_user.filepath}\\Customers', exist_ok=True)
+        os.makedirs(f'{self.login_user.filepath}\\Sales', exist_ok=True)
+
         save_obj(self.login_user)
 
         self.display_frame = tk.LabelFrame(self.master, bg='gold')
@@ -361,7 +368,7 @@ class TransApp:
     def menupage(self):
         # frame for menu page containing four rows and one column
         self.homeFrame = tk.LabelFrame(master=self.master, text='HOME', fg='black', font=('arial black', 12))
-        self.homeFrame.rowconfigure([0, 1, 2, 3], weight=1)
+        self.homeFrame.rowconfigure(list(range(3)), weight=1)
         self.homeFrame.columnconfigure(0, weight=1)
 
         # make status bar reflect logged in user name
@@ -371,37 +378,41 @@ class TransApp:
         # make menu bar reflect
         self.master.config(menu=self.menu_bar)
 
+        # set current user's data files
+        self.inv_obj.inv_data = f'{self.login_user.filepath}\\Inventory\\inv_data.txt'
+        self.inv_obj.inv_edits = f'{self.login_user.filepath}\\Inventory\\edited_inv.txt'
+        self.inv_obj.inv_dels = f'{self.login_user.filepath}\\Inventory\\deleted_inv.txt'
+        
+        self.cust_obj.cust_data = f'{self.login_user.filepath}\\Customers\\cust_data.txt'
+        self.cust_obj.cust_edits = f'{self.login_user.filepath}\\Customers\\edited_cust.txt'
+        self.cust_obj.cust_dels = f'{self.login_user.filepath}\\Customers\\deleted_cust.txt'
+        
+        self.sales_obj.sales_data = f'{self.login_user.filepath}\\Sales\\sales_data.txt'
+        self.sales_obj.sales_edits = f'{self.login_user.filepath}\\Sales\\edited_sales.txt'
+        self.sales_obj.sales_dels = f'{self.login_user.filepath}\\Sales\\deleted_sales.txt'
+        
+        self.acct_obj.acct_data = f'{self.login_user.filepath}\\Accounts\\acct_data.txt'
+        self.acct_obj.acct_edits = f'{self.login_user.filepath}\\Accounts\\edited_acct.txt'
+        self.acct_obj.acct_dels = f'{self.login_user.filepath}\\Accounts\\deleted_acct.txt'
+        
+        self.acctrans_obj.acctrans_data = f'{self.login_user.filepath}\\AccTransactions\\acctrans_data.txt'
+        self.acctrans_obj.acctrans_edits = f'{self.login_user.filepath}\\AccTransactions\\edited_acctrans.txt'
+        self.acctrans_obj.acctrans_dels = f'{self.login_user.filepath}\\AccTransactions\\deleted_acctrans.txt'
+
         # menu sections
         self.inventoryb = tk.Button(self.homeFrame, text="INVENTORY", fg='white', bg='purple',
                                     font=('arial black', 14), command=lambda: self.invenpage())
-        
-        self.customerb = tk.Button(self.homeFrame, text="CUSTOMERS", fg='white', bg='blue',
-                                   font=('arial black', 14), command=lambda: self.custpage())
 
         self.accountb = tk.Button(self.homeFrame, text="ACCOUNTS", fg='white', bg='green',
                                   font=('arial black', 14), command=lambda: self.acctpage())
 
-        self.salesb = tk.Button(self.homeFrame, text="SALES", fg='white', bg='brown',
+        self.salesb = tk.Button(self.homeFrame, text="SALES", fg='white', bg='blue',
                                 font=('arial black', 14), command=lambda: self.salepage())
-
-
-        # set current user's data files
-        self.inv_obj.inv_data = f'{self.login_user.filepath}\\inv_data.txt'
-        # print(self.inv_obj.inv_data)
-        self.cust_obj.cust_data = f'{self.login_user.filepath}\\cust_data.txt'
-        # print(self.cust_obj.cust_data)
-        self.sales_obj.sales_data = f'{self.login_user.filepath}\\sales_data.txt'
-        # print(self.sales_obj.sales_data)
-        self.acct_obj.acct_data = f'{self.login_user.filepath}\\acct_data.txt'
-        # print(self.acct_obj.acct_data)
-        self.acctrans_obj.acctrans_data = f'{self.login_user.filepath}\\acctrans_data.txt'
-        # print(self.acctrans_obj.acctrans_data)
 
         # menu sections
         self.inventoryb.grid(row=0, padx=40, sticky='nsew')
-        self.customerb.grid(row=1, padx=30, sticky='nsew')
-        self.accountb.grid(row=2, padx=20, sticky='nsew')
-        self.salesb.grid(row=3, padx=10, sticky='nsew')
+        self.accountb.grid(row=1, padx=20, sticky='nsew')
+        self.salesb.grid(row=2, padx=10, sticky='nsew')
 
         # display frame of menupage
         # clear frame space
@@ -418,24 +429,26 @@ class TransApp:
         if self.edit_frame is not None:
             self.edit_frame.grid_forget()
 
-        self.homeFrame.grid(row=1, rowspan=4, column=0, columnspan=5, sticky='nsew')
+        self.homeFrame.grid(row=1, rowspan=5, column=0, columnspan=5, sticky='nsew')
 
     def salepage(self):
         # frame for customer sales page containing three rows and one column
         self.sectionFrame = tk.LabelFrame(master=self.master, text='SALES', font=('arial black', 12), bg='brown',
                                           fg='white')
-        self.sectionFrame.rowconfigure([0, 1, 2, 3], weight=1)
+        self.sectionFrame.rowconfigure(list(range(5)), weight=1)
         self.sectionFrame.columnconfigure(0, weight=1)
 
         # display sales options
-        tk.Button(self.sectionFrame, text='ADD NEW ORDER', bg='white', fg='blue',
-                                font=('arial black', 14), command=self.new_sale).grid(row=1, padx=60, pady=10, sticky='nsew')
-        tk.Button(self.sectionFrame, text='UPDATE TRANSACTION', bg='white', fg='orange',
-                              font=('arial black', 14), command=self.edit_sale).grid(row=2, padx=80, pady=10, sticky='nsew')
-        tk.Button(self.sectionFrame, text='DELETE TRANSACTION', bg='white', fg='red',
-                              font=('arial black', 14), command=self.delete_sale).grid(row=3, padx=100, pady=10, sticky='nsew')
-        tk.Button(self.sectionFrame, text='SALES TRANSACTION VIEW', bg='white', fg='green',
-                              font=('arial black', 14), command=lambda: self.display_sale()).grid(row=0, padx=40, pady=10, sticky='nsew')
+        tk.Button(self.sectionFrame, text='CUSTOMERS', bg='white', fg='blue', font=('arial black', 14),
+                  command=lambda: self.custpage()).grid(row=0, padx=40, pady=10, sticky='nsew')
+        tk.Button(self.sectionFrame, text='VIEW CUSTOMER ORDERS', bg='white', fg='green', font=('arial black', 14),
+                  command=lambda: self.display_sale()).grid(row=1, padx=40, pady=10, sticky='nsew')
+        tk.Button(self.sectionFrame, text='BOOK ORDER', bg='white', fg='brown', font=('arial black', 14),
+                  command=self.new_sale).grid(row=2, padx=60, pady=10, sticky='nsew')
+        tk.Button(self.sectionFrame, text='UPDATE ORDER', bg='white', fg='orange', font=('arial black', 14),
+                  command=self.edit_sale).grid(row=3, padx=80, pady=10, sticky='nsew')
+        tk.Button(self.sectionFrame, text='DELETE ORDER', bg='white', fg='red', font=('arial black', 14),
+                  command=self.delete_sale).grid(row=4, padx=100, pady=10, sticky='nsew')
 
         # display inventory page's frame
         if self.display_frame is not None:
@@ -448,156 +461,148 @@ class TransApp:
         self.sectionFrame.grid(row=1, rowspan=4, column=0, columnspan=5, sticky='nsew')
 
     def new_sale(self):
-        global customer_ids, product_ids
         bg, fg = 'brown', 'white'
 
-        # create a list of existing customers
-        customer_ids = None
-        with open(self.cust_obj.cust_data, 'r', encoding='utf8') as hand:
-            for line in hand.readlines():
-                customer_ids = [v for k, v in eval(line).items() if k == 'customer_id']
+        prod_ids, prod_names, quants, units, entry_dates = self.inv_fields()  # all inventory fields
 
-        # create a list of existing products
-        product_ids = None
-        with open(self.inv_obj.inv_data, 'r', encoding='utf8') as hand:
-            for line in hand.readlines():
-                product_ids = [v for k, v in eval(line).items() if k == 'prod_id']
-
-        # when no customer account exists
-        if customer_ids is None:
-            return messagebox.showerror(message='No Record of Existing Customers')
-        print(customer_ids)
+        customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened = self.cust_fields()
+        cust_details = [(cid, fn, ln) for cid, fn, mn, ln, g, db, n, s, off, do in zip(customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened)]
+        prod_details = [(pid, pn) for pid, pn, q, u, d in zip(prod_ids, prod_names, quants, units, entry_dates)]
 
         # when no product account exists
-        if product_ids is None:
+        if len(prod_ids) < 1:
             return messagebox.showerror(message='No Record of Existing Products')
-        print(product_ids)
 
         # frame for input of new inventory
         self.new_frame = tk.LabelFrame(self.master, text='NEW CUSTOMER ORDER', fg=fg, font=('arial black', 12),
                                        bg=bg)
         self.new_frame.rowconfigure(list(range(9)), weight=1)
-        self.new_frame.columnconfigure(list(range(5)), weight=1)
+        self.new_frame.columnconfigure(list(range(6)), weight=1)
 
         # place new sale form
         # Order labels and entries
         tk.Label(self.new_frame, text='Orders', font=('calibri', 16),
                  bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nsew')
-        
-        # ordered quantity
-        tk.Label(self.new_frame, text='Quantity', font=('calibri', 16),
+        # product
+        tk.Label(self.new_frame, text='Select Product', font=('calibri', 16),
                  bg=bg, fg=fg, height=1).grid(row=0, column=1, stick='nw')
+        self.pr_idname_Cbox = ttk.Combobox(self.new_frame, font=('calibri', 16, 'bold'), height=2,  width=25, values=prod_details,
+                                        state='readonly')
+        self.pr_idname_Cbox.set(prod_details[0])
+        self.pr_idname_Cbox.grid(row=0, column=2, padx=2, pady=30, stick='sw')
+
+        # customer
+        tk.Label(self.new_frame, text='Select Customer', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=3, stick='nw')
+        self.cust_idnames_Cbox = ttk.Combobox(self.new_frame, font=('calibri', 16, 'bold'), height=2, width=30, values=cust_details,
+                                        state='readonly')
+        self.cust_idnames_Cbox.grid(row=0, column=4, padx=2, pady=30, stick='sw')
+        self.cust_idnames_Cbox.set(cust_details[0])
+
+
+        # ordered quantity
+        tk.Label(self.new_frame, text='Quantity', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=1, column=0, stick='nw')
         self.ord_qtyEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
-        self.ord_qtyEntry.grid(row=0, column=1, padx=2, pady=30, stick='sw')
+        self.ord_qtyEntry.grid(row=1, column=1, padx=2, pady=30, stick='sw')
 
         # unit of measurement
         tk.Label(self.new_frame, text='Unit', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=2, stick='nw')
+                 bg=bg, fg=fg, height=1).grid(row=1, column=2, stick='nw')
         self.ord_unitEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
-        self.ord_unitEntry.grid(row=0, column=2, padx=2, pady=30, stick='sw')
+        self.ord_unitEntry.grid(row=1, column=3, padx=4, pady=30, stick='sw')
+        for pid, pn, q, u, d in zip(prod_ids, prod_names, quants, units, entry_dates):
+            pi, pname = self.pr_idname_Cbox.get().split()
+            if  pid == pi:
+                self.ord_unitEntry.insert(0, f'{u}')
+        self.ord_unitEntry.config(state='disabled')
         
         # rate of order
         tk.Label(self.new_frame, text='Rate of Order', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=3, stick='nw')
+                 bg=bg, fg=fg, height=1).grid(row=1, column=4, stick='nw')
         self.ord_rateEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
-        self.ord_rateEntry.grid(row=0, column=3, padx=2, pady=30, stick='sw')
+        self.ord_rateEntry.grid(row=1, column=5, padx=2, pady=30, stick='sw')
         
         # price
         tk.Label(self.new_frame, text='Price', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=4, stick='nw')
+                 bg=bg, fg=fg, height=1).grid(row=2, column=0, stick='nw')
         self.ord_priceEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
-        self.ord_priceEntry.grid(row=0, column=4, padx=2, pady=30, stick='sw')
+        self.ord_priceEntry.grid(row=2, column=1, padx=2, pady=30, stick='sw')
 
         # currency
         tk.Label(self.new_frame, text='Currency', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=5, stick='nw')
+                 bg=bg, fg=fg, height=1).grid(row=2, column=2, stick='nw')
         self.currEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
-        self.currEntry.grid(row=0, column=5, padx=2, pady=30, stick='sw')
-
-        # customer Gender
-        tk.Label(self.new_frame, text='Gender:', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=1, column=0, padx=10, stick='nsew')
-        gend = tk.StringVar(value='None')
-
-        maleRadio = tk.Radiobutton(self.new_frame, text='Male', val='Male', variable=gend, font=('calibri', 16),
-                                   bg='blue', fg='black', command=lambda: self.sel_gender(gend.get()), state='normal')
-        maleRadio.grid(row=1, column=1, padx=2, sticky='w')
-        femaleRadio = tk.Radiobutton(self.new_frame, text='Female', val='Female', variable=gend, font=('calibri', 16),
-                                     bg='blue', fg='black', command=lambda: self.sel_gender(gend.get()), state='normal')
-        femaleRadio.grid(row=1, column=2, padx=2, sticky='w')
+        self.currEntry.grid(row=2, column=3, padx=2, pady=30, stick='sw')
 
         # customer order date
         tk.Label(self.new_frame, text='Date of Order', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=2, column=0, padx=10, stick='nsew')
+                 bg=bg, fg=fg, height=1).grid(row=3, column=0, padx=10, stick='nsew')
         # day
         tk.Label(self.new_frame, text='Day', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=2, column=1, padx=5, stick='nw')
+                 height=1).grid(row=3, column=1, padx=5, stick='nw')
         self.orddayEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
         self.orddayEntry.insert(0, str(datetime.date.today().day))
-        self.orddayEntry.grid(row=2, column=1, padx=5, pady=30, stick='sw')
+        self.orddayEntry.grid(row=4, column=1, padx=5, pady=30, stick='sw')
         # month
         tk.Label(self.new_frame, text='Month', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=2, column=2, padx=5, stick='nw')
+                 height=1).grid(row=3, column=2, padx=5, stick='nw')
         self.ordmonthEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
         self.ordmonthEntry.insert(0, str(datetime.date.today().month))
-        self.ordmonthEntry.grid(row=2, column=2, padx=5, pady=30, stick='sw')
+        self.ordmonthEntry.grid(row=3, column=2, padx=5, pady=30, stick='sw')
         # year
         tk.Label(self.new_frame, text='Year', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=2, column=3, stick='nw')
+                 height=1).grid(row=3, column=3, stick='nw')
         self.ordyrEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
         self.ordyrEntry.insert(0, str(datetime.date.today().year))
-        self.ordyrEntry.grid(row=2, column=3, pady=30, stick='sw')
+        self.ordyrEntry.grid(row=3, column=3, pady=30, stick='sw')
 
         # customer amount deposited
         tk.Label(self.new_frame, text='Deposit', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=3, column=0, padx=10, stick='nsew')
+                 height=1).grid(row=4, column=0, padx=10, stick='nsew')
         self.depEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
-        self.depEntry.grid(row=3, column=0, padx=5, pady=30, stick='sw')
+        self.depEntry.grid(row=4, column=0, padx=5, pady=30, stick='sw')
 
         # payment status
         tk.Label(self.new_frame, text='Payment Status', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=3, column=1, padx=5, stick='nsew')
+                 height=1).grid(row=4, column=1, padx=5, stick='nsew')
         self.pay_statText = tk.Text(self.new_frame, font=('calibri', 16, 'bold'), width=10, height=3)
-        self.pay_statText.grid(row=3, column=1, padx=5, pady=30, sticky='ew')
+        self.pay_statText.grid(row=4, column=1, padx=5, pady=30, sticky='ew')
 
         payment = tk.StringVar(value='None')
-
-        complRadio = tk.Radiobutton(self.new_frame, text='Complete', val='Complete', variable=gend, font=('calibri', 16),
-                                   bg='blue', fg='black', command=lambda: self.sel_paystat(payment.get()), state='normal')
-        complRadio.grid(row=1, column=1, padx=2, sticky='w')
-        incomplRadio = tk.Radiobutton(self.new_frame, text='Incomplete', val='Incomplete', variable=gend, font=('calibri', 16),
+        complRadio = tk.Radiobutton(self.new_frame, text='Complete', value='Complete', variable=payment, font=('calibri', 16), bg='blue', fg='black', command=lambda: self.sel_paystat(payment.get()), state='normal')
+        complRadio.grid(row=5, column=1, padx=2, sticky='w')
+        incomplRadio = tk.Radiobutton(self.new_frame, text='Incomplete', value='Incomplete', variable=payment, font=('calibri', 16),
                                      bg='blue', fg='black', command=lambda: self.sel_paystat(payment.get()), state='normal')
-        incomplRadio.grid(row=1, column=2, padx=2, sticky='w')
+        incomplRadio.grid(row=5, column=2, padx=2, sticky='w')
 
         # date of completion
-        tk.Label(self.new_frame, text='Date of Completion', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=4, column=0, padx=5, sticky='nsew')
+        tk.Label(self.new_frame, text='Date of Completion', font=('calibri', 16), bg=bg, fg=fg, height=1).grid(row=4, column=0, padx=5, sticky='nsew')
+
         # day
         tk.Label(self.new_frame, text='Day', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=4, column=1, sticky='nw')
+                 bg=bg, fg=fg, height=1).grid(row=6, column=1, sticky='nw')
         self.compdayEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
         self.compdayEntry.insert(0, str(datetime.date.today().day))
-        self.compdayEntry.grid(row=4, column=1, padx=5, pady=30, sticky='sw')
+        self.compdayEntry.grid(row=6, column=1, padx=5, pady=30, sticky='sw')
         # month
         tk.Label(self.new_frame, text='Month', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=4, column=2, sticky='nw')
+                 height=1).grid(row=6, column=2, sticky='nw')
         self.compmonthEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
         self.compmonthEntry.insert(0, str(datetime.date.today().month))
-        self.compmonthEntry.grid(row=4, column=2, padx=5, pady=30, sticky='sw')
+        self.compmonthEntry.grid(row=6, column=2, padx=5, pady=30, sticky='sw')
         # year
         tk.Label(self.new_frame, text='Year', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=4, column=3, sticky='nw')
+                 height=1).grid(row=6, column=3, sticky='nw')
         self.compyrEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
         self.compyrEntry.insert(0, str(datetime.date.today().year))
-        self.compyrEntry.grid(row=4, column=3, pady=30, sticky='sw')
+        self.compyrEntry.grid(row=6, column=3, pady=30, sticky='sw')
 
-        submitButton = tk.Button(self.new_frame, text='Submit', font=("Calibri", 14, 'bold'),
-                                 fg='white', bg='green', width=10, height=2, command=self.submit_sale)
-        submitButton.grid(row=6, column=2, padx=10, sticky='se')
+        tk.Button(self.new_frame, text='Submit', font=("Calibri", 14, 'bold'), fg='white', bg='green', width=10,
+                  height=2, command=self.submit_sale).grid(row=7, column=2, padx=10, sticky='se')
 
-        custpageb = tk.Button(self.new_frame, text='Back', font=("Calibri", 14, 'bold'),
-                              fg='brown', bg='white', height=2, width=15, command=self.salepage)
-        custpageb.grid(row=6, column=0, padx=15, stick='se')
+        tk.Button(self.new_frame, text='Back', font=("Calibri", 14, 'bold'), fg='brown', bg='white', height=2,
+                  width=15, command=self.salepage).grid(row=7, column=0, padx=15, stick='se')
 
         # display inventory page's frame
         if self.submit_frame is not None:
@@ -605,6 +610,17 @@ class TransApp:
         if self.sectionFrame is not None:
             self.sectionFrame.grid_forget()
         self.new_frame.grid(row=1, rowspan=8, column=0, columnspan=3, sticky='nsew')
+
+    def inv_fields(self):
+        invdata = self.read_inv()
+
+        prod_ids = [v for line in invdata for k, v in eval(line).items() if k == 'prod_id']
+        prod_names = [v for line in invdata for k, v in eval(line).items() if k == 'prod_name']
+        quants = [v for line in invdata for k, v in eval(line).items() if k == 'qty']
+        units = [v for line in invdata for k, v in eval(line).items() if k == 'unit']
+        entry_dates =  [v for line in invdata for k, v in eval(line).items() if k == 'entry_date']
+
+        return prod_ids, prod_names, quants, units, entry_dates
 
     def sel_paystat(self, payment_status):
         self.sales_obj.payment_status = payment_status
@@ -649,10 +665,10 @@ class TransApp:
                   command=lambda: self.display_acct()).grid(row=0, padx=40, pady=10, sticky='nsew')
         tk.Button(self.sectionFrame, text='CREATE ACCOUNT', bg='white', fg='blue',
                   font=('arial black', 14), command=self.new_acct).grid(row=1, padx=60, pady=10, sticky='nsew')
-        tk.Button(self.sectionFrame, text='PAYMENTS/WITHDRAWALS', bg='white', fg='orange',
-                  font=('arial black', 14), command=self.acctranspage).grid(row=2, padx=80, pady=10, sticky='nsew')
-        tk.Button(self.sectionFrame, text='DELETE ACCOUNT', bg='white', fg='red',
-                  font=('arial black', 14), command=self.delete_acct).grid(row=3, padx=100, pady=10, sticky='nsew')
+        tk.Button(self.sectionFrame, text='UPDATE ACCOUNT', bg='white', fg='orange',
+                  font=('arial black', 14), command=self.edit_acct).grid(row=2, padx=80, pady=10, sticky='nsew')
+        tk.Button(self.sectionFrame, text='ACCOUNT TRANSACTIONS', bg='white', fg='brown',
+                  font=('arial black', 14), command=self.acctranspage).grid(row=3, padx=100, pady=10, sticky='nsew')
         
         # display inventory page's frame
         if self.display_frame is not None:
@@ -691,7 +707,7 @@ class TransApp:
 
         # place new account form
         # use company name to select customer ID
-        tk.Label(self.new_frame, text='Account For:', font=('calibri', 13),
+        tk.Label(self.new_frame, text='Create Account For:', font=('calibri', 13),
                  bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
         cname_cbox = ttk.Combobox(self.new_frame, value=cust_names, font=('calibri', 13), width=24, state='readonly')
         for f, m, l in cust_names:
@@ -895,11 +911,8 @@ class TransApp:
         self.display_frame = self.make_frame(page_title='CUSTOMER ACCOUNTS VIEW', background_color=bg)
 
         # create a list of existing customer accounts
-        with open(self.acct_obj.acct_data, 'r', encoding='utf8') as hand:
-            acctdata = hand.readlines()
+        dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
 
-        # creating a list of customer account details for each customer
-        acct_ids = [v for line in acctdata for k, v in eval(line).items() if k == 'account_id']
         if len(acct_ids) < 1:
             return messagebox.showinfo(message='There are no existing accounts to view'
                                                '\n\nPlease create account(s) for customer(s)')
@@ -930,20 +943,11 @@ class TransApp:
         global acctdata
         bg, fg = 'green', 'white'
 
-        cid, acct_curr, acct_bal, dop = None, None, None, None
+        acct = self.fetch_acct(selected_acctid)  # get fields of the selected account
+        acct_bal = self.get_bal(selected_acctid)  # get current account balance
+        custid, f_name, m_name, l_name, sex, dbirth, country, state, office, dopened  = self.fetch_cust(acct['customer_id'])  # get fields of the selected customer
+        c_name = f'{f_name} {l_name}'  # customer's first and last names
 
-        for line in acctdata:
-            attr = eval(line)
-            # return print(attr)
-            for k, v in attr.items():
-                if k == 'account_id' and v == selected_acctid:
-                    acct_curr = attr['currency']
-                    cid = attr['customer_id']
-                    acct_bal = float(attr['balance'])
-                    dop = attr['date_opened']
-
-        acct = self.get_acct(selected_acctid)
-        acct_bal = self.get_bal(selected_acctid)
         if acct_bal is None:
             return messagebox.showinfo(
                 message=f'{selected_acctid} is an inactive account\nPlease select another account')
@@ -955,16 +959,21 @@ class TransApp:
         st.grid(row=0, column=0, columnspan=8, sticky='nsew')
         # display headings for customer records
         st.insert(index='end',
-                  chars='ACCOUNT ID, CUSTOMER ID, CURRENCY, BALANCE, DATE OPENED\n\n')
+                  chars='ACCOUNT ID,\tCUSTOMER ID,\tCUSTOMER NAME,\tCURRENCY,\tBALANCE,\tDATE OPENED\n\n')
 
         st.insert(index='end',
-                  chars=f"{acct['account_id']}, {acct['customer_id']}, {acct['currency']}, {acct_bal}, {acct['date_opened']}\n\n")
+                  chars=f"{acct['account_id']},\t{acct['customer_id']},\t{c_name},\t{acct['currency']},\t{acct_bal},\t{acct['date_opened']}\n\n")
         # make text field read-only
         st.config(state='disabled')
         # ensure that text can be copied to clipboard
         st.bind('<1>', lambda event: st.focus_set())
         
-    def get_acct(self, selected_acctid):
+    def fetch_acct(self, selected_acctid):
+        '''
+        returns the details of the selected account in a dictionary format
+        :param selected_acctid:
+        :return:--> {'date_opened': '', 'account_id': '', 'customer_id': '', 'currency': '', 'balance': ''}
+        '''
         dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
 
         acct = {'date_opened': '', 'account_id': '', 'customer_id': '', 'currency': '', 'balance': ''}
@@ -975,7 +984,7 @@ class TransApp:
 
         return acct
         
-    def acct_fields(self, selected_acctid=None):
+    def acct_fields(self):
         '''
         to generate a tuple of lists containing transactions in separate fields
         :return:--> (trans_dates, trans_acctids, trans_types, trans_amnts)
@@ -983,20 +992,6 @@ class TransApp:
 
         with open(self.acct_obj.acct_data, 'r', encoding='utf8') as hand:
             acctdata = hand.readlines()
-
-        if selected_acctid is not None:  # when we are interested in all accounts
-            for line in acctdata:
-                attr = eval(line)
-                # return print(attr)
-                for k, v in attr.items():
-                    if k == 'account_id' and v == selected_acctid:
-                        acct_types = attr['currency']
-                        cust_ids = attr['customer_id']
-                        acct_bals = float(attr['balance'])
-                        dates_opened = attr['date_opened']
-                        acct_ids = selected_acctid
-
-        else:  # when we are interested in just one account
             # creating a list of customer transaction fields for each transaction
             dates_opened = [v for line in acctdata for k, v in eval(line).items() if k == 'date_opened']
             acct_ids = [v for line in acctdata for k, v in eval(line).items() if k == 'account_id']
@@ -1008,19 +1003,17 @@ class TransApp:
 
     def get_bal(self, selected_acctid):
         '''
-        return the current account balance
+        calculate the current balance of the selected account
         :param selected_acctid:
         :return: --> float(acct_bal)
         '''
         creds, debs = [], []
-        # calculate customer's current account balance
-        trans = self.get_active_acctrans(selected_acctid)
+
+        trans = self.get_active_acctrans(selected_acctid)  # calculate customer's current account balance
 
         if trans is None:
             return None
-
         # print(trans)
-
         for ind in range(len([v for k, v in trans.items() if k == 'trans_date'][0])):
             # print(ind)
             if trans['trans_type'][ind] == 'Credit':
@@ -1031,6 +1024,244 @@ class TransApp:
         # print(f"Debits: {debs}\nCredits: {creds}")
         acct_bal = sum(creds) - sum(debs)
         return acct_bal
+
+    def edit_acct(self):
+        bg, fg = 'green', 'white'
+        acct = []
+        lines = {}
+
+        # setup display frame
+        self.display_frame = self.make_frame(page_title='CUSTOMER ACCOUNTS VIEW', background_color=bg)
+
+        # create a list of existing customer accounts
+        dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
+
+        if len(acct_ids) < 1:
+            return messagebox.showinfo(message='There are no existing accounts to view'
+                                               '\n\nPlease create account(s) for customer(s)')
+        # select account id
+        tk.Label(self.display_frame, text='Select Customer Account:', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
+        cacct_Cbox = ttk.Combobox(self.display_frame, value=acct_ids, font=('calibri', 13), width=24, state='readonly')
+        cacct_Cbox.set(acct_ids[0])
+        cacct_Cbox.grid(row=0, column=1, sticky='w')
+        ttk.Button(self.display_frame, text='SELECT', command=lambda: self.pop_editacct_form(cacct_Cbox.get())
+                   ).grid(row=0, column=2, sticky='w')
+
+        tk.Button(self.display_frame, text='Accounts Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
+                  width=15, command=self.acctpage).grid(row=2, column=3, padx=5, pady=5, stick='se')
+
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.edit_frame is not None:
+            self.edit_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+
+        self.display_frame.rowconfigure(list(range(3)), weight=1)
+        self.display_frame.columnconfigure(list(range(9)), weight=1)
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
+
+    def pop_editacct_form(self, selected_acctid):
+        bg, fg = 'green', 'white'
+
+        acct = self.fetch_acct(selected_acctid)  # get fields of the selected account
+        acct_bal = self.get_bal(selected_acctid)  # get current account balance
+        custid, f_name, m_name, l_name, sex, dbirth, country, state, office, dopened = self.fetch_cust(
+            acct['customer_id'])  # get fields of the selected customer
+        c_name = f'{f_name} {l_name}'  # customer's first and last names
+
+        if acct_bal is None:
+            return messagebox.showinfo(
+                message=f'{selected_acctid} is an inactive account\nPlease select another account')
+
+        # display headings for customer records
+        # create scrolled text field to display customer records
+        st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, wrap='word',
+                                       font=("Calibri", 14, 'bold'), relief='flat')
+        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
+        # display headings for customer records
+        st.insert(index='end',
+                  chars='ACCOUNT ID,\tCUSTOMER ID,\tCUSTOMER NAME,\tCURRENCY,\tBALANCE,\tDATE OPENED\n\n')
+
+        st.insert(index='end',
+                  chars=f"{acct['account_id']},\t{acct['customer_id']},\t{c_name},\t{acct['currency']},\t{acct_bal},\t{acct['date_opened']}\n\n")
+        # make text field read-only
+        st.config(state='disabled')
+        # ensure that text can be copied to clipboard
+        st.bind('<1>', lambda event: st.focus_set())
+
+        # to edit the given row number (at row entry - 1)
+        tk.Label(self.display_frame, text='CONFIRM ACCOUNT ID:', font=("Calibri", 12, 'bold'), bg=bg,
+                 fg=fg).grid(row=2, column=0, padx=2, sticky='e')
+        # select transid
+        edit_acctidCbox = ttk.Combobox(self.display_frame, width=12, value=acct['account_id'],
+                                        font=("Calibri", 12, 'bold'), state='readonly')
+        edit_acctidCbox.set(acct['account_id'])
+        edit_acctidCbox.grid(row=2, column=1, sticky='w')
+
+        # edit button
+        ttk.Button(self.display_frame, text='Confirm', width=15, command=lambda:
+        self.editing_acct(edit_acctidCbox.get())).grid(row=2, column=2, sticky='w')
+
+    def editing_acct(self, selected_acctid):
+        bg, fg = 'green', 'white'
+        self.display_frame = self.make_frame(page_title='EDIT SELECTED ACCOUNT', background_color=bg)
+
+        acct = self.fetch_acct(selected_acctid)
+        acct_bal = self.get_bal(selected_acctid)
+
+        # print(self.acct_obj.__dict__)
+        self.acct_obj.__dict__.update(acct)  # setting the account instance to have the selected account details
+        # print(self.acct_obj.__dict__)
+
+        # display editable fields in entries for user
+        tk.Label(self.display_frame, text="ACCOUNT ID", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=0, sticky='sw', padx=25, pady=15)
+        self.accid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.accid_entry.insert(0, string=f'{self.acct_obj.account_id}')
+        self.accid_entry.config(state='disabled')
+        self.accid_entry.grid(row=2, column=0, sticky='w', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="CUSTOMER ID", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=1, sticky='sw', padx=25, pady=15)
+        self.cid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.cid_entry.insert(0, string=f'{self.acct_obj.customer_id}')
+        self.cid_entry.config(state='disabled')
+        self.cid_entry.grid(row=2, column=1, sticky='w', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="CURRENCY", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=2, sticky='sw', padx=25, pady=15)
+        currs = ['NGN', 'GBP', 'USD', 'CAD', 'AUD', 'GHC']
+        self.acurr_Cbox = ttk.Combobox(self.display_frame, font=("Calibri", 12, 'bold'), value=currs, state='readonly')
+        self.acurr_Cbox.set(f'{self.acct_obj.currency}')
+        self.acurr_Cbox.grid(row=2, column=2, sticky='w', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="CURRENT BALANCE", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=3, column=0, sticky='sw', padx=25, pady=15)
+        self.acbal_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.acbal_entry.insert(0, string=f'{acct_bal}')
+        self.acbal_entry.config(state='disabled')
+        self.acbal_entry.grid(row=4, column=0, sticky='w', padx=25, pady=5)
+
+        # update and customer page buttons
+        tk.Button(self.display_frame, text='Update', font=("Calibri", 12, 'bold'), bg='orange', fg='white',
+                  height=1, width=15, command=lambda: self.update_acct(selected_acctid)).grid(row=6, column=1, padx=5, pady=5, stick='w')
+
+        tk.Button(self.display_frame, text='Accounts Page', font=("Calibri", 12, 'bold'),
+                  bg='blue', fg='white', height=1, width=15, command=self.acctpage).grid(row=6, column=2, padx=5,
+                                                                                             pady=5, stick='e')
+
+        # clear the frames before and after this page
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.edit_frame is not None:
+            self.edit_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+
+        # display an adjustible frame containing the selected info
+        self.display_frame.rowconfigure(list(range(7)), weight=1)
+        self.display_frame.columnconfigure(list(range(4)), weight=1)
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
+
+    def update_acct(self, selected_acctid):
+        bg, fg = 'green', 'white'
+        typ, accid = self.acurr_Cbox.get(), self.accid_entry.get()
+        dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
+        beg = accid[:4]
+
+        new_accid = f'{accid[:9]}{typ}'  # modifying the account id to reflect the change
+
+        if (typ == self.acct_obj.currency):
+            return messagebox.showerror(title='Same Values As Values',
+                                        message='No Changes Made!\n\nPlease Check The Following Fields: \nAccount Type')
+
+        # print(beg, typ)
+        # print([True for ai in acct_ids if ai.startswith(beg) and ai.endswith(typ)])
+        # print(type(new_accid), acct_ids)
+        if [True for ai in acct_ids if ai.startswith(beg) and ai.endswith(typ)]:  # check if user already has selected account type
+            return messagebox.showerror(title='Account Already Exists',
+                                        message=f'User Already Has a {typ} Account\n\nPlease Choose another Account Type')
+
+        if not(messagebox.askyesno(message='Do You Want To Save Changes Made?')):
+            messagebox.showinfo(message='No Changes Made')
+            return self.edit_acctrans()
+
+        self.save_edited_acct()  # save entry before changes made is implemented
+        self.acct_obj.account_id, self.acct_obj.currency = new_accid, typ  # setting the account instance to changes made
+        # print(self.acct_obj.__dict__)  # edited version
+
+        self.alter_acctid_trans(selected_acctid, new_accid)  # change the account id for old transactions
+
+        for ind in range(len(acct_ids)):  # fetch the particular transaction for editing
+            if acct_ids[ind] == selected_acctid:
+                acct_ids[ind], cust_ids[ind], acct_types[ind], acct_bals[ind], dates_opened[
+                    ind] = self.acct_obj.account_id, self.acct_obj.customer_id, self.acct_obj.currency, self.acct_obj.balance, self.acct_obj.date_opened
+
+        # when confirmation is given by user
+        self.display_frame = self.make_frame(background_color=bg)
+
+        tk.Label(self.display_frame, text=f"UPDATE STATUS", font=("Calibri", 20, 'bold'),
+                 bg=bg, fg=fg).grid(row=0, column=0, columnspan=2, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text=f"ACCOUNT ID\n{self.acct_obj.account_id}",
+                 font=("Calibri", 16, 'bold'), bg=bg, fg=fg).grid(row=1, column=1, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"CUSTOMER ID\n{self.acct_obj.customer_id}",
+                 font=("Calibri", 16, 'bold'), bg=bg, fg=fg).grid(row=1, column=2, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"CURRENCY\n{self.acct_obj.currency}",
+                 font=("Calibri", 16, 'bold'), bg=bg, fg=fg).grid(row=1, column=3, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"BALANCE\n{self.acct_obj.balance}",
+                 font=("Calibri", 16, 'bold'), bg=bg, fg=fg).grid(row=2, column=1, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"DATE OPENED\n{self.acct_obj.date_opened}",
+                 font=("Calibri", 16, 'bold'), bg=bg, fg=fg).grid(row=2, column=2, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text="HAS BEEN UPDATED!!", font=("Calibri", 20, 'bold'),
+                 bg=bg, fg=fg).grid(row=3, column=1, columnspan=2, sticky='NSEW', padx=25)
+
+        tk.Button(self.display_frame, text='Accounts Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg,
+                  height=1, width=15, command=self.acctpage).grid(row=4, column=2, padx=5, pady=5, stick='se')
+        tk.Button(self.display_frame, text='Transactions Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg,
+                  height=1, width=15, command=self.acctranspage).grid(row=4, column=1, padx=5, pady=5, stick='se')
+
+        # save updated version to file
+        with open(self.acct_obj.acct_data, 'w', encoding='utf8') as hand:
+            for do, ai, ci, at, ab in zip(dates_opened, acct_ids, cust_ids, acct_types, acct_bals):
+                if ai == selected_acctid:
+                    # print(self.acct_obj.__dict__)
+                    hand.writelines(f'{self.acct_obj.__dict__}\n')
+                    continue
+                dd = {'date_opened': do, 'account_id': ai, 'customer_id': ci, 'currency': at, 'balance': ab,
+                      'acct_data': self.acct_obj.acct_data, 'acct_edits': self.acct_obj.acct_edits,
+                      'acct_dels': self.acct_obj.acct_dels}
+                # print(dd)
+                hand.writelines(f'{dd}\n')
+
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.edit_frame is not None:
+            self.edit_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+
+        self.display_frame.rowconfigure([0, 1, 2, 3], weight=1)
+        self.display_frame.columnconfigure(list(range(4)), weight=1)
+        self.display_frame.grid(row=1, rowspan=4, column=0, columnspan=4, sticky='nsew')
+
+    def alter_acctid_trans(self, selected_acctid, new_acctid):
+        trans_ids, trans_dates, trans_acctids, trans_types, trans_amnts = self.acctrans_fields()  # all transactions
+        with open(self.acctrans_obj.acctrans_data, 'w', encoding='utf8') as hand:
+            for ti, td, ta, tt, tamt in zip(trans_ids, trans_dates, trans_acctids, trans_types, trans_amnts):
+                if ta == selected_acctid:  #  where there is the old account id
+                    ta = new_acctid  # set as new account id
+                self.acctrans_obj.trans_id, self.acctrans_obj.trans_date, self.acctrans_obj.account_id, self.acctrans_obj.trans_type, self.acctrans_obj.amount = ti, td, ta, tt, tamt
+                print(self.acctrans_obj.__dict__)
+                hand.writelines(f'{self.acctrans_obj.__dict__}\n')
+
+        print(f'transactions of {new_acctid} has been set')
+
+    def save_edited_acct(self):
+        with open(self.acct_obj.acct_edits, 'a', encoding='utf8') as hand:
+            hand.writelines(f'{self.acct_obj.__dict__}\n')
 
     def acctranspage(self):
         # frame for customer accounts page containing three rows and one column
@@ -1065,15 +1296,16 @@ class TransApp:
         bg, fg = 'orange', 'white'
 
         # frame for input of new inventory
-        self.new_frame = tk.LabelFrame(self.master, text='REGISTER CUSTOMER TRANSACTION', fg=fg,
-                                       font=('arial black', 12), bg=bg)
+        self.new_frame = tk.LabelFrame(self.master, text='REGISTER CUSTOMER TRANSACTION', font=('arial black', 12), bg=bg)
         self.new_frame.rowconfigure(list(range(6)), weight=1)
         self.new_frame.columnconfigure(list(range(5)), weight=1)
 
         # create a list of existing customer accounts
         dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
 
-        # print(f'{customer_ids}\n{acct_ids}')
+        if len(acct_ids) < 1:
+            return messagebox.showerror(title='No Existing Active Account',
+                                        message='To register a new transaction\nYou must first create and activate a customer account')
 
         # place new account form
         # use company name to select customer ID
@@ -1177,8 +1409,8 @@ class TransApp:
         # check for fields with invalid data types
         try:
             if float(amnt) <= 0:
-                return messagebox.showerror(title='Invalid number',
-                                            message=f'{amnt} is not a valid number\nPlease enter a positive number!')
+                return messagebox.showerror(title='Invalid Amount',
+                                            message=f'{amnt} is not a valid amount\nPlease enter a positive amount!')
             if type == 'Debit' and float(amnt) > float(bal):
                 return messagebox.showerror(title='Insufficient Funds',
                                             message=f'DEBIT amount: {amnt} cannot exceed your current balance: {bal}')
@@ -1267,12 +1499,14 @@ class TransApp:
                   width=15, command=self.acctranspage).grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         # create a list of existing customer accounts
-        with open(self.acct_obj.acct_data, 'r', encoding='utf8') as hand:
-            acctdata = hand.readlines()
+        acctdata = self.read_acct()
 
         # creating a list of customer account details for each customer
         acct_ids = [v for line in acctdata for k, v in eval(line).items() if k == 'account_id']
-
+        
+        if len(acct_ids) < 1:
+            return messagebox.showerror(title='No Existing Active Account', 
+                                        message='There are no available transactions to display')
         # select account id
         tk.Label(self.display_frame, text='Select Customer Account:', font=('calibri', 13),
                  bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
@@ -1298,7 +1532,12 @@ class TransApp:
         # global trans_dates, trans_types, trans_acctids, trans_amnts
         bg, fg = 'orange', 'white'
 
-        date_opened, acct_id, cid, acct_type, acct_bal = self.acct_fields(selected_acctid)  # customer's account information
+        acct = self.fetch_acct(selected_acctid)  # customer's account information
+        for k, v in acct.items():
+            if k == 'currency':
+                acct_type = v
+            if k == 'balance':
+                acct_bal = float(v)
 
         trans = self.get_active_acctrans(selected_acctid)
 
@@ -1348,11 +1587,12 @@ class TransApp:
         Empty = True
 
         for i, d, ai, tt, tamt in zip(trans_ids, trans_dates, trans_acctids, trans_types, trans_amnts):
-            if ai == selected_acctid:
+            if ai == selected_acctid:  # return selected transaction at trans id
                 trans['trans_id'].append(i), trans['trans_date'].append(d), trans['account_id'].append(ai), trans['trans_type'].append(tt), trans[
                     'amount'].append(tamt)
                 Empty = False
-            elif selected_acctid is None:
+
+            elif selected_acctid is None:  # return all transactions
                 trans['trans_id'].append(i), trans['trans_date'].append(d), trans['account_id'].append(ai), trans[
                     'trans_type'].append(tt), trans[
                     'amount'].append(tamt)
@@ -1362,10 +1602,20 @@ class TransApp:
             return None
         return trans
 
+    def fetch_transaction(self, selected_transid):
+        trans_ids, trans_dates, trans_acctids, trans_types, trans_amnts = self.acctrans_fields()
+
+        trans = {'trans_id': None, 'trans_date': None, 'account_id': None, 'trans_type': None, 'amount': None}
+
+        for i, d, ai, tt, tamt in zip(trans_ids, trans_dates, trans_acctids, trans_types, trans_amnts):
+            if i == selected_transid:  # return selected transaction at trans id
+                trans['trans_id'], trans['trans_date'], trans['account_id'], trans['trans_type'], trans['amount'] = i, d, ai, tt, tamt
+        return trans
+
     def acctrans_fields(self):
         '''
         to generate a tuple of lists containing transactions in separate fields
-        :return:--> (trans_dates, trans_acctids, trans_types, trans_amnts)
+        :return:--> (trans_ids, trans_dates, trans_acctids, trans_types, trans_amnts)
         '''
         with open(self.acctrans_obj.acctrans_data, 'r', encoding='utf8') as hand:
             acctransdata = hand.readlines()
@@ -1383,10 +1633,15 @@ class TransApp:
         bg, fg = 'brown', 'white'
         # setup display frame
         self.display_frame = self.make_frame(page_title='UPDATE CUSTOMER TRANSACTIONS', background_color=bg)
+        
         tk.Button(self.display_frame, text='Transactions Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
                   width=15, command=self.acctranspage).grid(row=2, column=3, padx=5, pady=5, stick='se')
         dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
-
+        
+        if len(acct_ids) < 1:
+            return messagebox.showerror(title='No Existing Active Account', 
+                                        message='There are no transactions available for update')
+        
         # select account id
         tk.Label(self.display_frame, text='Select Account:', font=('calibri', 13),
                  bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
@@ -1413,7 +1668,12 @@ class TransApp:
 
         acct_bal = self.get_bal(selected_acctid)
 
-        date_opened, acct_id, cid, acct_type, acct_bal = self.acct_fields(selected_acctid)  # customer's account information
+        acct = self.fetch_acct(selected_acctid)  # customer's account information
+        for k, v in acct.items():
+            if k == 'currency':
+                acct_type = v
+            if k == 'balance':
+                acct_bal = float(v)
 
         trans = self.get_active_acctrans(selected_acctid)  # customer's transactions
 
@@ -1542,7 +1802,7 @@ class TransApp:
     def update_acctrans(self):
         global trans, acct_bal
         bg, fg = 'brown', 'white'
-        type, amnt = self.trtyp_Cbox.get(), self.tramt_entry.get()
+        typ, amnt = self.trtyp_Cbox.get(), self.tramt_entry.get()
 
         try:
             if float(amnt) <= 0:
@@ -1554,12 +1814,18 @@ class TransApp:
         except ValueError:
             return messagebox.showerror(message='Please Check The Following Fields: \nTransaction Type, \nAmount fields')
 
-        if (type == self.acctrans_obj.trans_type) and (amnt == self.acctrans_obj.amount):
+        if (typ == self.acctrans_obj.trans_type) and (amnt == self.acctrans_obj.amount):
             return messagebox.showerror(title='Same Values As Values',
                                         message='No Changes Made!\n\nPlease Check The Following Fields: \nTransaction Type, \nAmount fields')
 
-        if type != self.acctrans_obj.trans_type:
-            self.acctrans_obj.trans_type = type
+        if not(messagebox.askyesno(message='Do You Want To Save Changes Made?')):
+            messagebox.showinfo(message='No Changes Made')
+            return self.edit_acctrans()
+
+        self.save_edited_acctrans()  # save entry before changes made is implemented
+
+        if typ != self.acctrans_obj.trans_type:
+            self.acctrans_obj.trans_type = typ
         if amnt != self.acctrans_obj.amount:
             self.acctrans_obj.amount = amnt
         # print(self.acctrans_obj.__dict__)
@@ -1569,6 +1835,14 @@ class TransApp:
             if trans['trans_id'][ind] == self.acctrans_obj.trans_id:
                 trans['trans_id'][ind], trans['account_id'][ind], trans['trans_type'][ind], trans['amount'][ind], trans['trans_date'][ind] = self.acctrans_obj.trans_id, self.acctrans_obj.account_id, self.acctrans_obj.trans_type, self.acctrans_obj.amount, self.acctrans_obj.trans_date
         # print(f'New: {trans}')
+
+        # save updated version to file
+        with open(self.acctrans_obj.acctrans_data, 'w', encoding='utf8') as hand:
+            trans_len = [len(v) for k, v in trans.items() if k == 'trans_id'][0]
+            for ind in range(trans_len):
+                curr_dict = {k: v[ind] for k, v in trans.items()}
+                # print(ind, curr_dict)
+                hand.writelines(f"{curr_dict}\n")
 
         # when confirmation is given by user
         self.display_frame = self.make_frame(background_color=bg)
@@ -1597,18 +1871,6 @@ class TransApp:
         tk.Button(self.display_frame, text='Transactions Page', font=("Calibri", 12, 'bold'),
                              fg=bg, bg=fg, height=1, width=15, command=self.acctranspage).grid(row=4, column=2, padx=5, pady=5, stick='se')
 
-        if not(messagebox.askyesno(message='Do You Want To Save Changes Made?')):
-            messagebox.showinfo(message='No Changes Made')
-            return self.edit_acctrans()
-
-        # save updated version to file
-        with open(self.acctrans_obj.acctrans_data, 'w', encoding='utf8') as hand:
-            trans_len = [len(v) for k, v in trans.items() if k == 'trans_id'][0]
-            for ind in range(trans_len):
-                curr_dict = {k: v[ind] for k, v in trans.items()}
-                # print(ind, curr_dict)
-                hand.writelines(f"{curr_dict}\n")
-
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
         if self.edit_frame is not None:
@@ -1620,61 +1882,31 @@ class TransApp:
         self.display_frame.columnconfigure(list(range(4)), weight=1)
         self.display_frame.grid(row=1, rowspan=4, column=0, columnspan=4, sticky='nsew')
 
-
+    def save_edited_acctrans(self):
+        with open(self.acctrans_obj.acctrans_edits, 'a', encoding='utf8') as hand:
+            hand.writelines(f'{self.acctrans_obj.__dict__}\n')
+    
     def delete_acctrans(self):
-        pass
-
-    def delete_acct(self):
-        global edit_acctid_entry, acct, lines
-        bg, fg = 'green', 'white'
-        acct = []
-        lines = {}
-
+        bg, fg = 'red', 'white'
         # setup display frame
-        self.display_frame = self.make_frame(page_title='UPDATE ACCOUNTS', background_color=bg)
+        self.display_frame = self.make_frame(page_title='DELETE CUSTOMER TRANSACTIONS', background_color=bg)
+        
+        tk.Button(self.display_frame, text='Transactions Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
+                  width=15, command=self.acctranspage).grid(row=2, column=3, padx=5, pady=5, stick='se')
+        dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
 
-        # retrieve customer data from file
-        # cust is a list of strings containing customer records
-        acct_rec = self.read_acct()
+        if len(acct_ids) < 1:
+            return messagebox.showerror(title='No Existing Active Account',
+                                        message='There are no transactions available for deletion')
 
-        for ind in range(len(acct_rec)):
-            # labelled format of saved customer record
-            lines['Row_' + str(ind)] = eval(acct_rec[ind])
-            # cust is a list of saved customer instances
-            acct.append(eval(acct_rec[ind]))
-
-        # display headings for customer records
-        # create scrolled text field to display customer records
-        st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, wrap='word',
-                                       font=("Calibri", 14, 'bold'), relief='flat')
-        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
-        # display headings for customer records
-        st.insert(index='end',
-                  chars='ACCOUNT ID, CUSTOMER ID, CURRENCY, BALANCE, DATE OPENED\n\n')
-
-        for ind in range(len(acct)):
-            # assign user input from stored customer records to each customer class attribute
-            self.acct_obj.__dict__ = acct[ind]
-
-            st.insert(index='end',
-                      chars=f"{self.acct_obj.account_id}, {self.acct_obj.customer_id}, {self.acct_obj.currency}, {self.acct_obj.balance}, {self.acct_obj.date_opened}\n\n")
-        # make text field read-only
-        st.config(state='disabled')
-        # ensure that text can be copied to clipboard
-        st.bind('<1>', lambda event: st.focus_set())
-
-        # to edit the given row number (at row entry - 1)
-        tk.Label(self.display_frame, text='ENTER ACCOUNT ID:', font=("Calibri", 12, 'bold'), bg=bg,
-                 fg=fg).grid(row=2, column=0, padx=2, sticky='e')
-        # acctid entry
-        edit_acctid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'), relief='sunken')
-        edit_acctid_entry.grid(row=2, column=1, padx=2, sticky='ew')
-        # edit button
-        tk.Button(self.display_frame, text='Delete', font=("Calibri", 12, 'bold'), bg='orange', fg=fg,
-                  height=1, width=10, command=self.erase_acct).grid(row=2, padx=5, column=2, sticky='w')
-
-        tk.Button(self.display_frame, text='Accounts Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
-                  width=15, command=self.acctpage).grid(row=2, column=3, padx=5, pady=5, stick='se')
+        # select account id
+        tk.Label(self.display_frame, text='Select Account:', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
+        cacct_Cbox = ttk.Combobox(self.display_frame, value=acct_ids, font=('calibri', 13), width=24, state='readonly')
+        cacct_Cbox.set(acct_ids[0])
+        cacct_Cbox.grid(row=0, column=1, sticky='w')
+        ttk.Button(self.display_frame, text='SELECT', command=lambda: self.pop_del_acctrans_form(cacct_Cbox.get())
+                   ).grid(row=0, column=2, sticky='w')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -1686,15 +1918,129 @@ class TransApp:
         self.display_frame.rowconfigure(list(range(3)), weight=1)
         self.display_frame.columnconfigure(list(range(9)), weight=1)
         self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
+        
+    def pop_del_acctrans_form(self, selected_acctid):
+        global trans, acct_bal, all_trans
+        bg, fg = 'red', 'white'
 
-    def erase_acct(self):
-        pass
+        acct_bal = self.get_bal(selected_acctid)
+
+        acct = self.fetch_acct(selected_acctid)  # customer's account information
+        for k, v in acct.items():
+            if k == 'currency':
+                acct_type = v
+            if k == 'balance':
+                acct_bal = float(v)
+
+        trans = self.get_active_acctrans(selected_acctid)  # selected account transactions
+        all_trans = self.get_active_acctrans()  # all transactions
+
+        if trans is None:
+            return messagebox.showinfo(title='Inactive Account Selected',
+                                       message=f'{selected_acctid} is inactive,\nPlease activate or\n\nSelect an active account to view')
+
+        # display headings for customer records
+        # create scrolled text field to display customer records
+        st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, wrap='word',
+                                       font=("Calibri", 14, 'bold'), relief='flat')
+        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
+        # display headings for customer records
+        st.insert(index='end',
+                  chars='TRANSACTION ID, TRANSACTION DATE, ACCOUNT ID, TRANSACTION TYPE, AMOUNT, BALANCE\n\n')
+        # print(len([v for k, v in trans.items() if k == 'trans_date'][0]), trans)
+        for ind in range(len([v for k, v in trans.items() if k == 'trans_date'][0])):
+            print(ind)
+            if trans['trans_type'][ind] == 'Credit':
+                acct_bal += float(trans['amount'][ind])
+            else:  # if trans['trans_type'][ind] == 'Debit':
+                acct_bal -= float(trans['amount'][ind])
+
+            # print(acct_bal, trans['trans_type'][ind], float(trans['amount'][ind]))
+
+            st.insert(index='end',
+                      chars=f"{trans['trans_id'][ind]},\t"
+                            f"{trans['trans_date'][ind]},\t"
+                            f" {trans['account_id'][ind]},\t"
+                            f"{trans['trans_type'][ind]},\t"
+                            f"{acct_type}{trans['amount'][ind]},\t"
+                            f"{acct_type}{acct_bal}\n\n")
+        # make text field read-only
+        st.config(state='disabled')
+        # ensure that text can be copied to clipboard
+        st.bind('<1>', lambda event: st.focus_set())
+
+        # to edit the given row number (at row entry - 1)
+        tk.Label(self.display_frame, text='SELECT TRANSACTION ID:', font=("Calibri", 12, 'bold'), bg=bg,
+                 fg=fg).grid(row=2, column=0, padx=2, sticky='e')
+        # select transid
+        edit_transidCbox = ttk.Combobox(self.display_frame, width=12, value=trans['trans_id'],
+                                        font=("Calibri", 12, 'bold'), state='readonly')
+        edit_transidCbox.set(trans['trans_id'][0])
+        edit_transidCbox.grid(row=2, column=1, sticky='w')
+
+        # edit button
+        ttk.Button(self.display_frame, text='Delete', width=10, command=lambda:
+        self.erase_acctrans(edit_transidCbox.get())).grid(row=2, column=2, sticky='w')
+        
+    def erase_acctrans(self, selected_transid):
+        global trans, acct_bal, all_trans
+        bg, fg = 'red', 'white'
+  
+        self.display_frame = self.make_frame(page_title='RECORD DELETED', background_color=bg)
+
+        sel_trans = self.fetch_transaction(selected_transid)  # customer's transactions
+        print(f'Selected Transaction: {sel_trans}')
+
+        self.acctrans_obj.__dict__.update(sel_trans)
+        print(f'Instance: {self.acctrans_obj.__dict__}')
+
+        retainer = {'trans_id': [], 'trans_date': [], 'account_id': [], 'trans_type': [], 'amount': []}  # to retain all transactions except the selected transaction
+
+        for ind in range(len(
+                [v for k, v in all_trans.items() if k == 'trans_date'][0])):  # fetch all  except that particular transaction
+            if all_trans['trans_id'][ind] == selected_transid:
+                continue
+            retainer['trans_id'].append(all_trans['trans_id'][ind]), retainer['account_id'].append(all_trans['account_id'][ind])
+            retainer['trans_type'].append(all_trans['trans_type'][ind]), retainer['amount'].append(all_trans['amount'][ind])
+            retainer['trans_date'].append(all_trans['trans_date'][ind])
+
+        print(f"All Transactions: {all_trans}\nRetained Transactions: {retainer}")
+
+        if not (messagebox.askyesno(title='CONFIRM DELETE', message='Do You Want To Delete?')):
+            return messagebox.showinfo(message='RECORD NOT DELETED')
+
+        with open(self.acctrans_obj.acctrans_data, 'w', encoding='utf8') as hand:
+            retainer_len = [len(v) for k, v in retainer.items() if k == 'trans_id'][0]
+            for ind in range(retainer_len):
+                curr_dict = {k: v[ind] for k, v in retainer.items()}
+                # print(ind, curr_dict)
+                hand.writelines(f"{curr_dict}\n")
+
+        self.save_del_acctrans()
+
+        st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, font=("Calibri", 14, 'bold'), relief='flat')
+        st.insert(index='1.0', chars='TRANSACTIION ID,\tACCOUNT ID,\tTRANSACTION DATE,\tTRANSACTION TYPE,\nAMOUNT\n\n'
+                                     f'{self.acctrans_obj.trans_id}, {self.acctrans_obj.account_id}, {self.acctrans_obj.trans_type}, {self.acctrans_obj.amount}, {self.acctrans_obj.trans_date}\n\n'
+                                     'HAS BEEN DELETED!!')
+
+        st.grid(row=0, column=0, columnspan=10, sticky='ew')
+
+        tk.Button(self.display_frame, text='Transaction Page', font=("Calibri", 12, 'bold'),
+                             fg=bg, bg=fg, height=1, width=15, command=self.acctranspage).grid(row=3, column=3, padx=5, pady=5, stick='se')
+
+        self.display_frame.rowconfigure(list(range(4)), weight=1)
+        self.display_frame.columnconfigure(list(range(4)), weight=1)
+        self.display_frame.grid(row=1, rowspan=3, column=0, columnspan=4, sticky='nsew')
+
+    def save_del_acctrans(self):
+        with open(self.acctrans_obj.acctrans_dels, 'a', encoding='utf8') as hand:
+            hand.writelines(f'{self.acctrans_obj.__dict__}\n')
 
     def custpage(self):
         # frame for customer page containing three rows and one column
         self.sectionFrame = tk.LabelFrame(master=self.master, text='CUSTOMER', font=('arial black', 12), bg='blue',
                                       fg='white')
-        self.sectionFrame.rowconfigure([0, 1, 2, 3], weight=1)
+        self.sectionFrame.rowconfigure([0, 1, 2], weight=1)
         self.sectionFrame.columnconfigure(0, weight=1)
 
         # display customer options
@@ -1702,10 +2048,10 @@ class TransApp:
                                 font=('arial black', 14), command=self.new_cust).grid(row=1, padx=60, pady=10, sticky='nsew')
         tk.Button(self.sectionFrame, text='UPDATE CUSTOMER RECORD', bg='white', fg='orange',
                               font=('arial black', 14), command=self.edit_cust).grid(row=2, padx=80, pady=10, sticky='nsew')
-        tk.Button(self.sectionFrame, text='DELETE CUSTOMER RECORD', bg='white', fg='red',
-                              font=('arial black', 14), command=self.delete_cust).grid(row=3, padx=100, pady=10, sticky='nsew')
         tk.Button(self.sectionFrame, text='VIEW CUSTOMER RECORDS', bg='white', fg='green',
                               font=('arial black', 14), command=lambda: self.display_cust()).grid(row=0, padx=40, pady=10, sticky='nsew')
+        # tk.Button(self.sectionFrame, text='DELETE CUSTOMER RECORD', bg='white', fg='red',
+        #           font=('arial black', 14), command=self.delete_cust).grid(row=3, padx=100, pady=10, sticky='nsew')
 
         # display inventory page's frame
         if self.display_frame is not None:
@@ -1964,6 +2310,10 @@ class TransApp:
         return cust_attr
     
     def cust_fields(self):
+        '''
+        return (customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened)
+        :return: tuple of fields
+        '''
         with open(self.cust_obj.cust_data, 'r', encoding='utf8') as hand:
             custdata = hand.readlines()
         customer_ids = [v for line in custdata for k, v in eval(line).items() if k == 'customer_id']
@@ -1978,6 +2328,18 @@ class TransApp:
         dates_opened = [v for line in custdata for k, v in eval(line).items() if k == 'date_opened']
         
         return customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened
+
+    def fetch_cust(self, selected_custid):
+        '''
+        fetches the selected customer's details
+        :param selected_custid:
+        :return: (custid, f_name, m_name, l_name, sex, dbirth, country, state, office, dopened)
+        '''
+        customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened = self.cust_fields()
+
+        for cid, f, m, l, g, db, n, s, o, do in zip(customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened):
+            if cid == selected_custid:
+                return cid, f, m, l, g, db, n, s, o, do
 
     def display_cust(self):
         global edit_custid_entry, cust, lines
@@ -2402,9 +2764,10 @@ class TransApp:
 
     def erase_cust(self):
         global lines, cust_ids, del_row, del_custid_entry
+        bg, fg = 'red', 'white'
         # raise error alarm if any of the field is blank
 
-        self.display_frame = self.make_frame(page_title='RECORD DELETED', background_color='blue')
+        self.display_frame = self.make_frame(page_title='RECORD DELETED', background_color=bg)
 
         cust_ids = []
 
@@ -2433,8 +2796,10 @@ class TransApp:
                     self.cust_obj.__dict__ = rec
                     continue
                 hand.writelines(f"{rec}\n")
-
-        st = scrolledtext.ScrolledText(self.display_frame, bg='blue', fg='white', font=("Calibri", 14, 'bold'), relief='flat')
+        
+        self.save_del_cust()
+        
+        st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, font=("Calibri", 14, 'bold'), relief='flat')
         st.insert(index='1.0', chars='ID, FIRST NAME, MIDDLE NAME, LAST NAME, GENDER, DATE OF BIRTH, NATIONALITY, STATE OF ORIGIN, OFFICE ADDRESS, DATE OPENED\n\n'
                                      f'{self.cust_obj.customer_id}, {self.cust_obj.first_name}, {self.cust_obj.mid_name}, {self.cust_obj.last_name}, '
                                      f'{self.cust_obj.gender}, {self.cust_obj.date_of_birth}, {self.cust_obj.country}, {self.cust_obj.state_of_origin}'
@@ -2444,11 +2809,15 @@ class TransApp:
         st.grid(row=0, column=0, columnspan=10, sticky='ew')
 
         tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'),
-                             fg='blue', bg='white', height=1, width=15, command=self.custpage).grid(row=3, column=3, padx=5, pady=5, stick='se')
+                             fg=bg, bg=fg, height=1, width=15, command=self.custpage).grid(row=3, column=3, padx=5, pady=5, stick='se')
 
         self.display_frame.rowconfigure(list(range(4)), weight=1)
         self.display_frame.columnconfigure(list(range(4)), weight=1)
         self.display_frame.grid(row=1, rowspan=3, column=0, columnspan=4, sticky='nsew')
+        
+    def save_del_cust(self):
+        with open(self.cust_obj.cust_dels, 'a', encoding='utf8') as hand:
+            hand.writelines(f'{self.cust_obj.__dict__}\n')
     
     def invenpage(self):
         # frame for inventory page containing three rows and one column
@@ -2648,7 +3017,6 @@ class TransApp:
         self.submit_frame.grid(row=1, sticky='nsew')
 
     def read_inv(self):
-        self.inv_obj.inv_data = f'{self.login_user.filepath}\\inv_data.txt'
         with open(self.inv_obj.inv_data, 'r', encoding='utf8') as hand:
             # inventory attributes is a list of record strings
             inv_attr = hand.readlines()
@@ -2900,6 +3268,8 @@ class TransApp:
         # when confirmation is given by user
         self.display_frame = self.make_frame()
 
+        self.save_edited_inv()  # save the old record before editing
+
         # reassign the newly entered values to the inventory object's name, qty, unit and date
         self.inv_obj.prod_name = prn.title()
         self.inv_obj.qty, self.inv_obj.unit = pq, pu.title()
@@ -2938,6 +3308,10 @@ class TransApp:
         self.display_frame.rowconfigure(list(range(4)), weight=1)
         self.display_frame.columnconfigure(list(range(4)), weight=1)
         self.display_frame.grid(row=1, rowspan=4, column=0, columnspan=4, sticky='nsew')
+
+    def save_edited_inv(self):
+        with open(self.inv_obj.inv_edits, 'a', encoding='utf8') as hand:
+            hand.writelines(f'{self.inv_obj.__dict__}\n')
 
     def delete_inv(self):
         global lines, inven, del_row, del_prodid_entry
@@ -3035,6 +3409,8 @@ class TransApp:
                     continue
                 hand.writelines(f"{rec}\n")
 
+        self.save_del_inv()  # save deleted record
+
         tk.Label(self.display_frame, text=f"PRODUCT\n{self.inv_obj.prod_name}", font=("Calibri", 10, 'bold'),
                  bg='purple', fg='white').grid(row=0, column=0, sticky='nsew', padx=25, pady=15)
         tk.Label(self.display_frame, text=f"ID\n{self.inv_obj.prod_id}: ", font=("Calibri", 10, 'bold'),
@@ -3046,13 +3422,16 @@ class TransApp:
         tk.Label(self.display_frame, text="HAS BEEN DELETED!!", font=("Calibri", 10, 'bold'),
                  bg='purple', fg='white').grid(row=1, column=1, columnspan=2, sticky='NSEW', padx=25)
 
-        invpageb = tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'),
-                             fg='purple', bg='white', height=1, width=15, command=self.invenpage)
-        invpageb.grid(row=2, column=3, padx=5, pady=5, stick='se')
+        tk.Button(self.display_frame, text='Inventory Page', font=("Calibri", 12, 'bold'), fg='purple', bg='white',
+                  height=1, width=15, command=self.invenpage).grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         self.display_frame.rowconfigure([0, 1, 2, 3], weight=1)
         self.display_frame.columnconfigure(list(range(4)), weight=1)
         self.display_frame.grid(row=1, rowspan=len(inven) + 2, column=0, columnspan=4, sticky='nsew')
+
+    def save_del_inv(self):
+        with open(self.inv_obj.inv_dels, 'a', encoding='utf8') as hand:
+            hand.writelines(f'{self.inv_obj.__dict__}\n')
 
 # some functions
 def login(ta, user):
@@ -3135,21 +3514,46 @@ def save_obj(user):
         # user's login data file
         with open(f'{user.filepath}\\login_data.txt', 'w', encoding='utf8') as hand:
             hand.writelines(f'{user.__dict__}\n')
-        # inventory data file
-        with open(f'{user.filepath}\\inv_data.txt', 'w', encoding='utf8') as hand:
-            hand.writelines('')
+
+        # inventory data files
+        with open(f'{user.filepath}\\Inventory\\inv_data.txt', 'w', encoding='utf8') as hand:
+            hand.writelines('')  # for new entries
+        with open(f'{user.filepath}\\Inventory\\edited_inv.txt', 'w', encoding='utf8') as hand:
+            hand.writelines('')  # for old entries before editing
+        with open(f'{user.filepath}\\Inventory\\deleted_inv.txt', 'w', encoding='utf8') as hand:
+            hand.writelines('')  # for discarded entries
+
         # customer data file
-        with open(f'{user.filepath}\\cust_data.txt', 'w', encoding='utf8') as hand:
+        with open(f'{user.filepath}\\Customers\\cust_data.txt', 'w', encoding='utf8') as hand:
             hand.writelines('')
+        with open(f'{user.filepath}\\Customers\\edited_cust.txt', 'w', encoding='utf8') as hand:
+            hand.writelines('')  # for old entries before editing
+        with open(f'{user.filepath}\\Customers\\deleted_cust.txt', 'w', encoding='utf8') as hand:
+            hand.writelines('')  # for discarded entries
+
         # sales data file
-        with open(f'{user.filepath}\\sales_data.txt', 'w', encoding='utf8') as hand:
+        with open(f'{user.filepath}\\Sales\\sales_data.txt', 'w', encoding='utf8') as hand:
             hand.writelines('')
+        with open(f'{user.filepath}\\Sales\\edited_sales.txt', 'w', encoding='utf8') as hand:
+            hand.writelines('')  # for old entries before editing
+        with open(f'{user.filepath}\\Sales\\deleted_sales.txt', 'w', encoding='utf8') as hand:
+            hand.writelines('')  # for discarded entries
+
         # accounts data file
-        with open(f'{user.filepath}\\acct_data.txt', 'w', encoding='utf8') as hand:
+        with open(f'{user.filepath}\\Accounts\\acct_data.txt', 'w', encoding='utf8') as hand:
             hand.writelines('')
-        # accounts data file
-        with open(f'{user.filepath}\\acctrans_data.txt', 'w', encoding='utf8') as hand:
+        with open(f'{user.filepath}\\Accounts\\edited_acct.txt', 'w', encoding='utf8') as hand:
+            hand.writelines('')  # for old entries before editing
+        with open(f'{user.filepath}\\Accounts\\deleted_acct.txt', 'w', encoding='utf8') as hand:
+            hand.writelines('')  # for discarded entries
+
+        # transactions data file
+        with open(f'{user.filepath}\\AccTransactions\\acctrans_data.txt', 'w', encoding='utf8') as hand:
             hand.writelines('')
+        with open(f'{user.filepath}\\AccTransactions\\edited_acctrans.txt', 'w', encoding='utf8') as hand:
+            hand.writelines('')  # for old entries before editing
+        with open(f'{user.filepath}\\AccTransactions\\deleted_acctrans.txt', 'w', encoding='utf8') as hand:
+            hand.writelines('')  # for discarded entries
 
         print(f'New Files Created at {user.filepath}')
 
