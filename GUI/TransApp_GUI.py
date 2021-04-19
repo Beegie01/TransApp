@@ -47,8 +47,8 @@ class TransApp:
         # menu bar section
         self.menu_bar = tk.Menu(self.master)
         main_menu = tk.Menu(self.menu_bar, tearoff=0)
-        main_menu.add_command(label="HOME", command=lambda: self.menupage())
-        main_menu.add_command(label="SIGN OUT", command=lambda: self.firstpage())
+        main_menu.add_command(label="HOME", command=lambda: self.menupage(event=None))
+        main_menu.add_command(label="SIGN OUT", command=lambda: self.firstpage(event=None))
         main_menu.add_command(label="EXIT", command=lambda: self.master.destroy())
         self.menu_bar.add_cascade(menu=main_menu, label='MENU')
 
@@ -91,6 +91,8 @@ class TransApp:
         self.introFrame = tk.Frame(master=self.master, bg='GOLD')
         self.introFrame.rowconfigure(0, weight=1)
         self.introFrame.columnconfigure(0, weight=1)
+        self.introFrame.focus()
+        self.introFrame.bind('<Return>', self.firstpage)
 
         # frame for menu page containing four rows and one column
         self.homeFrame = tk.LabelFrame(master=self.master, text='HOME', fg='black', font=('arial black', 12))
@@ -131,7 +133,7 @@ class TransApp:
         tk.Label(master=self.status_bar_frame, font=('arial black', 10), fg='black', bg='gold',
                  text="TransApp-2021").grid(row=0, column=3, sticky='nsew')
         
-    def firstpage(self):
+    def firstpage(self, event):
 
         self.display_frame = tk.LabelFrame(master=self.master, text='SETUP', bg='gold', font=('arial black', 12))
 
@@ -322,18 +324,21 @@ class TransApp:
         self.display_frame.grid(row=1, rowspan=4, column=0, columnspan=5, sticky='nsew')
 
     def loginpage(self):
-        global eme, pe, cpe
+        global eme, pe, cpe, signinb
         cpe = None
         self.display_frame = tk.LabelFrame(master=self.master, text='LOGIN USER', bg='gold', font=('arial black', 12))
 
         tk.Label(self.display_frame, text='Email', fg='black', bg='gold', font=('calibri', 12, 'bold')).grid(row=0, sticky='e')
         eme = tk.Entry(self.display_frame, font=('calibri', 12), width=30)
         eme.grid(row=0, column=1, sticky='w', padx=3, pady=5)
+        eme.focus_set()
 
         tk.Label(self.display_frame, text='Password', fg='black', bg='gold', font=('calibri', 12, 'bold')).grid(row=1,
                                                                                                         sticky='e')
         pe = tk.Entry(self.display_frame, font=('calibri', 12), show='*', width=15)
         pe.grid(row=1, column=1, sticky='w', padx=3, pady=5)
+        eme.bind('<Return>', self.cursor_to_password)
+        pe.bind('<Return>', lambda event: login(event, self, self.login_user))
 
         # radio button to show and hide password entries
         passw = tk.BooleanVar(self.display_frame)
@@ -342,7 +347,10 @@ class TransApp:
                        variable=passw, command=lambda: self.showpassword(passw.get())).grid(row=1, column=1, sticky='e')
 
         # login/signin button
-        ttk.Button(self.display_frame, text="Sign in", command=lambda: login(self, self.login_user), width=10).grid(row=2, column=1, sticky='n')
+        signinb = tk.Button(self.display_frame, text="Sign in", font=('calibri', 12, 'bold'), bg='green', fg='white',
+                  width=10)
+        signinb.bind('<Button-1>',  lambda event: login(event, self, self.login_user))
+        signinb.grid(row=2, column=1, sticky='n')
 
         # front page
         ttk.Button(self.display_frame, text='Back', width=10, command=self.firstpage).grid(row=3, column=0, sticky='e')
@@ -354,18 +362,25 @@ class TransApp:
         self.display_frame.columnconfigure(list(range(3)), weight=1)
         self.display_frame.grid(row=1, rowspan=4, column=0, columnspan=5, sticky='nsew')
 
+    def cursor_to_password(self, event):
+        global pe
+        pe.focus_set()
+
     def frontpage(self):
+        global startbtn
         # place label on frame
         frontlabel = tk.Label(master=self.introFrame, text='\nTRANSAPP\n\nBY\n\nBEEGIE\n\nMARCH, 2021', fg='black', bg='gold', font=('Arial Black', 20))
         frontlabel.grid(row=0, sticky='nsew')
-        menuButton = tk.Button(self.introFrame, text=" CLICK HERE TO START ", fg='white', bg='green',
-                                  font=('arial black', 14), command=self.firstpage)
-        menuButton.grid(row=1, sticky='sew')
+        tk.Button(self.introFrame, text=" TO START, PRESS 'ENTER' ", command=lambda: self.firstpage(event=None),
+                  fg='white', bg='green', font=('arial black', 10, 'bold')).grid(row=1, sticky='sew')
 
         # place label frame on app frame starting at row 1, column 0
         self.introFrame.grid(row=0, rowspan=4, column=0, columnspan=5, sticky='nsew')
 
-    def menupage(self):
+    def menupage(self, event):
+        # bind universal events
+        self.master.tk_focusFollowsMouse()  # from this point on, focus follows the mouse pointer
+
         # frame for menu page containing four rows and one column
         self.homeFrame = tk.LabelFrame(master=self.master, text='HOME', fg='black', font=('arial black', 12))
         self.homeFrame.rowconfigure(list(range(3)), weight=1)
@@ -410,9 +425,9 @@ class TransApp:
                                 font=('arial black', 14), command=lambda: self.salepage())
 
         # menu sections
-        self.inventoryb.grid(row=0, padx=40, sticky='nsew')
-        self.accountb.grid(row=1, padx=20, sticky='nsew')
-        self.salesb.grid(row=2, padx=10, sticky='nsew')
+        self.inventoryb.grid(row=0, padx=45, sticky='nsew')
+        self.salesb.grid(row=1, padx=30, sticky='nsew')
+        self.accountb.grid(row=2, padx=15, sticky='nsew')
 
         # display frame of menupage
         # clear frame space
@@ -443,7 +458,7 @@ class TransApp:
                   command=lambda: self.custpage()).grid(row=0, padx=40, pady=10, sticky='nsew')
         tk.Button(self.sectionFrame, text='VIEW CUSTOMER ORDERS', bg='white', fg='green', font=('arial black', 14),
                   command=lambda: self.display_sale()).grid(row=1, padx=40, pady=10, sticky='nsew')
-        tk.Button(self.sectionFrame, text='BOOK ORDER', bg='white', fg='brown', font=('arial black', 14),
+        tk.Button(self.sectionFrame, text='BOOK NEW ORDER', bg='white', fg='brown', font=('arial black', 14),
                   command=self.new_sale).grid(row=2, padx=60, pady=10, sticky='nsew')
         tk.Button(self.sectionFrame, text='UPDATE ORDER', bg='white', fg='orange', font=('arial black', 14),
                   command=self.edit_sale).grid(row=3, padx=80, pady=10, sticky='nsew')
@@ -461,11 +476,18 @@ class TransApp:
         self.sectionFrame.grid(row=1, rowspan=4, column=0, columnspan=5, sticky='nsew')
 
     def new_sale(self):
+        global prod_ids, prod_names, quants, units, entry_dates
+        global customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened
+        global dates_opened, acct_ids, cust_ids, acct_types, acct_bals
+
         bg, fg = 'brown', 'white'
 
         prod_ids, prod_names, quants, units, entry_dates = self.inv_fields()  # all inventory fields
 
-        customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened = self.cust_fields()
+        customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened = self.cust_fields()  # all customer fields
+
+        dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()  # all account fields
+
         cust_details = [(cid, fn, ln) for cid, fn, mn, ln, g, db, n, s, off, do in zip(customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened)]
         prod_details = [(pid, pn) for pid, pn, q, u, d in zip(prod_ids, prod_names, quants, units, entry_dates)]
 
@@ -474,135 +496,36 @@ class TransApp:
             return messagebox.showerror(message='No Record of Existing Products')
 
         # frame for input of new inventory
-        self.new_frame = tk.LabelFrame(self.master, text='NEW CUSTOMER ORDER', fg=fg, font=('arial black', 12),
+        self.new_frame = tk.LabelFrame(self.master, text='BOOKING NEW ORDER', fg=fg, font=('arial black', 12),
                                        bg=bg)
-        self.new_frame.rowconfigure(list(range(9)), weight=1)
-        self.new_frame.columnconfigure(list(range(6)), weight=1)
+        self.new_frame.rowconfigure(list(range(15)), weight=1)
+        self.new_frame.columnconfigure(list(range(8)), weight=1)
 
         # place new sale form
         # Order labels and entries
-        tk.Label(self.new_frame, text='Orders', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nsew')
+        tk.Label(self.new_frame, text='Select:', font=('calibri', 12),
+                 bg=bg, fg=fg, height=1).grid(row=0, rowspan=2, column=0, stick='sw', padx=15)
         # product
-        tk.Label(self.new_frame, text='Select Product', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=1, stick='nw')
-        self.pr_idname_Cbox = ttk.Combobox(self.new_frame, font=('calibri', 16, 'bold'), height=2,  width=25, values=prod_details,
-                                        state='readonly')
+        tk.Label(self.new_frame, text='Product', font=('calibri', 12),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=1, stick='sw', padx=15)
+        self.pr_idname_Cbox = ttk.Combobox(self.new_frame, font=('calibri', 10, 'bold'), height=2,  width=25,
+                                           values=prod_details, state='readonly')
         self.pr_idname_Cbox.set(prod_details[0])
-        self.pr_idname_Cbox.grid(row=0, column=2, padx=2, pady=30, stick='sw')
+        self.pr_idname_Cbox.grid(row=1, column=1, padx=15, stick='nw')
 
         # customer
-        tk.Label(self.new_frame, text='Select Customer', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=3, stick='nw')
-        self.cust_idnames_Cbox = ttk.Combobox(self.new_frame, font=('calibri', 16, 'bold'), height=2, width=30, values=cust_details,
-                                        state='readonly')
-        self.cust_idnames_Cbox.grid(row=0, column=4, padx=2, pady=30, stick='sw')
+        tk.Label(self.new_frame, text='Customer', font=('calibri', 12),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=2, stick='sw')
+        self.cust_idnames_Cbox = ttk.Combobox(self.new_frame, font=('calibri', 10, 'bold'), height=2, width=30,
+                                              values=cust_details, state='readonly')
+        self.cust_idnames_Cbox.grid(row=1, column=2, padx=2, stick='nw')
         self.cust_idnames_Cbox.set(cust_details[0])
 
-
-        # ordered quantity
-        tk.Label(self.new_frame, text='Quantity', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=1, column=0, stick='nw')
-        self.ord_qtyEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
-        self.ord_qtyEntry.grid(row=1, column=1, padx=2, pady=30, stick='sw')
-
-        # unit of measurement
-        tk.Label(self.new_frame, text='Unit', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=1, column=2, stick='nw')
-        self.ord_unitEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
-        self.ord_unitEntry.grid(row=1, column=3, padx=4, pady=30, stick='sw')
-        for pid, pn, q, u, d in zip(prod_ids, prod_names, quants, units, entry_dates):
-            pi, pname = self.pr_idname_Cbox.get().split()
-            if  pid == pi:
-                self.ord_unitEntry.insert(0, f'{u}')
-        self.ord_unitEntry.config(state='disabled')
-        
-        # rate of order
-        tk.Label(self.new_frame, text='Rate of Order', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=1, column=4, stick='nw')
-        self.ord_rateEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
-        self.ord_rateEntry.grid(row=1, column=5, padx=2, pady=30, stick='sw')
-        
-        # price
-        tk.Label(self.new_frame, text='Price', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=2, column=0, stick='nw')
-        self.ord_priceEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
-        self.ord_priceEntry.grid(row=2, column=1, padx=2, pady=30, stick='sw')
-
-        # currency
-        tk.Label(self.new_frame, text='Currency', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=2, column=2, stick='nw')
-        self.currEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'))
-        self.currEntry.grid(row=2, column=3, padx=2, pady=30, stick='sw')
-
-        # customer order date
-        tk.Label(self.new_frame, text='Date of Order', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=3, column=0, padx=10, stick='nsew')
-        # day
-        tk.Label(self.new_frame, text='Day', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=3, column=1, padx=5, stick='nw')
-        self.orddayEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
-        self.orddayEntry.insert(0, str(datetime.date.today().day))
-        self.orddayEntry.grid(row=4, column=1, padx=5, pady=30, stick='sw')
-        # month
-        tk.Label(self.new_frame, text='Month', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=3, column=2, padx=5, stick='nw')
-        self.ordmonthEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
-        self.ordmonthEntry.insert(0, str(datetime.date.today().month))
-        self.ordmonthEntry.grid(row=3, column=2, padx=5, pady=30, stick='sw')
-        # year
-        tk.Label(self.new_frame, text='Year', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=3, column=3, stick='nw')
-        self.ordyrEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
-        self.ordyrEntry.insert(0, str(datetime.date.today().year))
-        self.ordyrEntry.grid(row=3, column=3, pady=30, stick='sw')
-
-        # customer amount deposited
-        tk.Label(self.new_frame, text='Deposit', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=4, column=0, padx=10, stick='nsew')
-        self.depEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
-        self.depEntry.grid(row=4, column=0, padx=5, pady=30, stick='sw')
-
-        # payment status
-        tk.Label(self.new_frame, text='Payment Status', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=4, column=1, padx=5, stick='nsew')
-        self.pay_statText = tk.Text(self.new_frame, font=('calibri', 16, 'bold'), width=10, height=3)
-        self.pay_statText.grid(row=4, column=1, padx=5, pady=30, sticky='ew')
-
-        payment = tk.StringVar(value='None')
-        complRadio = tk.Radiobutton(self.new_frame, text='Complete', value='Complete', variable=payment, font=('calibri', 16), bg='blue', fg='black', command=lambda: self.sel_paystat(payment.get()), state='normal')
-        complRadio.grid(row=5, column=1, padx=2, sticky='w')
-        incomplRadio = tk.Radiobutton(self.new_frame, text='Incomplete', value='Incomplete', variable=payment, font=('calibri', 16),
-                                     bg='blue', fg='black', command=lambda: self.sel_paystat(payment.get()), state='normal')
-        incomplRadio.grid(row=5, column=2, padx=2, sticky='w')
-
-        # date of completion
-        tk.Label(self.new_frame, text='Date of Completion', font=('calibri', 16), bg=bg, fg=fg, height=1).grid(row=4, column=0, padx=5, sticky='nsew')
-
-        # day
-        tk.Label(self.new_frame, text='Day', font=('calibri', 16),
-                 bg=bg, fg=fg, height=1).grid(row=6, column=1, sticky='nw')
-        self.compdayEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
-        self.compdayEntry.insert(0, str(datetime.date.today().day))
-        self.compdayEntry.grid(row=6, column=1, padx=5, pady=30, sticky='sw')
-        # month
-        tk.Label(self.new_frame, text='Month', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=6, column=2, sticky='nw')
-        self.compmonthEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
-        self.compmonthEntry.insert(0, str(datetime.date.today().month))
-        self.compmonthEntry.grid(row=6, column=2, padx=5, pady=30, sticky='sw')
-        # year
-        tk.Label(self.new_frame, text='Year', font=('calibri', 16), bg=bg, fg=fg,
-                 height=1).grid(row=6, column=3, sticky='nw')
-        self.compyrEntry = tk.Entry(self.new_frame, font=('calibri', 16, 'bold'), width=10)
-        self.compyrEntry.insert(0, str(datetime.date.today().year))
-        self.compyrEntry.grid(row=6, column=3, pady=30, sticky='sw')
-
-        tk.Button(self.new_frame, text='Submit', font=("Calibri", 14, 'bold'), fg='white', bg='green', width=10,
-                  height=2, command=self.submit_sale).grid(row=7, column=2, padx=10, sticky='se')
-
-        tk.Button(self.new_frame, text='Back', font=("Calibri", 14, 'bold'), fg='brown', bg='white', height=2,
-                  width=15, command=self.salepage).grid(row=7, column=0, padx=15, stick='se')
+        tk.Button(self.new_frame, command=lambda: self.place_ids(self.pr_idname_Cbox.get(), self.cust_idnames_Cbox.get()),
+                   font=("Calibri", 10, 'bold'), fg='black', bg='light blue', height=1, width=10,
+                  text='Select').grid(row=1, column=5, sticky='nw')
+        tk.Button(self.new_frame, text='Cancel', font=("Calibri", 10, 'bold'), fg='red', bg='white', height=1,
+                  width=10, command=self.salepage).grid(row=1, column=6, stick='n')
 
         # display inventory page's frame
         if self.submit_frame is not None:
@@ -610,6 +533,177 @@ class TransApp:
         if self.sectionFrame is not None:
             self.sectionFrame.grid_forget()
         self.new_frame.grid(row=1, rowspan=8, column=0, columnspan=3, sticky='nsew')
+
+    def place_ids(self, prod_selection, cust_selection):
+        global prod_ids, prod_names, quants, units, entry_dates
+        global customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened
+        global dates_opened, acct_ids, cust_ids, acct_types, acct_bals
+        bg, fg = 'brown', 'white'
+
+        # print(prod_selection.split())
+        prframe = tk.Frame(self.new_frame, bg=bg, padx=10)
+        prframe.grid(row=2, rowspan=2, column=1, sticky='ew')
+        cuframe = tk.Frame(self.new_frame, bg=bg, padx=10)
+        cuframe.grid(row=2, rowspan=2, column=1, sticky='ew')
+
+        pid, pn = prod_selection.split()  # selection split into a list of strings
+        tk.Label(self.new_frame, text='Selected:', font=('calibri', 12),
+                 bg=bg, fg=fg, height=1).grid(row=2, column=0, sticky='w')
+
+        tk.Label(prframe, text='Product ID:', font=('calibri', 12), anchor='e',
+                 bg=bg, fg=fg, height=1).grid(row=0, column=0, sticky='ew')
+        self.prid = tk.Entry(prframe, font=('calibri', 10, 'bold'), fg='white', bg='black', width=10)
+        self.prid.insert(0, pid)
+        self.prid.grid(row=1, column=0, sticky='ew')
+        self.prid.config(state='disabled')
+
+        # print(cust_selection.split())  # selection split into a list
+        cid, fn, ln = cust_selection.split()
+        tk.Label(cuframe, text='Customer ID:', font=('calibri', 12),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=1, sticky='ew')
+        self.cuid = tk.Entry(cuframe, font=('calibri', 10, 'bold'), fg='white', bg='black', width=10)
+        self.cuid.insert(0, cid)
+        self.cuid.grid(row=1, column=1, sticky='ew')
+        self.cuid.config(state='disabled')
+
+        Found = False
+        sel_currs, sel_acids = [], []
+        for d, a, c, t, b in zip(dates_opened, acct_ids, cust_ids, acct_types, acct_bals):
+            if c == cid:
+                sel_currs.append(t)  # a list of all the customer's account-types/currencies
+                sel_acids.append(a)  # a list of all the customer's account numbers
+                Found = True
+        if not Found:
+            return messagebox.showinfo(message="Customer's account is inactive")
+
+        # select the account type from account number
+        tk.Label(self.new_frame, text='Select Account', font=('calibri', 12),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=2, stick='sw')
+        self.currCbox = ttk.Combobox(self.new_frame, font=('calibri', 10, 'bold'), values=sel_acids)
+        self.currCbox.grid(row=1, column=2, padx=2, stick='nw')
+        self.currCbox.set('None')
+        self.currCbox.config(state='readonly')
+        self.currCbox.bind('<FocusIn>', self.disp_curr)
+        self.currCbox.bind('<FocusOut>', self.disp_curr2)
+
+        # currency
+        tk.Label(self.new_frame, text='Currency', font=('calibri', 12), bg=bg, fg=fg,
+                 height=1).grid(row=6, column=2, stick='sw')
+        self.currEntry = ttk.Entry(self.new_frame, font=('calibri', 10, 'bold'))
+        self.currEntry.grid(row=7, column=2, padx=2, stick='nw')
+        self.currEntry.insert(0, 'None Selected')
+        self.currEntry.config(state='disabled')
+
+        # ordered quantity
+        tk.Label(self.new_frame, text='Quantity', font=('calibri', 12), bg=bg, fg=fg,
+                 height=1).grid(row=4, column=0, padx=15, stick='sw')
+        self.ord_qtyEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), fg='black')
+        self.ord_qtyEntry.grid(row=5, column=0, padx=15, stick='nw')
+        evt1 = '<KeyRelease>'
+        self.ord_qtyEntry.bind(evt1, self.calc_price)
+
+        # unit of measurement
+        tk.Label(self.new_frame, text='Unit', font=('calibri', 12),
+                 bg=bg, fg=fg, height=1).grid(row=4, column=1, stick='sw')
+        self.ord_unitEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), bg='black', fg='white')
+        self.ord_unitEntry.grid(row=5, column=1, padx=2, stick='nw')
+        for prdid, pn, q, u, d in zip(prod_ids, prod_names, quants, units, entry_dates):
+            if prdid == pid:
+                self.ord_unitEntry.insert(0, f'{u}')
+        self.ord_unitEntry.config(state='disabled')
+
+        # rate of order
+        tk.Label(self.new_frame, text='Rate/Unit', font=('calibri', 12),
+                 bg=bg, fg=fg, height=1).grid(row=6, column=3, stick='sw')
+        self.ord_rateEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'))
+        self.ord_rateEntry.grid(row=7, column=3, padx=2, stick='nw')
+        evt2 = '<KeyRelease>'
+        self.ord_rateEntry.bind(evt2, self.calc_price)
+
+        # price
+        tk.Label(self.new_frame, text='Price', font=('calibri', 12), bg=bg, fg=fg,
+                 height=1).grid(row=6, column=4, stick='sw')
+        self.ord_priceEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), fg='white', bg='black')
+        self.ord_priceEntry.grid(row=7, column=4, padx=2,  stick='nw')
+        self.ord_priceEntry.insert(0, 'Yet to be determined')
+        self.ord_priceEntry.config(state='disabled')
+        #
+        # # customer order date
+        # tk.Label(self.new_frame, text='Date of Order', font=('calibri', 12),
+        #          bg=bg, fg=fg, height=1).grid(row=5, column=0, padx=10, stick='nsew')
+        # # day
+        # tk.Label(self.new_frame, text='Day', font=('calibri', 12), bg=bg, fg=fg,
+        #          height=1).grid(row=5, column=1, padx=5, stick='nw')
+        # self.orddayEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), width=10)
+        # self.orddayEntry.insert(0, str(datetime.date.today().day))
+        # self.orddayEntry.grid(row=6, column=1, padx=5, pady=30, stick='sw')
+        # # month
+        # tk.Label(self.new_frame, text='Month', font=('calibri', 12), bg=bg, fg=fg,
+        #          height=1).grid(row=5, column=2, padx=5, stick='nw')
+        # self.ordmonthEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), width=10)
+        # self.ordmonthEntry.insert(0, str(datetime.date.today().month))
+        # self.ordmonthEntry.grid(row=6, column=2, padx=5, pady=30, stick='sw')
+        # # year
+        # tk.Label(self.new_frame, text='Year', font=('calibri', 12), bg=bg, fg=fg,
+        #          height=1).grid(row=5, column=3, stick='nw')
+        # self.ordyrEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), width=10)
+        # self.ordyrEntry.insert(0, str(datetime.date.today().year))
+        # self.ordyrEntry.grid(row=6, column=3, pady=30, stick='sw')
+        #
+        # # customer amount deposited
+        # tk.Label(self.new_frame, text='Deposit', font=('calibri', 12), bg=bg, fg=fg,
+        #          height=1).grid(row=7, column=0, padx=10, stick='nsew')
+        # self.depEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), width=10)
+        # self.depEntry.grid(row=8, column=0, padx=5, pady=30, stick='sw')
+        #
+        # # payment status
+        # tk.Label(self.new_frame, text='Payment Status', font=('calibri', 12), bg=bg, fg=fg,
+        #          height=1).grid(row=7, column=1, padx=5, stick='nsew')
+        # self.pay_statText = tk.Text(self.new_frame, font=('calibri', 10, 'bold'), width=10, height=3)
+        # self.pay_statText.grid(row=8, column=1, padx=5, pady=30, sticky='ew')
+        #
+        # payment = tk.StringVar(value='None')
+        # complRadio = tk.Radiobutton(self.new_frame, text='Complete', value='Complete', variable=payment, font=('calibri', 16), bg='blue', fg='black', command=lambda: self.sel_paystat(payment.get()), state='normal')
+        # complRadio.grid(row=9, column=1, padx=2, sticky='w')
+        # incomplRadio = tk.Radiobutton(self.new_frame, text='Incomplete', value='Incomplete', variable=payment, font=('calibri', 16),
+        #                              bg='blue', fg='black', command=lambda: self.sel_paystat(payment.get()), state='normal')
+        # incomplRadio.grid(row=9, column=2, padx=2, sticky='w')
+
+        tk.Button(self.new_frame, text='Submit', font=("Calibri", 14, 'bold'), fg='white', bg='green', width=10,
+                  height=1, command=self.submit_sale).grid(row=13, column=2, padx=10, sticky='se')
+
+    def calc_price(self, event):
+        qty, rate = self.ord_qtyEntry.get(), self.ord_rateEntry.get()  # store qty and rate
+        if qty not in string.whitespace and rate not in string.whitespace:
+
+            try:
+                calc_amnt = float(qty) * float(rate)
+                self.ord_priceEntry.config(state='normal')
+                self.ord_priceEntry.delete(0, 'end')
+                self.ord_priceEntry.insert(0, calc_amnt)
+                self.ord_priceEntry.config(state='disabled')
+            except:
+                return messagebox.showerror(message='Quantity and Rate should be given in figures')
+        else:
+            self.ord_priceEntry.config(state='normal')
+            self.ord_priceEntry.delete(0, 'end')
+            self.ord_priceEntry.insert(0, 'Yet to be determined')
+            self.ord_priceEntry.config(state='disabled')
+
+    def disp_curr(self, event):
+        global dates_opened, acct_ids, cust_ids, acct_types, acct_bals
+        aid = self.currCbox.get()  # selected account id
+        self.currEntry.config(state='normal')
+        for d, a, c, t, b in zip(dates_opened, acct_ids, cust_ids, acct_types, acct_bals):
+            if a == aid:
+                self.currEntry.delete(0, 'end')
+                self.currEntry.insert(0, t)  # display selected customer's account-type/currency
+        self.currEntry.config(state='disabled')
+        self.currCbox.unbind('<FocusIn>')  # no longer respond to focus in
+        self.currCbox.bind('<Button-1>')  # now respond to mouse left click
+
+    def disp_curr2(self, event):
+        self.currCbox.bind('<FocusIn>', self.disp_curr)  # upon focus out rebind focus in
 
     def inv_fields(self):
         invdata = self.read_inv()
@@ -987,7 +1081,7 @@ class TransApp:
     def acct_fields(self):
         '''
         to generate a tuple of lists containing transactions in separate fields
-        :return:--> (trans_dates, trans_acctids, trans_types, trans_amnts)
+        :return:--> (dates_opened, acct_ids, cust_ids, acct_types, acct_bals)
         '''
 
         with open(self.acct_obj.acct_data, 'r', encoding='utf8') as hand:
@@ -3434,12 +3528,14 @@ class TransApp:
             hand.writelines(f'{self.inv_obj.__dict__}\n')
 
 # some functions
-def login(ta, user):
+def login(event, ta, user):
     global eme, pe
     email, pwd = eme.get(), pe.get()
     mandatory_entries = [email, pwd]
 
     ta.display_frame = tk.LabelFrame(ta.master, bg='gold')
+    ta.display_frame.focus()
+    ta.display_frame.bind('<Return>', lambda event: ta.menupage(event))
 
     wspace = string.whitespace
 
@@ -3492,8 +3588,9 @@ def login(ta, user):
                  font=("Calibri", 10, 'bold'),
                  bg='gold', fg='black').grid(row=0, column=1, columnspan=2, sticky='NSEW', padx=25)
 
-        ttk.Button(ta.display_frame, text=f"Go to {user.company_name}'s Menu", width=30,
-                   command=ta.menupage).grid(row=1, column=0, columnspan=3, sticky='NSEW', padx=25)
+        btn = ttk.Button(ta.display_frame, text=f"Go to {user.company_name}'s Menu", width=30)
+        btn.bind('<Button-1>', lambda event: ta.menupage(event))
+        btn.grid(row=1, column=0, columnspan=3, sticky='NSEW', padx=25)
 
         if ta.display_frame is not None:
             ta.display_frame.grid_forget()
