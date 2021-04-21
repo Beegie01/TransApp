@@ -832,6 +832,19 @@ class TransApp:
     def disp_curr2(self, event):
         self.currCbox.bind('<FocusIn>', self.disp_curr)  # upon focus out reset to respond to focus in
 
+    def gen_ordid(self, ord_ids):
+        '''
+        produce an eight-digit figure
+        :param ord_ids:
+        :return:
+        '''
+        oids = []
+        for ordid in ord_ids:
+            oids.append(int(ordid))  # transforming order id from string into integers
+        if len(oids):  # there are existing order ids
+            return max(oids) + 1  # increment by 1
+        return 10000000  # 8-digits number
+
     def sel_paystat(self, payment_status):
         '''
         to keep record of the check button for payment status
@@ -892,7 +905,8 @@ class TransApp:
         # if order id is existing, simply continue
         ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp = self.sales_fields()
 
-        ord_id = daily_incremental_id(ta, ord_dates)  # use the dates column to determine the current order id
+        # ord_id = daily_incremental_id(ta, ord_dates)  # use the dates column to determine the current order id
+        ord_id = self.gen_ordid(ord_ids)  # use the dates column to determine the current order id
 
         ord_date = f'{datetime.date.today().year}-{self.month[datetime.date.today().month]}-{datetime.date.today().day}'
         ord_time = f'{datetime.datetime.today().hour}:{datetime.datetime.today().minute}:{datetime.datetime.today().second}'
@@ -1100,31 +1114,39 @@ class TransApp:
         return sales_attr
 
     def display_sale(self):
-        bg, fg = 'orange', 'white'
+        bg, fg = 'orange', 'black'
 
         # setup display frame
         self.display_frame = self.make_frame(page_title="VIEW CUSTOMER'S ORDERS", background_color=bg)
-
-        tk.Button(self.display_frame, text='Sales Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
-                  width=15, command=self.salepage).grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         # get a list of all existing customer orders
         ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp = self.sales_fields()
         cust_details = self.fetch_cust_details()
 
-        if not(len(ord_ids)):
+        if not(len(ord_dates)):
             return messagebox.showerror(title='No Existing Orders',
                                         message='There are no available orders for display')
         # select customer from list
-        tk.Label(self.display_frame, text='Select Customer:', font=('calibri', 13),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='sw')
-        self.cct_Cbox = ttk.Combobox(self.display_frame, value=cust_details, font=('calibri', 13), width=24, state='readonly')
+        tk.Label(self.display_frame, text='Select Customer', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=0, sticky='sw', padx=10)
+        self.cct_Cbox = ttk.Combobox(self.display_frame, value=cust_details, font=('calibri', 13), width=30, state='readonly')
         self.cct_Cbox.set(cust_details[0])
-        self.cct_Cbox.grid(row=1, column=0, sticky='nw')
+        self.cct_Cbox.grid(row=1, column=0, sticky='nw', padx=10)
         self.cct_Cbox.bind('<FocusIn>', lambda event: self.show_acct_list(event, cust_ids, acct_ids))
 
-        ttk.Button(self.display_frame, text='SELECT', command=lambda: self.pop_view(cacct_Cbox.get())
-                   ).grid(row=0, column=5, sticky='w')
+        tk.Label(self.display_frame, text='Select Account', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=1, sticky='sw')
+        self.sacct_Cbox = ttk.Combobox(self.display_frame, font=('calibri', 13), width=20,
+                                       state='readonly')
+        self.sacct_Cbox.set('Unavailable')
+        self.sacct_Cbox.grid(row=1, column=1, sticky='nw')
+
+        self.select_btn = tk.Button(self.display_frame, text='DISPLAY', fg='white', bg='green', width=15, height=1, state='disabled',
+                                    font=("Calibri", 12, 'bold'), command=lambda: self.pop_salesview(self.cct_Cbox.get()))
+        self.select_btn.grid(row=0, rowspan=2, column=4, sticky='w')
+
+        tk.Button(self.display_frame, text='BACK', font=("Calibri", 12, 'bold'), fg=bg, bg='white', height=1,
+                  width=15, command=self.salepage).grid(row=0, rowspan=2, column=5, sticky='w')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -1133,37 +1155,97 @@ class TransApp:
         if self.new_frame is not None:
             self.new_frame.grid_forget()
 
-        self.display_frame.rowconfigure(list(range(3)), weight=1)
+        self.display_frame.rowconfigure(list(range(7)), weight=1)
         self.display_frame.columnconfigure(list(range(9)), weight=1)
         self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
     def show_acct_list(self, event, cust_ids, acct_ids):
         bg, fg = 'orange', 'white'
         # select account from list
-        c, fn, ln = self.cct_Cbox.get().split()
-        aids = []
+        c, fn, ln = self.cct_Cbox.get().split()  # split the selected tuple (cust_id, firstname, lastname) into elements
+        accids = []
         for cid, aid in zip(cust_ids, acct_ids):
-            if cid == c:
-                aids.append(aid)
+            if (cid == c) and (aid not in accids):  # if cust_id is found
+                accids.append(aid)  # store the account id
 
-        if len(aids):
-            tk.Label(self.display_frame, text='Select Account:', font=('calibri', 13),
-                     bg=bg, fg=fg, height=1).grid(row=0, column=1, padx=10, stick='sw')
-            cacct_Cbox = ttk.Combobox(self.display_frame, values=aids, font=('calibri', 13), width=24,
-                                      state='readonly')
-            cacct_Cbox.set(aids[0])
-            cacct_Cbox.grid(row=1, column=1, sticky='nw')
+        if len(accids):
+            self.sacct_Cbox.config(values=accids)  # assign account ids list to drop down menu
+            self.sacct_Cbox.set(accids[0])  # set first value as first element of account ids list
+            self.select_btn.config(state='normal')  # enable the submit button (if previously disabled)
             self.cct_Cbox.unbind('<FocusIn>')
             self.cct_Cbox.bind('<FocusOut>', lambda event: self.show_acct_list2(event, cust_ids, acct_ids))
 
         else:
-            cacct_Cbox.grid_forget()
-            messagebox.showinfo(message='The Selected customer is inactive')
-
+            self.sacct_Cbox.set('Inactive Account')  # show when inactive account is selected
+            self.cct_Cbox.unbind('<FocusIn>')
+            self.cct_Cbox.bind('<FocusOut>', lambda event: self.show_acct_list2(event, cust_ids, acct_ids))
+            self.select_btn.config(state='disabled')  # enable the submit button (if previously normal)
+            # messagebox.showinfo(message='The Selected customer is inactive')
 
     def show_acct_list2(self, event, cust_ids, acct_ids):
         # reset list to focus in
         self.cct_Cbox.bind('<FocusIn>', lambda event: self.show_acct_list(event, cust_ids, acct_ids))
+
+    def pop_salesview(self, selected_cust_details):
+        '''
+        display sales info regarding the chosen account
+        :return:
+        '''
+        bg, fg = 'orange', 'black'
+        cid, fn, ln = selected_cust_details.split()
+        selected_acctid = self.sacct_Cbox.get()
+
+        prod_ids, prod_names, quants, units, entry_dates = self.inv_fields()  # all inventory fields
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp = self.sales_fields()
+        # display headings for customer sales records
+        # create scrolled text field to display customer sales records
+
+        st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, wrap='word',
+                                       font=("Calibri", 14, 'bold'), relief='flat')
+
+        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
+        # display headings for customer records
+        st.insert(index='end',
+                  chars='ORDER DATE,\tORDER TIME,\tORDER ID,\tACCOUNT ID,\tPRODUCT,\tQUANTITY,\tUNIT,\tRATE/UNIT,\tPRICE,\tPAYMENT STATUS,\tDATE OF COMPLETION\n\n')
+
+        for ord_date, ord_time, ord_id, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, pstat, date_comp in zip(ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp):
+            if acct_id == selected_acctid:  # display only selected account number
+                for prd_id, prod_name, quant, unit, entry_date in zip(prod_ids, prod_names, quants, units, entry_dates):  # to insert product name instead of product id
+                    if prd_id == prod_id:
+                        st.insert(index='end',
+                                  chars=f'{ord_date},\t'
+                                        f'{ord_time},\t'
+                                        f'{ord_id},\t'
+                                        f'{acct_id},\t'
+                                        f'{prod_name},\t'
+                                        f'{ord_quant},\t'
+                                        f'{unit},\t'
+                                        f'{rpu},\t'
+                                        f'{price},\t'
+                                        f'{pstat},\t'
+                                        f'{date_comp}\n')
+                        break  # stop loop immediately after getting product's name of product id
+
+        # make text field read-only
+        st.config(state='disabled')
+        # ensure that text can be copied to clipboard
+        st.bind('<1>', lambda event: st.focus_set())
+
+        # select customer from list
+        tk.Label(self.display_frame, text='Select Customer', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=3, column=0, sticky='sw', padx=10)
+        self.cct_Cbox.config(height=5)
+        self.cct_Cbox.grid(row=4, column=0, sticky='nsw', padx=10)
+
+        tk.Label(self.display_frame, text='Select Account', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=3, column=1, sticky='sw')
+        self.sacct_Cbox.config(height=5)
+        self.sacct_Cbox.grid(row=4, column=1, sticky='nsw')
+
+        self.select_btn.grid(row=3, rowspan=2, column=4, sticky='w')
+
+        tk.Button(self.display_frame, text='BACK', font=("Calibri", 12, 'bold'), fg=bg, bg='white', height=1,
+                  width=15, command=self.salepage).grid(row=3, rowspan=2, column=5, sticky='w')
 
     def sales_fields(self):
         '''
@@ -1193,7 +1275,117 @@ class TransApp:
         return ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp
 
     def edit_sale(self):
-        pass
+        bg, fg = 'brown', 'white'
+        # setup display frame
+        self.display_frame = self.make_frame(page_title="UPDATE CUSTOMER'S ORDERS", background_color=bg)
+
+        # get a list of all existing customer orders
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp = self.sales_fields()
+        cust_details = self.fetch_cust_details()
+
+        if not (len(ord_dates)):
+            return messagebox.showerror(title='No Existing Orders',
+                                        message='There are no available orders for display')
+        # select customer from list
+        tk.Label(self.display_frame, text='Select Customer', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=3, column=0, sticky='sw', padx=10)
+        self.cct_Cbox = ttk.Combobox(self.display_frame, value=cust_details, font=('calibri', 13), width=30,
+                                     state='readonly')
+        self.cct_Cbox.set(cust_details[0])
+        self.cct_Cbox.grid(row=4, column=0, sticky='nw', padx=10)
+        self.cct_Cbox.bind('<FocusIn>', lambda event: self.show_acct_list(event, cust_ids, acct_ids))
+
+        tk.Label(self.display_frame, text='Select Account', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=3, column=1, sticky='sw')
+        self.sacct_Cbox = ttk.Combobox(self.display_frame, font=('calibri', 13), width=20,
+                                       state='readonly')
+        self.sacct_Cbox.set('Unavailable')
+        self.sacct_Cbox.grid(row=4, column=1, sticky='nw')
+
+        self.select_btn = tk.Button(self.display_frame, text='EDIT', fg='white', bg='green', width=15, height=1,
+                                    state='disabled',
+                                    font=("Calibri", 12, 'bold'),
+                                    command=lambda: self.pop_sales_edit(self.sacct_Cbox.get()))  # param: selected account id
+        self.select_btn.grid(row=3, rowspan=2, column=4, sticky='w')
+
+        tk.Button(self.display_frame, text='BACK', font=("Calibri", 12, 'bold'), fg=bg, bg='white', height=1,
+                  width=15, command=self.salepage).grid(row=3, rowspan=2, column=5, sticky='w')
+
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.edit_frame is not None:
+            self.edit_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+
+        self.display_frame.rowconfigure(list(range(7)), weight=1)
+        self.display_frame.columnconfigure(list(range(9)), weight=1)
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
+
+    def pop_sales_edit(self, selected_acctid):
+        bg, fg = 'brown', 'white'
+
+        # setup display frame
+        self.display_frame = self.make_frame(page_title="UPDATE CUSTOMER'S ORDERS", background_color=bg)
+
+        prod_ids, prod_names, quants, units, entry_dates = self.inv_fields()  # all inventory fields
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp = self.sales_fields()
+        # display headings for customer sales records
+        # create scrolled text field to display customer sales records
+
+        st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, wrap='word',
+                                       font=("Calibri", 14, 'bold'), relief='flat')
+
+        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
+        # display headings for customer records
+        st.insert(index='end',
+                  chars='ORDER DATE,\tORDER TIME,\tORDER ID,\tACCOUNT ID,\tPRODUCT,\tQUANTITY,\tUNIT,\tRATE/UNIT,\tPRICE,\tPAYMENT STATUS,\tDATE OF COMPLETION\n\n')
+
+        acct_ord_ids = []  # to collect all orders made through the selected account
+        for ord_date, ord_time, ord_id, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, pstat, date_comp in zip(
+                ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices,
+                pstats, dates_comp):
+            if acct_id == selected_acctid:  # display only selected account number
+                acct_ord_ids.append(ord_id)  # add current order id to list
+                for prd_id, prod_name, quant, unit, entry_date in zip(prod_ids, prod_names, quants, units,
+                                                                      entry_dates):  # to insert product name instead of product id
+                    if prd_id == prod_id:
+                        st.insert(index='end',
+                                  chars=f'{ord_date},\t'
+                                        f'{ord_time},\t'
+                                        f'{ord_id},\t'
+                                        f'{acct_id},\t'
+                                        f'{prod_name},\t'
+                                        f'{ord_quant},\t'
+                                        f'{unit},\t'
+                                        f'{rpu},\t'
+                                        f'{price},\t'
+                                        f'{pstat},\t'
+                                        f'{date_comp}\n')
+                        break  # stop loop immediately after getting product's name of product id
+
+        # make text field read-only
+        st.config(state='disabled')
+        # ensure that text can be copied to clipboard
+        st.bind('<1>', lambda event: st.focus_set())
+
+        # select customer from list
+        tk.Label(self.display_frame, text='Select Order', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=3, column=0, sticky='sw', padx=10)
+        self.cct_Cbox = ttk.Combobox(self.display_frame, font=('calibri', 13), width=12, values=acct_ord_ids,
+                                       state='readonly')
+        self.cct_Cbox.set(acct_ord_ids[0])
+        self.cct_Cbox.grid(row=4, column=0, sticky='nsw', padx=10)
+
+        tk.Button(self.display_frame, text='UPDATE', font=("Calibri", 12, 'bold'), fg='orange', bg=fg, height=1,
+                  width=15, command=self.editing_sale).grid(row=3, rowspan=2, column=1, sticky='w')
+
+        tk.Button(self.display_frame, text='BACK', font=("Calibri", 12, 'bold'), fg='blue', bg=fg, height=1,
+                  width=15, command=self.salepage).grid(row=3, rowspan=2, column=3, sticky='w')
+
+        self.display_frame.rowconfigure(list(range(5)), weight=1)
+        self.display_frame.columnconfigure(list(range(5)), weight=1)
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
     def editing_sale(self):
         pass
@@ -2049,7 +2241,7 @@ class TransApp:
         # setup display frame
         self.display_frame = self.make_frame(page_title="CUSTOMER'S FINANCIAL ACTIVITIES", background_color=bg)
 
-        tk.Button(self.display_frame, text='Transactions Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
+        tk.Button(self.display_frame, text='Back', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
                   width=15, command=self.acctranspage).grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         # create a list of existing customer accounts
@@ -2067,6 +2259,7 @@ class TransApp:
         cacct_Cbox = ttk.Combobox(self.display_frame, value=acct_ids, font=('calibri', 13), width=24, state='readonly')
         cacct_Cbox.set(acct_ids[0])
         cacct_Cbox.grid(row=0, column=1, sticky='w')
+
         ttk.Button(self.display_frame, text='SELECT', command=lambda: self.pop_view(cacct_Cbox.get())
                    ).grid(row=0, column=2, sticky='w')
 
@@ -2336,7 +2529,7 @@ class TransApp:
                   bg='orange', fg='white', height=1, width=15, command=self.update_acctrans).grid(row=6, column=1, padx=5,
                                                                                               pady=5, stick='w')
 
-        tk.Button(self.display_frame, text='Transaction Page', font=("Calibri", 12, 'bold'),
+        tk.Button(self.display_frame, text='Cancel', font=("Calibri", 12, 'bold'),
                   bg='blue', fg='white', height=1, width=15, command=self.acctranspage).grid(row=6, column=2, padx=5,
                                                                                          pady=5, stick='e')
 
@@ -3999,7 +4192,7 @@ class TransApp:
             hand.writelines(f'{self.inv_obj.__dict__}\n')
 
 # some functions
-def daily_incremental_id(ta, dates):
+def daily_incremental_id(ta, ord_dates, ord_ids):
     '''
     among dates, check for the number of times that today's date appears
     and add 1 (if zero, the answer is 1)
@@ -4008,8 +4201,8 @@ def daily_incremental_id(ta, dates):
     '''
     today = f'{datetime.date.today().year}-{ta.month[datetime.date.today().month]}-{datetime.date.today().day}'
     tdates = []
-    if today in dates:
-        for d in dates:
+    if today in ord_dates:
+        for d in ord_dates:
             if d == today:
                 tdates.append(d)  # list of all the today's dates
     return len(tdates) + 1
