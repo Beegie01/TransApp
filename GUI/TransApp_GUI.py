@@ -25,7 +25,7 @@ class TransApp:
         hand.writelines('')
     os.makedirs(f'{os.getcwd()}\\TransAppUsers', exist_ok=True)
 
-    def __init__(self, master): #, inventory_obj, customer_obj, sales_obj):
+    def __init__(self, master):
         self.master = master
         # user login 
         self.login_user = User()
@@ -42,7 +42,7 @@ class TransApp:
         self.acctrans_obj = AcctTrans()
         # create an object of sales
         self.sales_obj = Sales()
-        
+
 
         # menu bar section
         self.menu_bar = tk.Menu(self.master)
@@ -73,7 +73,7 @@ class TransApp:
         self.display_frame = None
 
         self.edit_frame = None
-        
+
         # list of entries
         self.day = list(range(1, 32))
         self.month = {1: 'JAN', 2: 'FEB', 3: 'MAR', 4: 'APR', 5: 'MAY', 6: 'JUN', 7: 'JUL', 8: 'AUG',
@@ -132,7 +132,7 @@ class TransApp:
                  ).grid(row=0, column=4, sticky='ew')
         tk.Label(master=self.status_bar_frame, font=('arial black', 10), fg='black', bg='gold',
                  text="TransApp-2021").grid(row=0, column=3, sticky='nsew')
-        
+
     def firstpage(self, event):
 
         self.display_frame = tk.LabelFrame(master=self.master, text='SETUP', bg='gold', font=('arial black', 12))
@@ -203,11 +203,12 @@ class TransApp:
         cpe.grid(row=4, column=1, sticky='w', padx=3, pady=5)
 
         # submit signup button
-        ttk.Button(self.display_frame, text='Create User',  width=15,
+        tk.Button(self.display_frame, text='Create User',  width=15, height=1, fg='white', bg='green', font=('calibri', 10, 'bold'),
                    command=self.setattr).grid(row=6, column=1, sticky='e')
 
         # front page
-        ttk.Button(self.display_frame, text='Back', width=8, command=self.firstpage).grid(row=6, column=0, sticky='e')
+        tk.Button(self.display_frame, text='Back', width=8, font=('calibri', 10, 'bold'), fg='red', bg='white',
+                  command=lambda: self.firstpage(event=None)).grid(row=6, column=0, sticky='e')
 
         self.display_frame.rowconfigure(list(range(6)), weight=1)
         self.display_frame.columnconfigure(list(range(3)), weight=1)
@@ -397,19 +398,19 @@ class TransApp:
         self.inv_obj.inv_data = f'{self.login_user.filepath}\\Inventory\\inv_data.txt'
         self.inv_obj.inv_edits = f'{self.login_user.filepath}\\Inventory\\edited_inv.txt'
         self.inv_obj.inv_dels = f'{self.login_user.filepath}\\Inventory\\deleted_inv.txt'
-        
+
         self.cust_obj.cust_data = f'{self.login_user.filepath}\\Customers\\cust_data.txt'
         self.cust_obj.cust_edits = f'{self.login_user.filepath}\\Customers\\edited_cust.txt'
         self.cust_obj.cust_dels = f'{self.login_user.filepath}\\Customers\\deleted_cust.txt'
-        
+
         self.sales_obj.sales_data = f'{self.login_user.filepath}\\Sales\\sales_data.txt'
         self.sales_obj.sales_edits = f'{self.login_user.filepath}\\Sales\\edited_sales.txt'
         self.sales_obj.sales_dels = f'{self.login_user.filepath}\\Sales\\deleted_sales.txt'
-        
+
         self.acct_obj.acct_data = f'{self.login_user.filepath}\\Accounts\\acct_data.txt'
         self.acct_obj.acct_edits = f'{self.login_user.filepath}\\Accounts\\edited_acct.txt'
         self.acct_obj.acct_dels = f'{self.login_user.filepath}\\Accounts\\deleted_acct.txt'
-        
+
         self.acctrans_obj.acctrans_data = f'{self.login_user.filepath}\\AccTransactions\\acctrans_data.txt'
         self.acctrans_obj.acctrans_edits = f'{self.login_user.filepath}\\AccTransactions\\edited_acctrans.txt'
         self.acctrans_obj.acctrans_dels = f'{self.login_user.filepath}\\AccTransactions\\deleted_acctrans.txt'
@@ -475,6 +476,28 @@ class TransApp:
 
         self.sectionFrame.grid(row=1, rowspan=4, column=0, columnspan=5, sticky='nsew')
 
+    def fetch_cust_details(self):
+        '''
+        generate a list of tuples containing (customer_id, first_name, last_name)
+        :return: [(cid, fn, ln)]
+        '''
+        customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened = self.cust_fields()  # all customer fields
+
+        cust_details = [(cid, fn, ln) for cid, fn, mn, ln, g, db, n, s, off, do in
+                        zip(customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin,
+                            office_addrs, dates_opened)]
+
+        return cust_details
+
+    def fetch_prod_details(self):
+        '''
+        generate a list of tuples containing (prod_id, prod_name)
+        :return: [(pid, pn)]
+        '''
+        prod_ids, prod_names, quants, units, entry_dates = self.inv_fields()  # all inventory fields
+        prod_details = [(pid, pn) for pid, pn, q, u, d in zip(prod_ids, prod_names, quants, units, entry_dates)]
+        return prod_details
+
     def new_sale(self):
         global prod_ids, prod_names, quants, units, entry_dates
         global customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened
@@ -488,43 +511,45 @@ class TransApp:
 
         dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()  # all account fields
 
-        cust_details = [(cid, fn, ln) for cid, fn, mn, ln, g, db, n, s, off, do in zip(customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened)]
-        prod_details = [(pid, pn) for pid, pn, q, u, d in zip(prod_ids, prod_names, quants, units, entry_dates)]
+        cust_details = self.fetch_cust_details()
+        prod_details = self.fetch_prod_details()
 
         # when no product account exists
-        if len(prod_ids) < 1:
+        if not(len(prod_ids)):
             return messagebox.showerror(message='No Record of Existing Products')
 
         # frame for input of new inventory
-        self.new_frame = tk.LabelFrame(self.master, text='BOOKING NEW ORDER', fg=fg, font=('arial black', 12),
+        self.new_frame = tk.LabelFrame(self.master, text='BOOKING AN ORDER', fg=fg, font=('arial black', 12),
                                        bg=bg)
         self.new_frame.rowconfigure(list(range(15)), weight=1)
         self.new_frame.columnconfigure(list(range(8)), weight=1)
 
         # place new sale form
         # Order labels and entries
-        tk.Label(self.new_frame, text='Select:', font=('calibri', 12),
-                 bg=bg, fg=fg, height=1).grid(row=0, rowspan=2, column=0, stick='sw', padx=15)
+        tk.Label(self.new_frame, text='Select:', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=0, rowspan=2, column=0, stick='e', padx=15)
         # product
-        tk.Label(self.new_frame, text='Product', font=('calibri', 12),
+        tk.Label(self.new_frame, text='Product', font=('calibri', 14),
                  bg=bg, fg=fg, height=1).grid(row=0, column=1, stick='sw', padx=15)
-        self.pr_idname_Cbox = ttk.Combobox(self.new_frame, font=('calibri', 10, 'bold'), height=2,  width=25,
+        self.pr_idname_Cbox = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), height=2,  width=25,
                                            values=prod_details, state='readonly')
         self.pr_idname_Cbox.set(prod_details[0])
         self.pr_idname_Cbox.grid(row=1, column=1, padx=15, stick='nw')
+        self.pr_idname_Cbox.bind('<FocusIn>', lambda event: self.dsp_pid(event, self.pr_idname_Cbox.get()))
 
         # customer
-        tk.Label(self.new_frame, text='Customer', font=('calibri', 12),
+        tk.Label(self.new_frame, text='Customer', font=('calibri', 14),
                  bg=bg, fg=fg, height=1).grid(row=0, column=2, stick='sw')
-        self.cust_idnames_Cbox = ttk.Combobox(self.new_frame, font=('calibri', 10, 'bold'), height=2, width=30,
+        self.cust_idnames_Cbox = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), height=2, width=30,
                                               values=cust_details, state='readonly')
-        self.cust_idnames_Cbox.grid(row=1, column=2, padx=2, stick='nw')
+        self.cust_idnames_Cbox.grid(row=1, column=2, stick='nw')
         self.cust_idnames_Cbox.set(cust_details[0])
+        self.cust_idnames_Cbox.bind('<FocusIn>',
+                                    lambda event: self.dsp_cid(event, self.cust_idnames_Cbox.get()))  # respond to focus in
 
-        tk.Button(self.new_frame, command=lambda: self.place_ids(self.pr_idname_Cbox.get(), self.cust_idnames_Cbox.get()),
-                   font=("Calibri", 10, 'bold'), fg='black', bg='light blue', height=1, width=10,
-                  text='Select').grid(row=1, column=5, sticky='nw')
-        tk.Button(self.new_frame, text='Cancel', font=("Calibri", 10, 'bold'), fg='red', bg='white', height=1,
+        tk.Button(self.new_frame, text='Select', font=("Calibri", 12, 'bold'), fg='green', bg='white', height=1, width=10,
+                  command=lambda: self.place_ids(self.pr_idname_Cbox.get(), self.cust_idnames_Cbox.get())).grid(row=1, column=5, stick='n')
+        tk.Button(self.new_frame, text='Cancel', font=("Calibri", 12, 'bold'), fg='red', bg='white', height=1,
                   width=10, command=self.salepage).grid(row=1, column=6, stick='n')
 
         # display inventory page's frame
@@ -534,38 +559,96 @@ class TransApp:
             self.sectionFrame.grid_forget()
         self.new_frame.grid(row=1, rowspan=8, column=0, columnspan=3, sticky='nsew')
 
+    def dsp_pid(self, event, prod_selection):
+        '''
+        respond to focus into the product selection box
+        by reflecting the corresponding product id below
+        :param event:
+        :param prod_selection:
+        :return:
+        '''
+        bg, fg = 'brown', 'white'
+        # print(prod_selection.split())
+        prframe = tk.Frame(self.new_frame, bg=bg)
+        prframe.grid(row=2, rowspan=2, column=1, sticky='ew')
+
+        pid, pn = prod_selection.split()  # selection split into a list of strings
+        tk.Label(self.new_frame, text='Selected:', font=('calibri', 16),
+                 bg=bg, fg=fg, height=1).grid(row=2, rowspan=2, column=0, sticky='e', padx=15)
+
+        tk.Label(prframe, text='Product ID:', font=('calibri', 14),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=0, sticky='ew')
+        self.prid = tk.Entry(prframe, font=('calibri', 14, 'bold'), fg='white', bg='black', width=10)
+        self.prid.insert(0, pid)
+        self.prid.grid(row=1, column=0, sticky='ew')
+        self.prid.config(state='disabled')
+        self.pr_idname_Cbox.unbind('<FocusIn>')
+        self.pr_idname_Cbox.bind('<FocusOut>', self.dsp_pid2)
+
+    def dsp_pid2(self, event):
+        '''
+        respond to subsequent focus in
+        :param event:
+        :return:
+        '''
+        bg, fg = 'brown', 'white'
+        self.pr_idname_Cbox.bind('<FocusIn>', lambda event: self.dsp_pid(event, self.pr_idname_Cbox.get()))
+
+    def dsp_cid(self, event, cust_selection):
+        '''
+        respond to focus into the customer selection box
+        by reflecting the corresponding customer id below
+        :param event:
+        :param cust_selection:
+        :return:
+        '''
+        bg, fg = 'brown', 'white'
+        cuframe = tk.Frame(self.new_frame, bg=bg)
+        cuframe.grid(row=2, rowspan=2, column=2, sticky='ew')
+
+        # print(cust_selection.split())  # selection split into a list
+        cid, fn, ln = cust_selection.split()
+        tk.Label(cuframe, text='Customer ID:', font=('calibri', 14),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=0, sticky='ew')
+        self.cuid = tk.Entry(cuframe, font=('calibri', 14, 'bold'), fg='white', bg='black', width=10)
+        self.cuid.insert(0, cid)
+        self.cuid.grid(row=1, column=0, sticky='ew')
+        self.cuid.config(state='disabled')
+
+        self.cust_idnames_Cbox.unbind('<FocusIn>')
+        self.cust_idnames_Cbox.bind('<FocusOut>', self.dsp_cid2)
+
+        # select the account type from account number
+        tk.Label(self.new_frame, text='Select Account', font=('calibri', 14),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=3, stick='sw')
+        self.currCbox = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'))
+        self.currCbox.grid(row=1, column=3, padx=2, stick='nw')
+        self.currCbox.set('Press Select Button')  # direct user to press the select button to continue
+        self.currCbox.config(state='readonly')
+
+    def dsp_cid2(self, event):
+        '''
+        respond to subsequent focus in
+        :param event:
+        :return:
+        '''
+        bg, fg = 'brown', 'white'
+        self.cust_idnames_Cbox.bind('<FocusIn>',
+                                    lambda evnt: self.dsp_cid(evnt, self.cust_idnames_Cbox.get()))
+
     def place_ids(self, prod_selection, cust_selection):
         global prod_ids, prod_names, quants, units, entry_dates
         global customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened
         global dates_opened, acct_ids, cust_ids, acct_types, acct_bals
+        global paym_stat
         bg, fg = 'brown', 'white'
 
-        # print(prod_selection.split())
-        prframe = tk.Frame(self.new_frame, bg=bg, padx=10)
-        prframe.grid(row=2, rowspan=2, column=1, sticky='ew')
-        cuframe = tk.Frame(self.new_frame, bg=bg, padx=10)
-        cuframe.grid(row=2, rowspan=2, column=1, sticky='ew')
-
         pid, pn = prod_selection.split()  # selection split into a list of strings
-        tk.Label(self.new_frame, text='Selected:', font=('calibri', 12),
-                 bg=bg, fg=fg, height=1).grid(row=2, column=0, sticky='w')
-
-        tk.Label(prframe, text='Product ID:', font=('calibri', 12), anchor='e',
-                 bg=bg, fg=fg, height=1).grid(row=0, column=0, sticky='ew')
-        self.prid = tk.Entry(prframe, font=('calibri', 10, 'bold'), fg='white', bg='black', width=10)
-        self.prid.insert(0, pid)
-        self.prid.grid(row=1, column=0, sticky='ew')
-        self.prid.config(state='disabled')
-
-        # print(cust_selection.split())  # selection split into a list
         cid, fn, ln = cust_selection.split()
-        tk.Label(cuframe, text='Customer ID:', font=('calibri', 12),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=1, sticky='ew')
-        self.cuid = tk.Entry(cuframe, font=('calibri', 10, 'bold'), fg='white', bg='black', width=10)
-        self.cuid.insert(0, cid)
-        self.cuid.grid(row=1, column=1, sticky='ew')
-        self.cuid.config(state='disabled')
+        self.dsp_cid(event=None, cust_selection=cust_selection)  # display the corresponding customer id
+        self.dsp_pid(event=None, prod_selection=prod_selection)  # display the corresponding product id
 
+        self.pr_idname_Cbox.config(state='disabled'), self.cust_idnames_Cbox.config(state='disabled')
         Found = False
         sel_currs, sel_acids = [], []
         for d, a, c, t, b in zip(dates_opened, acct_ids, cust_ids, acct_types, acct_bals):
@@ -577,160 +660,537 @@ class TransApp:
             return messagebox.showinfo(message="Customer's account is inactive")
 
         # select the account type from account number
-        tk.Label(self.new_frame, text='Select Account', font=('calibri', 12),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=2, stick='sw')
-        self.currCbox = ttk.Combobox(self.new_frame, font=('calibri', 10, 'bold'), values=sel_acids)
-        self.currCbox.grid(row=1, column=2, padx=2, stick='nw')
-        self.currCbox.set('None')
+        tk.Label(self.new_frame, text='Select Account', font=('calibri', 14),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=3, stick='sw')
+        self.currCbox = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), values=sel_acids)
+        self.currCbox.grid(row=1, column=3, padx=2, stick='nw')
+        self.currCbox.set('Select An Account')
         self.currCbox.config(state='readonly')
         self.currCbox.bind('<FocusIn>', self.disp_curr)
         self.currCbox.bind('<FocusOut>', self.disp_curr2)
 
         # currency
-        tk.Label(self.new_frame, text='Currency', font=('calibri', 12), bg=bg, fg=fg,
-                 height=1).grid(row=6, column=2, stick='sw')
-        self.currEntry = ttk.Entry(self.new_frame, font=('calibri', 10, 'bold'))
-        self.currEntry.grid(row=7, column=2, padx=2, stick='nw')
-        self.currEntry.insert(0, 'None Selected')
+        tk.Label(self.new_frame, text='Currency', font=('calibri', 14), bg=bg, fg=fg,
+                 height=1).grid(row=2, column=3, stick='sw')
+        self.currEntry = ttk.Entry(self.new_frame, font=('calibri', 14, 'bold'))
+        self.currEntry.grid(row=3, column=3, padx=2, stick='nw')
+        self.currEntry.insert(0, 'Unavailable')
         self.currEntry.config(state='disabled')
 
+        # order details
+        tk.Label(self.new_frame, text='ORDER:', font=('calibri', 14), bg=bg, fg=fg,
+                 height=1).grid(row=4, rowspan=2, column=0, stick='nse', padx=15)
+
         # ordered quantity
-        tk.Label(self.new_frame, text='Quantity', font=('calibri', 12), bg=bg, fg=fg,
-                 height=1).grid(row=4, column=0, padx=15, stick='sw')
-        self.ord_qtyEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), fg='black')
-        self.ord_qtyEntry.grid(row=5, column=0, padx=15, stick='nw')
+        tk.Label(self.new_frame, text='Quantity', font=('calibri', 14), bg=bg, fg=fg,
+                 height=1).grid(row=4, column=1, stick='sw')
+        self.ord_qtyEntry = tk.Entry(self.new_frame, font=('calibri', 14, 'bold'), fg='black', width=12)
+        self.ord_qtyEntry.insert(0, 'Unavailable')
+        self.ord_qtyEntry.config(state='disabled')
+        self.ord_qtyEntry.grid(row=5, column=1, stick='nw')
         evt1 = '<KeyRelease>'
         self.ord_qtyEntry.bind(evt1, self.calc_price)
 
         # unit of measurement
-        tk.Label(self.new_frame, text='Unit', font=('calibri', 12),
-                 bg=bg, fg=fg, height=1).grid(row=4, column=1, stick='sw')
-        self.ord_unitEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), bg='black', fg='white')
-        self.ord_unitEntry.grid(row=5, column=1, padx=2, stick='nw')
+        tk.Label(self.new_frame, text='Unit', font=('calibri', 14),
+                 bg=bg, fg=fg, height=1).grid(row=4, column=2, stick='sw')
+        self.ord_unitEntry = tk.Entry(self.new_frame, font=('calibri', 14, 'bold'), bg='black', fg='white')
+        self.ord_unitEntry.grid(row=5, column=2, padx=2, stick='nw')
         for prdid, pn, q, u, d in zip(prod_ids, prod_names, quants, units, entry_dates):
             if prdid == pid:
                 self.ord_unitEntry.insert(0, f'{u}')
         self.ord_unitEntry.config(state='disabled')
 
         # rate of order
-        tk.Label(self.new_frame, text='Rate/Unit', font=('calibri', 12),
-                 bg=bg, fg=fg, height=1).grid(row=6, column=3, stick='sw')
-        self.ord_rateEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'))
-        self.ord_rateEntry.grid(row=7, column=3, padx=2, stick='nw')
+        tk.Label(self.new_frame, text='Rate/Unit', font=('calibri', 14), bg=bg, fg=fg,
+                 height=1).grid(row=6, column=1, stick='sw')
+        self.ord_rateEntry = tk.Entry(self.new_frame, font=('calibri', 14, 'bold'), width=12)
+        self.ord_rateEntry.insert(0, 'Unavailable')
+        self.ord_rateEntry.config(state='disabled')
+        self.ord_rateEntry.grid(row=7, column=1, padx=2, stick='nw')
         evt2 = '<KeyRelease>'
         self.ord_rateEntry.bind(evt2, self.calc_price)
 
         # price
-        tk.Label(self.new_frame, text='Price', font=('calibri', 12), bg=bg, fg=fg,
-                 height=1).grid(row=6, column=4, stick='sw')
-        self.ord_priceEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), fg='white', bg='black')
-        self.ord_priceEntry.grid(row=7, column=4, padx=2,  stick='nw')
-        self.ord_priceEntry.insert(0, 'Yet to be determined')
+        tk.Label(self.new_frame, text='Price', font=('calibri', 14), bg=bg, fg=fg,
+                 height=1).grid(row=6, column=2, stick='sw')
+        self.ord_priceEntry = tk.Entry(self.new_frame, font=('calibri', 14, 'bold'), fg='white', bg='black')
+        self.ord_priceEntry.grid(row=7, column=2, padx=2,  stick='nw')
+        self.ord_priceEntry.insert(0, 'Undetermined')
         self.ord_priceEntry.config(state='disabled')
-        #
-        # # customer order date
-        # tk.Label(self.new_frame, text='Date of Order', font=('calibri', 12),
-        #          bg=bg, fg=fg, height=1).grid(row=5, column=0, padx=10, stick='nsew')
-        # # day
-        # tk.Label(self.new_frame, text='Day', font=('calibri', 12), bg=bg, fg=fg,
-        #          height=1).grid(row=5, column=1, padx=5, stick='nw')
-        # self.orddayEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), width=10)
-        # self.orddayEntry.insert(0, str(datetime.date.today().day))
-        # self.orddayEntry.grid(row=6, column=1, padx=5, pady=30, stick='sw')
-        # # month
-        # tk.Label(self.new_frame, text='Month', font=('calibri', 12), bg=bg, fg=fg,
-        #          height=1).grid(row=5, column=2, padx=5, stick='nw')
-        # self.ordmonthEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), width=10)
-        # self.ordmonthEntry.insert(0, str(datetime.date.today().month))
-        # self.ordmonthEntry.grid(row=6, column=2, padx=5, pady=30, stick='sw')
-        # # year
-        # tk.Label(self.new_frame, text='Year', font=('calibri', 12), bg=bg, fg=fg,
-        #          height=1).grid(row=5, column=3, stick='nw')
-        # self.ordyrEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), width=10)
-        # self.ordyrEntry.insert(0, str(datetime.date.today().year))
-        # self.ordyrEntry.grid(row=6, column=3, pady=30, stick='sw')
-        #
-        # # customer amount deposited
-        # tk.Label(self.new_frame, text='Deposit', font=('calibri', 12), bg=bg, fg=fg,
-        #          height=1).grid(row=7, column=0, padx=10, stick='nsew')
-        # self.depEntry = tk.Entry(self.new_frame, font=('calibri', 10, 'bold'), width=10)
-        # self.depEntry.grid(row=8, column=0, padx=5, pady=30, stick='sw')
-        #
-        # # payment status
-        # tk.Label(self.new_frame, text='Payment Status', font=('calibri', 12), bg=bg, fg=fg,
-        #          height=1).grid(row=7, column=1, padx=5, stick='nsew')
-        # self.pay_statText = tk.Text(self.new_frame, font=('calibri', 10, 'bold'), width=10, height=3)
-        # self.pay_statText.grid(row=8, column=1, padx=5, pady=30, sticky='ew')
-        #
-        # payment = tk.StringVar(value='None')
-        # complRadio = tk.Radiobutton(self.new_frame, text='Complete', value='Complete', variable=payment, font=('calibri', 16), bg='blue', fg='black', command=lambda: self.sel_paystat(payment.get()), state='normal')
-        # complRadio.grid(row=9, column=1, padx=2, sticky='w')
-        # incomplRadio = tk.Radiobutton(self.new_frame, text='Incomplete', value='Incomplete', variable=payment, font=('calibri', 16),
-        #                              bg='blue', fg='black', command=lambda: self.sel_paystat(payment.get()), state='normal')
-        # incomplRadio.grid(row=9, column=2, padx=2, sticky='w')
 
-        tk.Button(self.new_frame, text='Submit', font=("Calibri", 14, 'bold'), fg='white', bg='green', width=10,
-                  height=1, command=self.submit_sale).grid(row=13, column=2, padx=10, sticky='se')
+        # payment status
+        tk.Label(self.new_frame, text='Payment Status:', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=8, rowspan=2, column=0, padx=15, stick='nse')
+
+        self.pay_stat = tk.Entry(self.new_frame, font=('calibri', 14, 'bold'), width=10)
+        self.pay_stat.grid(row=8, column=1, stick='sw')
+        self.pay_stat.insert(0, "Pending")
+        self.pay_stat.config(state='disabled')
+
+        paym_stat = tk.BooleanVar()
+        paym_stat.set(False)
+        self.complCheck = tk.Checkbutton(self.new_frame, text='Confirm', variable=paym_stat,
+                                         font=("Calibri", 14, 'bold'), state='disabled',
+                                         selectcolor='black', bg=bg, fg=fg,
+                                         command=lambda: self.sel_paystat(paym_stat.get()))
+        self.complCheck.grid(row=9, column=1, padx=2, sticky='nw')
+        # adjust confirm checkbox
+        if self.pay_stat.get() != 'Eligible for Confirmation':
+            self.pay_stat.grid_forget()
+        else:
+            self.complCheck = tk.Checkbutton(self.new_frame, text='Confirm', variable=paym_stat,
+                                             font=("Calibri", 14, 'bold'), state='disabled',
+                                             selectcolor='black', bg=bg, fg=fg,
+                                             command=lambda: self.sel_paystat(paym_stat.get()))
+            self.complCheck.grid(row=9, column=1, padx=2, sticky='nw')
+
+        # submit button
+        self.submitbtn = tk.Button(self.new_frame, text='Submit', font=("Calibri", 14, 'bold'), fg='white', bg='green',
+                              width=10, height=1, command=self.before_submit)
 
     def calc_price(self, event):
+        global paym_stat
+        bg, fg = 'brown', 'white'
         qty, rate = self.ord_qtyEntry.get(), self.ord_rateEntry.get()  # store qty and rate
+        acct_bal = self.accbalEntry.get()  # calculate the account balance
+
         if qty not in string.whitespace and rate not in string.whitespace:
 
             try:
                 calc_amnt = float(qty) * float(rate)
+                if calc_amnt > float(acct_bal):  # price has exceeded account balance
+                    self.pay_stat.config(state='normal', width=10)
+                    self.pay_stat.delete(0, 'end')
+                    self.pay_stat.insert(0, 'Pending')
+                    self.pay_stat.config(state='disabled')
+                    self.pay_stat.grid(row=8, column=1, stick='sw')
+                    # uncheck check box
+                    paym_stat.set(False)
+                    self.complCheck = tk.Checkbutton(self.new_frame, text='Confirm', variable=paym_stat,
+                                                     font=("Calibri", 14, 'bold'), state='disabled',
+                                                     selectcolor='black', bg=bg, fg=fg,
+                                                     command=lambda: self.sel_paystat(paym_stat.get()))
+                    self.complCheck.grid(row=9, column=1, padx=2, sticky='nw')
+                    if self.compl_yearEntry is not None:
+                        self.compl_yearEntry.grid_forget(), self.compl_monthEntry.grid_forget(), self.compl_dayEntry.grid_forget()
+
+                else:
+                    self.pay_stat.config(state='normal', width=25)
+                    self.pay_stat.delete(0, 'end')
+                    self.pay_stat.insert(0, 'Eligible for confirmation')
+                    self.pay_stat.config(state='disabled')
+                    self.pay_stat.grid(row=8, column=1, stick='sw')
+                    self.complCheck.config(state='normal')
                 self.ord_priceEntry.config(state='normal')
                 self.ord_priceEntry.delete(0, 'end')
                 self.ord_priceEntry.insert(0, calc_amnt)
                 self.ord_priceEntry.config(state='disabled')
-            except:
-                return messagebox.showerror(message='Quantity and Rate should be given in figures')
+            except TypeError as TE:
+                return messagebox.showerror(message=f'{TE}\n'
+                                                    'Please Make sure a valid account has been selected')
+            except ValueError as VE:
+                return messagebox.showerror(message=f'{VE}\n\nQuantity and Rate should be given in figures\n'
+                                                    'Please Make sure a valid account has been selected')
         else:
             self.ord_priceEntry.config(state='normal')
             self.ord_priceEntry.delete(0, 'end')
-            self.ord_priceEntry.insert(0, 'Yet to be determined')
+            self.ord_priceEntry.insert(0, 'Undetermined')
             self.ord_priceEntry.config(state='disabled')
 
     def disp_curr(self, event):
         global dates_opened, acct_ids, cust_ids, acct_types, acct_bals
-        aid = self.currCbox.get()  # selected account id
+        bg, fg = 'brown', 'white'
+        acctid = self.currCbox.get()  # selected account id
         self.currEntry.config(state='normal')
         for d, a, c, t, b in zip(dates_opened, acct_ids, cust_ids, acct_types, acct_bals):
-            if a == aid:
+            if a == acctid:
                 self.currEntry.delete(0, 'end')
                 self.currEntry.insert(0, t)  # display selected customer's account-type/currency
         self.currEntry.config(state='disabled')
-        self.currCbox.unbind('<FocusIn>')  # no longer respond to focus in
-        self.currCbox.bind('<Button-1>')  # now respond to mouse left click
+
+        acct_bal = self.get_bal(acctid)
+        tk.Label(self.new_frame, font=('calibri', 14, 'bold'), fg=fg, bg=bg, text='Account Balance').grid(row=6, column=3, sticky='sw')
+        self.accbalEntry = tk.Entry(self.new_frame, font=('calibri', 14, 'bold'), width=13)
+        self.accbalEntry.insert(0, f'{acct_bal}')
+        self.accbalEntry.config(state='disabled')
+        self.accbalEntry.grid(row=7, column=3, sticky='nw')
+
+        if acctid in ['Select An Account', 'Press Select Button']:
+            self.submitbtn.grid_forget()
+
+        else:
+            self.submitbtn.grid(row=13, column=2, padx=10, sticky='se')  # display the submit button
+            self.ord_qtyEntry.config(state='normal')  # make quantity entry available for input
+            self.ord_qtyEntry.delete(0, 'end')  # clear quantity entry of its previous content - "Unavailable"
+            self.ord_rateEntry.config(state='normal')  # make rate entry available for input
+            self.ord_rateEntry.delete(0, 'end')  # clear rate entry of its previous content - "Unavailable"
+            # self.complCheck.config(state='normal')
+
+        self.currCbox.unbind('<FocusIn>')  # no longer respond to focus in (only respond to focus out)
 
     def disp_curr2(self, event):
-        self.currCbox.bind('<FocusIn>', self.disp_curr)  # upon focus out rebind focus in
-
-    def inv_fields(self):
-        invdata = self.read_inv()
-
-        prod_ids = [v for line in invdata for k, v in eval(line).items() if k == 'prod_id']
-        prod_names = [v for line in invdata for k, v in eval(line).items() if k == 'prod_name']
-        quants = [v for line in invdata for k, v in eval(line).items() if k == 'qty']
-        units = [v for line in invdata for k, v in eval(line).items() if k == 'unit']
-        entry_dates =  [v for line in invdata for k, v in eval(line).items() if k == 'entry_date']
-
-        return prod_ids, prod_names, quants, units, entry_dates
+        self.currCbox.bind('<FocusIn>', self.disp_curr)  # upon focus out reset to respond to focus in
 
     def sel_paystat(self, payment_status):
-        self.sales_obj.payment_status = payment_status
-        print(self.sales_obj.payment_status)
+        '''
+        to keep record of the check button for payment status
+        :param payment_status:
+        :return:
+        '''
+        bg, fg = 'brown', 'white'
 
-    def submit_sale(self):
-        pass
+        l = tk.Label(self.new_frame, text='Payment Completion Date', font=('calibri', 16), bg=bg, fg=fg, height=1)
+        ld = tk.Label(self.new_frame, text='Day', font=('calibri', 14), bg=bg, fg=fg, height=1)
+        lm = tk.Label(self.new_frame, text='Month', font=('calibri', 14), bg=bg, fg=fg, height=1)
+        ly = tk.Label(self.new_frame, text='Year', font=('calibri', 14), bg=bg, fg=fg, height=1)
 
-    def savesale(self):
-        pass
+        if not payment_status:
+            self.pay_stat.config(state='normal', width=10)
+            self.pay_stat.delete(0, 'end')
+            self.pay_stat.insert(0, 'Pending')
+            self.pay_stat.config(state='disabled')
+            if self.compl_yearEntry is not None:
+                # l.grid_forget(), ld.grid_forget(), lm.grid_forget(), ly.grid_forget()
+                self.compl_yearEntry.grid_forget()
+                self.compl_monthEntry.grid_forget()
+                self.compl_dayEntry.grid_forget()
+        else:
+            self.pay_stat.config(state='normal', width=10)
+            self.pay_stat.delete(0, 'end')
+            self.pay_stat.insert(0, 'Completed')
+            self.pay_stat.config(state='disabled')
+
+            # customer order date
+            l.grid(row=11, rowspan=2, column=0, padx=15, stick='nse')
+            # day
+            ld.grid(row=11, column=1, stick='sw')
+            self.compl_dayEntry = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), width=10)
+            self.compl_dayEntry.insert(0, str(datetime.date.today().day))
+            self.compl_dayEntry.grid(row=12, column=1, stick='nw')
+            self.compl_dayEntry.config(state='disabled')
+            # month
+            lm.grid(row=11, column=2, padx=5, stick='sw')
+            self.compl_monthEntry = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), width=10)
+            self.compl_monthEntry.insert(0, str(self.month[datetime.date.today().month]))
+            self.compl_monthEntry.grid(row=12, column=2, padx=5, stick='nw')
+            self.compl_monthEntry.config(state='disabled')
+            # year
+            ly.grid(row=11, column=3, stick='sw')
+            self.compl_yearEntry = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), width=10)
+            self.compl_yearEntry.insert(0, str(datetime.date.today().year))
+            self.compl_yearEntry.grid(row=12, column=3, stick='nw')
+            self.compl_yearEntry.config(state='disabled')
+
+    def before_submit(self):
+        bg, fg = 'brown', 'white'
+        self.submit_frame = tk.LabelFrame(self.master, text='DO YOU WANT TO SAVE?', fg=fg, bg=bg,
+                                          font=('arial black', 12))
+        self.submit_frame.rowconfigure(list(range(5)), weight=1)
+        self.submit_frame.columnconfigure(list(range(4)), weight=1)
+
+        # if order id is existing, simply continue
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp = self.sales_fields()
+
+        ord_id = daily_incremental_id(ta, ord_dates)  # use the dates column to determine the current order id
+
+        ord_date = f'{datetime.date.today().year}-{self.month[datetime.date.today().month]}-{datetime.date.today().day}'
+        ord_time = f'{datetime.datetime.today().hour}:{datetime.datetime.today().minute}:{datetime.datetime.today().second}'
+        prod_id, cust_id, acct_id = self.prid.get(), self.cuid.get(), self.currCbox.get()
+        try:
+            ord_quant, ord_unit, rpu, price = float(self.ord_qtyEntry.get()), self.ord_unitEntry.get(), float(self.ord_rateEntry.get()), float(self.ord_priceEntry.get())
+            paym_stat = self.pay_stat.get()
+        except TypeError as TE:
+            return messagebox.showerror(message=TE)
+        except ValueError as VE:
+            return messagebox.showerror(message=VE)
+
+        mandatory_entries = [ord_quant, rpu, price]
+
+        if [True for entry in mandatory_entries if (str(entry) in string.whitespace) or (entry is None)]:
+            return messagebox.showerror(title='Blank Field', message='BLANK FIELD(S) DETECTED!')
+
+        if paym_stat != 'Completed':  # order was not confirmed
+            paym_stat, date_comp = 'Pending', None
+            self.submit_pendingsale(ord_date, ord_time, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, paym_stat, date_comp, ord_id)
+        else:  # order was confirmed
+            date_comp = f'{self.compl_yearEntry.get()}-{self.compl_monthEntry.get()}-{self.compl_dayEntry.get()}'
+            self.submit_complsale(ord_date, ord_time, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, paym_stat, date_comp, ord_id)
+
+    def submit_pendingsale(self, ord_date, ord_time, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, paym_stat, date_comp, ord_id):
+        '''
+        sets the sales class attributes
+        and does not implement a debit transaction
+        on the customer's account
+        :param ord_date:
+        :param ord_time:
+        :param prod_id:
+        :param cust_id:
+        :param acct_id:
+        :param ord_quant:
+        :param ord_unit:
+        :param rpu:
+        :param price:
+        :param paym_stat:
+        :param date_comp:
+        :return:
+        '''
+        bg, fg = 'brown', 'white'
+
+        # set new attributes
+        self.sales_obj.ord_id = ord_id
+        self.sales_obj.ord_date, self.sales_obj.ord_time = ord_date, ord_time
+        self.sales_obj.product_id, self.sales_obj.customer_id, self.sales_obj.account_id = prod_id, cust_id, acct_id
+        self.sales_obj.ord_quantity, self.sales_obj.ord_unit, self.sales_obj.rate_per_unit, self.sales_obj.price = ord_quant, ord_unit, rpu, price
+        self.sales_obj.payment_status, self.sales_obj.date_of_completion = paym_stat, date_comp
+
+        print(self.sales_obj.__dict__)
+
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"ORDER ID\n{self.sales_obj.ord_id}").grid(row=0, column=0, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"PRODUCT ID\n{self.sales_obj.product_id}").grid(row=0, column=1, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"CUSTOMER ID\n{self.sales_obj.customer_id}").grid(row=0, column=2, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"ACCOUNT ID\n{self.sales_obj.account_id}").grid(row=0, column=3, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"ORDERED QTY\n{self.sales_obj.ord_quantity}").grid(row=1, column=0, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"ORDERED UNIT\n{self.sales_obj.ord_unit}").grid(row=1, column=1, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"RATE/UNIT\n{self.sales_obj.rate_per_unit}").grid(row=1, column=2, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"PRICE\n{self.sales_obj.price}").grid(row=1, column=3, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"PAYMENT STATUS\n{self.sales_obj.payment_status}").grid(row=2, column=0, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"DATE OF COMPLETION\n{self.sales_obj.date_of_completion}").grid(row=2, column=1, sticky='ew')
+
+        # save and cancel buttons
+        tk.Button(self.submit_frame, text='Save', font=("Calibri", 14, 'bold'), fg='green', bg='white',
+                  height=3, width=10, command=self.save_sale).grid(row=4, column=0, padx=5, stick='ew')
+        tk.Button(self.submit_frame, text='Cancel', font=("Calibri", 14, 'bold'), bg='red', fg='white',
+                  height=3, width=10, command=self.new_sale).grid(row=4, column=3, padx=5, stick='ew')
+
+        if self.display_frame is not None:
+            self.display_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+
+        self.submit_frame.grid(row=1, sticky='nsew')
+
+    def submit_complsale(self, ord_date, ord_time, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, paym_stat, date_comp, ord_id):
+        '''
+        sets the sales class attributes
+        and implements a corresponding debit transaction
+        on the customer's account
+        :param ord_date:
+        :param ord_time:
+        :param prod_id:
+        :param cust_id:
+        :param acct_id:
+        :param ord_quant:
+        :param ord_unit:
+        :param rpu:
+        :param price:
+        :param paym_stat:
+        :param date_comp:
+        :return:
+        '''
+        bg, fg = 'brown', 'white'
+        # set new attributes
+        self.sales_obj.ord_id = ord_id
+        self.sales_obj.ord_date, self.sales_obj.ord_time = ord_date, ord_time
+        self.sales_obj.product_id, self.sales_obj.customer_id, self.sales_obj.account_id = prod_id, cust_id, acct_id
+        self.sales_obj.ord_quantity, self.sales_obj.ord_unit, self.sales_obj.rate_per_unit, self.sales_obj.price = ord_quant, ord_unit, rpu, price
+        self.sales_obj.payment_status, self.sales_obj.date_of_completion = paym_stat, date_comp
+
+        print(self.sales_obj.__dict__)
+
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"ORDER ID\n{self.sales_obj.ord_id}").grid(row=0, column=0, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"PRODUCT ID\n{self.sales_obj.product_id}").grid(row=0, column=1, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"CUSTOMER ID\n{self.sales_obj.customer_id}").grid(row=0, column=2, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"ACCOUNT ID\n{self.sales_obj.account_id}").grid(row=0, column=3, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"ORDERED QTY\n{self.sales_obj.ord_quantity}").grid(row=1, column=0, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"ORDERED UNIT\n{self.sales_obj.ord_unit}").grid(row=1, column=1, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"RATE/UNIT\n{self.sales_obj.rate_per_unit}").grid(row=1, column=2, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"PRICE\n{self.sales_obj.price}").grid(row=1, column=3, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"PAYMENT STATUS\n{self.sales_obj.payment_status}").grid(row=2, column=0, sticky='ew')
+        tk.Label(self.submit_frame, font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                 text=f"DATE OF COMPLETION\n{self.sales_obj.date_of_completion}").grid(row=2, column=1, sticky='ew')
+
+        # save and cancel buttons
+        submitbtn = tk.Button(self.submit_frame, text='Save', font=("Calibri", 14, 'bold'), fg='green', bg='white',
+                  height=3, width=10, command=self.save_sale)
+        submitbtn.grid(row=4, column=0, padx=5, stick='ew')
+        submitbtn.bind('<Button-1>', lambda event: self.log_debit_trans(event, self.sales_obj.account_id))
+        tk.Button(self.submit_frame, text='Cancel', font=("Calibri", 14, 'bold'), bg='red', fg='white',
+                  height=3, width=10, command=self.new_sale).grid(row=4, column=3, padx=5, stick='ew')
+
+        if self.display_frame is not None:
+            self.display_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+
+        self.submit_frame.grid(row=1, sticky='nsew')
+
+    def log_debit_trans(self, event, selected_acctid):
+        '''
+        to record an automatic debit transaction
+        on the customer account for a completed transaction
+        so that it reflects on the customer's available account balance
+        :return:
+        '''
+        # if transaction id is existing, simply continue
+        trans = self.get_active_acctrans()
+        if trans is None:  # if no prior transaction
+            # print(trans)  # this should be None
+            start = uniqueid()  # randomly generate a ten-digit number as the starting sequence
+            seq = next(start)  # return the generator value
+        else:  # if there are existing transactions
+            print(trans)
+            seq = max([int(ind) for ind in
+                       trans['trans_id']]) + 1  # simply increment last/maximum number in the sequence by 1
+
+        self.acctrans_obj.trans_id = f'{seq}'
+        self.acctrans_obj.account_id, self.acctrans_obj.trans_type = selected_acctid, 'Debit'
+        self.acctrans_obj.amount, self.acctrans_obj.trans_date = self.sales_obj.price, self.sales_obj.date_of_completion
+
+        print(self.acctrans_obj.__dict__)
+
+        with open(self.acctrans_obj.acctrans_data, 'a', encoding='utf8') as hand:
+            hand.writelines(f'{self.acctrans_obj.__dict__}\n')
+        print('Debit Saved')
+
+    def save_sale(self):
+        bg, fg = 'brown', 'white'
+        with open(self.sales_obj.sales_data, 'a',
+                  encoding='utf8') as hand:
+            hand.writelines(f"{self.sales_obj.__dict__}\n")
+
+        self.submit_frame = self.make_frame(background_color=bg)
+
+        tk.Label(self.submit_frame, text='NEW CUSTOMER ORDER BOOKED!', font=("arial", 14, 'bold'),
+                 bg=bg, fg=fg).grid(row=0, column=0, columnspan=4, sticky='nsew')
+
+        tk.Button(self.submit_frame, text='Add Another Booking', font=("Calibri", 14, 'bold'), bg='blue', fg=fg,
+                  height=5, width=15, command=self.new_sale).grid(row=1, column=0, padx=5, stick='ew')
+
+        tk.Button(self.submit_frame, text='Sales Page', font=("Calibri", 14, 'bold'), fg=bg, bg=fg,
+                  height=5, width=15, command=self.salepage).grid(row=1, column=3, padx=5, stick='ew')
+
+        self.submit_frame.rowconfigure([0, 1], weight=1)
+        self.submit_frame.columnconfigure(list(range(4)), weight=1)
+        self.submit_frame.grid(row=1, sticky='nsew')
 
     def read_sale(self):
-        pass
+        with open(self.sales_obj.sales_data, 'r', encoding='utf8') as hand:
+            # customer atributes is a list of record strings
+            sales_attr = hand.readlines()
+        return sales_attr
 
     def display_sale(self):
-        pass
+        bg, fg = 'orange', 'white'
+
+        # setup display frame
+        self.display_frame = self.make_frame(page_title="VIEW CUSTOMER'S ORDERS", background_color=bg)
+
+        tk.Button(self.display_frame, text='Sales Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
+                  width=15, command=self.salepage).grid(row=2, column=3, padx=5, pady=5, stick='se')
+
+        # get a list of all existing customer orders
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp = self.sales_fields()
+        cust_details = self.fetch_cust_details()
+
+        if not(len(ord_ids)):
+            return messagebox.showerror(title='No Existing Orders',
+                                        message='There are no available orders for display')
+        # select customer from list
+        tk.Label(self.display_frame, text='Select Customer:', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='sw')
+        self.cct_Cbox = ttk.Combobox(self.display_frame, value=cust_details, font=('calibri', 13), width=24, state='readonly')
+        self.cct_Cbox.set(cust_details[0])
+        self.cct_Cbox.grid(row=1, column=0, sticky='nw')
+        self.cct_Cbox.bind('<FocusIn>', lambda event: self.show_acct_list(event, cust_ids, acct_ids))
+
+        ttk.Button(self.display_frame, text='SELECT', command=lambda: self.pop_view(cacct_Cbox.get())
+                   ).grid(row=0, column=5, sticky='w')
+
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.edit_frame is not None:
+            self.edit_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+
+        self.display_frame.rowconfigure(list(range(3)), weight=1)
+        self.display_frame.columnconfigure(list(range(9)), weight=1)
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
+
+    def show_acct_list(self, event, cust_ids, acct_ids):
+        bg, fg = 'orange', 'white'
+        # select account from list
+        c, fn, ln = self.cct_Cbox.get().split()
+        aids = []
+        for cid, aid in zip(cust_ids, acct_ids):
+            if cid == c:
+                aids.append(aid)
+
+        if len(aids):
+            tk.Label(self.display_frame, text='Select Account:', font=('calibri', 13),
+                     bg=bg, fg=fg, height=1).grid(row=0, column=1, padx=10, stick='sw')
+            cacct_Cbox = ttk.Combobox(self.display_frame, values=aids, font=('calibri', 13), width=24,
+                                      state='readonly')
+            cacct_Cbox.set(aids[0])
+            cacct_Cbox.grid(row=1, column=1, sticky='nw')
+            self.cct_Cbox.unbind('<FocusIn>')
+            self.cct_Cbox.bind('<FocusOut>', lambda event: self.show_acct_list2(event, cust_ids, acct_ids))
+
+        else:
+            cacct_Cbox.grid_forget()
+            messagebox.showinfo(message='The Selected customer is inactive')
+
+
+    def show_acct_list2(self, event, cust_ids, acct_ids):
+        # reset list to focus in
+        self.cct_Cbox.bind('<FocusIn>', lambda event: self.show_acct_list(event, cust_ids, acct_ids))
+
+    def sales_fields(self):
+        '''
+        (ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp)
+        :return:
+        '''
+        with open(self.sales_obj.sales_data, 'r', encoding='utf8') as hand:
+            salesdata = hand.readlines()
+
+        if not(len(salesdata)):
+            return [], [], [], [], [], [], [], [], [], [], [], []
+
+        # creating a list of customer transaction fields for each transaction
+        ord_ids = [v for line in salesdata for k, v in eval(line).items() if k == 'ord_id']
+        ord_dates = [v for line in salesdata for k, v in eval(line).items() if k == 'ord_date']
+        ord_times = [v for line in salesdata for k, v in eval(line).items() if k == 'ord_time']
+        prod_ids = [v for line in salesdata for k, v in eval(line).items() if k == 'product_id']
+        cust_ids = [v for line in salesdata for k, v in eval(line).items() if k == 'customer_id']
+        acct_ids = [v for line in salesdata for k, v in eval(line).items() if k == 'account_id']
+        ord_quants = [v for line in salesdata for k, v in eval(line).items() if k == 'ord_quantity']
+        ord_units = [v for line in salesdata for k, v in eval(line).items() if k == 'ord_unit']
+        rpus = [v for line in salesdata for k, v in eval(line).items() if k == 'rate_per_unit']
+        prices = [v for line in salesdata for k, v in eval(line).items() if k == 'price']
+        pstats = [v for line in salesdata for k, v in eval(line).items() if k == 'payment_status']
+        dates_comp = [v for line in salesdata for k, v in eval(line).items() if k == 'date_of_completion']
+
+        return ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp
 
     def edit_sale(self):
         pass
@@ -755,7 +1215,7 @@ class TransApp:
         self.sectionFrame.columnconfigure(0, weight=1)
 
         # display sales options
-        tk.Button(self.sectionFrame, text='VIEW ACCOUNTS', bg='white', fg='green', font=('arial black', 14), 
+        tk.Button(self.sectionFrame, text='VIEW ACCOUNTS', bg='white', fg='green', font=('arial black', 14),
                   command=lambda: self.display_acct()).grid(row=0, padx=40, pady=10, sticky='nsew')
         tk.Button(self.sectionFrame, text='CREATE ACCOUNT', bg='white', fg='blue',
                   font=('arial black', 14), command=self.new_acct).grid(row=1, padx=60, pady=10, sticky='nsew')
@@ -763,7 +1223,7 @@ class TransApp:
                   font=('arial black', 14), command=self.edit_acct).grid(row=2, padx=80, pady=10, sticky='nsew')
         tk.Button(self.sectionFrame, text='ACCOUNT TRANSACTIONS', bg='white', fg='brown',
                   font=('arial black', 14), command=self.acctranspage).grid(row=3, padx=100, pady=10, sticky='nsew')
-        
+
         # display inventory page's frame
         if self.display_frame is not None:
             self.display_frame.grid_forget()
@@ -1019,7 +1479,7 @@ class TransApp:
         ttk.Button(self.display_frame, text='SELECT', command=lambda: self.pop_acctview(cacct_Cbox.get())
                    ).grid(row=0, column=2, sticky='w')
 
-        tk.Button(self.display_frame, text='Accounts Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1, 
+        tk.Button(self.display_frame, text='Accounts Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
                   width=15, command=self.acctpage).grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
@@ -1061,7 +1521,7 @@ class TransApp:
         st.config(state='disabled')
         # ensure that text can be copied to clipboard
         st.bind('<1>', lambda event: st.focus_set())
-        
+
     def fetch_acct(self, selected_acctid):
         '''
         returns the details of the selected account in a dictionary format
@@ -1077,7 +1537,7 @@ class TransApp:
                 acct['date_opened'], acct['account_id'], acct['customer_id'], acct['currency'], acct['balance'] = d, ai, cid, curr, bal
 
         return acct
-        
+
     def acct_fields(self):
         '''
         to generate a tuple of lists containing transactions in separate fields
@@ -1086,12 +1546,12 @@ class TransApp:
 
         with open(self.acct_obj.acct_data, 'r', encoding='utf8') as hand:
             acctdata = hand.readlines()
-            # creating a list of customer transaction fields for each transaction
-            dates_opened = [v for line in acctdata for k, v in eval(line).items() if k == 'date_opened']
-            acct_ids = [v for line in acctdata for k, v in eval(line).items() if k == 'account_id']
-            cust_ids = [v for line in acctdata for k, v in eval(line).items() if k == 'customer_id']
-            acct_types = [v for line in acctdata for k, v in eval(line).items() if k == 'currency']
-            acct_bals = [v for line in acctdata for k, v in eval(line).items() if k == 'balance']
+        # creating a list of customer transaction fields for each transaction
+        dates_opened = [v for line in acctdata for k, v in eval(line).items() if k == 'date_opened']
+        acct_ids = [v for line in acctdata for k, v in eval(line).items() if k == 'account_id']
+        cust_ids = [v for line in acctdata for k, v in eval(line).items() if k == 'customer_id']
+        acct_types = [v for line in acctdata for k, v in eval(line).items() if k == 'currency']
+        acct_bals = [v for line in acctdata for k, v in eval(line).items() if k == 'balance']
 
         return dates_opened, acct_ids, cust_ids, acct_types, acct_bals
 
@@ -1420,7 +1880,7 @@ class TransApp:
         if self.sectionFrame is not None:
             self.sectionFrame.grid_forget()
         self.new_frame.grid(row=1, rowspan=6, column=0, columnspan=3, sticky='nsew')
-        
+
     def popform(self, selected_acctid):
 
         bg, fg = 'orange', 'white'
@@ -1492,9 +1952,9 @@ class TransApp:
 
         acctid, type, amnt, bal = selected_acctid, self.deb_cred.get(), self.amntEntry.get(), self.balEntry.get()
         tdate = f'{self.transyrCbox.get()}-{self.transmonthCbox.get()}-{self.transdayCbox.get()}'
-        
+
         wspace = string.whitespace
-        
+
         # run necessary checks
         # check for empty field
         if amnt in wspace:
@@ -1551,9 +2011,9 @@ class TransApp:
             self.display_frame.grid_forget()
         if self.new_frame is not None:
             self.new_frame.grid_forget()
-            
+
         self.submit_frame.grid(row=1, sticky='nsew')
-        
+
     def saveacctrans(self):
         bg, fg = 'orange', 'white'
         with open(self.acctrans_obj.acctrans_data, 'a',
@@ -1597,9 +2057,9 @@ class TransApp:
 
         # creating a list of customer account details for each customer
         acct_ids = [v for line in acctdata for k, v in eval(line).items() if k == 'account_id']
-        
-        if len(acct_ids) < 1:
-            return messagebox.showerror(title='No Existing Active Account', 
+
+        if not(len(acct_ids)):
+            return messagebox.showerror(title='No Existing Active Account',
                                         message='There are no available transactions to display')
         # select account id
         tk.Label(self.display_frame, text='Select Customer Account:', font=('calibri', 13),
@@ -1638,7 +2098,7 @@ class TransApp:
         if trans is None:
             return messagebox.showinfo(title='Inactive Account Selected',
                 message=f'{selected_acctid} is inactive,\nPlease activate or\n\nSelect an active account to view')
-                
+
         # display headings for customer records
         # create scrolled text field to display customer records
         st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, wrap='word',
@@ -1673,7 +2133,7 @@ class TransApp:
     def get_active_acctrans(self, selected_acctid=None):
         '''
         to generate a dictionary of transaction fields for the same account
-        :return:
+        :return: trans--> {'trans_id': [], 'trans_date': [], 'account_id': [], 'trans_type': [], 'amount': []}
         '''
         trans_ids, trans_dates, trans_acctids, trans_types, trans_amnts = self.acctrans_fields()
 
@@ -1727,15 +2187,15 @@ class TransApp:
         bg, fg = 'brown', 'white'
         # setup display frame
         self.display_frame = self.make_frame(page_title='UPDATE CUSTOMER TRANSACTIONS', background_color=bg)
-        
+
         tk.Button(self.display_frame, text='Transactions Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
                   width=15, command=self.acctranspage).grid(row=2, column=3, padx=5, pady=5, stick='se')
         dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
-        
+
         if len(acct_ids) < 1:
-            return messagebox.showerror(title='No Existing Active Account', 
+            return messagebox.showerror(title='No Existing Active Account',
                                         message='There are no transactions available for update')
-        
+
         # select account id
         tk.Label(self.display_frame, text='Select Account:', font=('calibri', 13),
                  bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
@@ -1755,7 +2215,7 @@ class TransApp:
         self.display_frame.rowconfigure(list(range(3)), weight=1)
         self.display_frame.columnconfigure(list(range(9)), weight=1)
         self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
-        
+
     def pop_edit_acctrans_form(self, selected_acctid):
         global trans, acct_bal
         bg, fg = 'brown', 'white'
@@ -1979,12 +2439,12 @@ class TransApp:
     def save_edited_acctrans(self):
         with open(self.acctrans_obj.acctrans_edits, 'a', encoding='utf8') as hand:
             hand.writelines(f'{self.acctrans_obj.__dict__}\n')
-    
+
     def delete_acctrans(self):
         bg, fg = 'red', 'white'
         # setup display frame
         self.display_frame = self.make_frame(page_title='DELETE CUSTOMER TRANSACTIONS', background_color=bg)
-        
+
         tk.Button(self.display_frame, text='Transactions Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
                   width=15, command=self.acctranspage).grid(row=2, column=3, padx=5, pady=5, stick='se')
         dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
@@ -2012,7 +2472,7 @@ class TransApp:
         self.display_frame.rowconfigure(list(range(3)), weight=1)
         self.display_frame.columnconfigure(list(range(9)), weight=1)
         self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
-        
+
     def pop_del_acctrans_form(self, selected_acctid):
         global trans, acct_bal, all_trans
         bg, fg = 'red', 'white'
@@ -2075,11 +2535,11 @@ class TransApp:
         # edit button
         ttk.Button(self.display_frame, text='Delete', width=10, command=lambda:
         self.erase_acctrans(edit_transidCbox.get())).grid(row=2, column=2, sticky='w')
-        
+
     def erase_acctrans(self, selected_transid):
         global trans, acct_bal, all_trans
         bg, fg = 'red', 'white'
-  
+
         self.display_frame = self.make_frame(page_title='RECORD DELETED', background_color=bg)
 
         sel_trans = self.fetch_transaction(selected_transid)  # customer's transactions
@@ -2204,7 +2664,7 @@ class TransApp:
         # day
         tk.Label(self.new_frame, text='Day', font=('calibri', 16), bg=bg, fg=fg,
                  height=1).grid(row=2, column=1, padx=5, stick='nw')
-        self.bdayCbox = ttk.Combobox(self.new_frame, font=('calibri', 16, 'bold'), value=self.day, 
+        self.bdayCbox = ttk.Combobox(self.new_frame, font=('calibri', 16, 'bold'), value=self.day,
                                      width=10, state='readonly')
         self.bdayCbox.set(str(datetime.date.today().day))
         self.bdayCbox.grid(row=2, column=1, padx=5, pady=30, stick='sw')
@@ -2218,7 +2678,7 @@ class TransApp:
         # year
         tk.Label(self.new_frame, text='Year', font=('calibri', 16), bg=bg, fg=fg,
                  height=1).grid(row=2, column=3, stick='nw')
-        self.byrCbox = ttk.Combobox(self.new_frame, font=('calibri', 16, 'bold'), value=self.year, 
+        self.byrCbox = ttk.Combobox(self.new_frame, font=('calibri', 16, 'bold'), value=self.year,
                                      width=10, state='readonly')
         self.byrCbox.set(str(datetime.date.today().year))
         self.byrCbox.grid(row=2, column=3, pady=30, stick='sw')
@@ -2249,7 +2709,7 @@ class TransApp:
         # day
         tk.Label(self.new_frame, text='Day', font=('calibri', 16),
                  bg=bg, fg=fg, height=1).grid(row=5, column=1, sticky='nw')
-        self.regdayCbox = ttk.Combobox(self.new_frame, font=('calibri', 16, 'bold'), value=self.day, 
+        self.regdayCbox = ttk.Combobox(self.new_frame, font=('calibri', 16, 'bold'), value=self.day,
                                      width=10, state='readonly')
         self.regdayCbox.set(str(datetime.date.today().day))
         self.regdayCbox.grid(row=5, column=1, padx=5, pady=30, sticky='sw')
@@ -2263,7 +2723,7 @@ class TransApp:
         # year
         tk.Label(self.new_frame, text='Year', font=('calibri', 16), bg=bg, fg=fg,
                  height=1).grid(row=5, column=3, sticky='nw')
-        self.regyrCbox = ttk.Combobox(self.new_frame, font=('calibri', 16, 'bold'), value=self.year, 
+        self.regyrCbox = ttk.Combobox(self.new_frame, font=('calibri', 16, 'bold'), value=self.year,
                                      width=10, state='readonly')
         self.regyrCbox.set(str(datetime.date.today().year))
         self.regyrCbox.grid(row=5, column=3, pady=30, sticky='sw')
@@ -2396,13 +2856,13 @@ class TransApp:
         self.submit_frame.rowconfigure([0, 1], weight=1)
         self.submit_frame.columnconfigure(list(range(4)), weight=1)
         self.submit_frame.grid(row=1, sticky='nsew')
-        
+
     def read_cust(self):
         with open(self.cust_obj.cust_data, 'r', encoding='utf8') as hand:
             # customer attributes is a list of record strings
             cust_attr = hand.readlines()
         return cust_attr
-    
+
     def cust_fields(self):
         '''
         return (customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened)
@@ -2420,7 +2880,7 @@ class TransApp:
         states_of_origin = [v for line in custdata for k, v in eval(line).items() if k == 'state_of_origin']
         office_addrs = [v for line in custdata for k, v in eval(line).items() if k == 'office_addr']
         dates_opened = [v for line in custdata for k, v in eval(line).items() if k == 'date_opened']
-        
+
         return customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened
 
     def fetch_cust(self, selected_custid):
@@ -2536,7 +2996,7 @@ class TransApp:
                   bg='orange', fg='white', height=1, width=10, command=self.editing_cust).grid(row=2,
                                                                                                padx=5, column=2, sticky='w')
 
-        tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'), fg='blue', bg='white', 
+        tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'), fg='blue', bg='white',
                   height=1, width=15, command=self.custpage).grid(row=2, column=6, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
@@ -2606,10 +3066,10 @@ class TransApp:
         self.lname_entry.grid(row=2, column=2, sticky='w', padx=25, pady=5)
         # gender
         gends = ['Male', 'Female']
-        
+
         tk.Label(self.display_frame, text="GENDER", font=("Calibri", 10, 'bold'),
                  bg='blue', fg='white').grid(row=1, column=3, sticky='sw', padx=25, pady=15)
-        self.genderCbox = ttk.Combobox(self.display_frame, font=('calibri', 16, 'bold'), value=gends, 
+        self.genderCbox = ttk.Combobox(self.display_frame, font=('calibri', 16, 'bold'), value=gends,
                                      width=8, state='readonly')
         self.genderCbox.set(f'{self.cust_obj.gender}')
         self.genderCbox.grid(row=2, column=3, sticky='w', padx=25, pady=5)
@@ -2621,7 +3081,7 @@ class TransApp:
         tk.Label(self.display_frame, text="BIRTH YEAR", font=("Calibri", 10, 'bold'),
                  bg='blue', fg='white').grid(row=3, column=1, sticky='sw', padx=25, pady=15)
         year = re.findall(r'(\d{2,4})-(\w{3})-(\d{1,2})', self.cust_obj.date_of_birth)[0][0]
-        self.byearCbox = ttk.Combobox(self.display_frame, font=('calibri', 16, 'bold'), value=self.year, 
+        self.byearCbox = ttk.Combobox(self.display_frame, font=('calibri', 16, 'bold'), value=self.year,
                                      width=10, state='readonly')
         self.byearCbox.set(f'{year}')
         self.byearCbox.grid(row=4, column=1, sticky='w', padx=25, pady=5)
@@ -2637,7 +3097,7 @@ class TransApp:
         tk.Label(self.display_frame, text="BIRTH DAY", font=("Calibri", 10, 'bold'),
                  bg='blue', fg='white').grid(row=3, column=3, sticky='sw', padx=25, pady=15)
         day = re.findall(r'(\d{2,4})-(\w{3})-(\d{1,2})', self.cust_obj.date_of_birth)[0][2]
-        self.bdCbox = ttk.Combobox(self.display_frame, font=('calibri', 16, 'bold'), value=self.day, 
+        self.bdCbox = ttk.Combobox(self.display_frame, font=('calibri', 16, 'bold'), value=self.day,
                                      width=10, state='readonly')
         self.bdCbox.set(f'{day}')
         self.bdCbox.grid(row=4, column=3, sticky='w', padx=25, pady=5)
@@ -2736,7 +3196,7 @@ class TransApp:
             self.cust_obj.mid_name = None
         else:
             self.cust_obj.mid_name = mname.capitalize()
-        
+
 
         # update the retrieved data from file with the changes made
         lines[edit_row] = self.cust_obj.__dict__
@@ -2890,9 +3350,9 @@ class TransApp:
                     self.cust_obj.__dict__ = rec
                     continue
                 hand.writelines(f"{rec}\n")
-        
+
         self.save_del_cust()
-        
+
         st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, font=("Calibri", 14, 'bold'), relief='flat')
         st.insert(index='1.0', chars='ID, FIRST NAME, MIDDLE NAME, LAST NAME, GENDER, DATE OF BIRTH, NATIONALITY, STATE OF ORIGIN, OFFICE ADDRESS, DATE OPENED\n\n'
                                      f'{self.cust_obj.customer_id}, {self.cust_obj.first_name}, {self.cust_obj.mid_name}, {self.cust_obj.last_name}, '
@@ -2908,11 +3368,11 @@ class TransApp:
         self.display_frame.rowconfigure(list(range(4)), weight=1)
         self.display_frame.columnconfigure(list(range(4)), weight=1)
         self.display_frame.grid(row=1, rowspan=3, column=0, columnspan=4, sticky='nsew')
-        
+
     def save_del_cust(self):
         with open(self.cust_obj.cust_dels, 'a', encoding='utf8') as hand:
             hand.writelines(f'{self.cust_obj.__dict__}\n')
-    
+
     def invenpage(self):
         # frame for inventory page containing three rows and one column
         self.sectionFrame = tk.LabelFrame(master=self.master, text='INVENTORY', font=('arial black', 12), bg='purple',
@@ -3169,6 +3629,17 @@ class TransApp:
         self.display_frame.rowconfigure(list(range(3)), weight=1)
         self.display_frame.columnconfigure(list(range(3)), weight=1)
         self.display_frame.grid(row=1, rowspan=3, column=0, columnspan=3, sticky='nsew')
+
+    def inv_fields(self):
+        invdata = self.read_inv()
+
+        prod_ids = [v for line in invdata for k, v in eval(line).items() if k == 'prod_id']
+        prod_names = [v for line in invdata for k, v in eval(line).items() if k == 'prod_name']
+        quants = [v for line in invdata for k, v in eval(line).items() if k == 'qty']
+        units = [v for line in invdata for k, v in eval(line).items() if k == 'unit']
+        entry_dates =  [v for line in invdata for k, v in eval(line).items() if k == 'entry_date']
+
+        return prod_ids, prod_names, quants, units, entry_dates
 
     def edit_inv(self):
         global edit_invid_entry, inven, lines
@@ -3528,6 +3999,21 @@ class TransApp:
             hand.writelines(f'{self.inv_obj.__dict__}\n')
 
 # some functions
+def daily_incremental_id(ta, dates):
+    '''
+    among dates, check for the number of times that today's date appears
+    and add 1 (if zero, the answer is 1)
+    :param dates: a collection of existing dates
+    :return:
+    '''
+    today = f'{datetime.date.today().year}-{ta.month[datetime.date.today().month]}-{datetime.date.today().day}'
+    tdates = []
+    if today in dates:
+        for d in dates:
+            if d == today:
+                tdates.append(d)  # list of all the today's dates
+    return len(tdates) + 1
+
 def login(event, ta, user):
     global eme, pe
     email, pwd = eme.get(), pe.get()
