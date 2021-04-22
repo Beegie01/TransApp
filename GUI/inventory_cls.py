@@ -2,8 +2,9 @@
 # from tkinter import messagebox, scrolledtext
 
 class Inventory:
-
     inv_data = None
+    inv_edits = None
+    inv_dels = None
 
     def __init__(self):#, master):
         # self.master = master

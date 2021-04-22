@@ -1,20 +1,20 @@
 class Sales:
-    sales_data = None   #'C:\\Users\\welcome\\Desktop\\Personal Python Projects\\GUI\\TransApp\\sales_data.txt'
+    sales_data = None
+    sales_edits = None
+    sales_dels = None
 
     def __init__(self):#, master):
         # self.master = master
-        self.order_date = None
-        self.order_time = None
-        self.order_id = None
-        self.product_id = None
-        self.customer_id = None
-        self.account_id = None
-        self.ordered_qty = None
-        self.ordered_unit = None
-        self.rate_of_order = None
-        self.price = None
-        self.currency = None
-        self.deposit = None
-        self.balance = None
-        self.payment_status = None
-        self.date_of_completion = None
+        self.ord_date = None  # automatic - current date
+        self.ord_time = None  # automatic - current time
+        self.ord_id = None  # automatic - generated based on date
+        self.product_id = None  # selection
+        self.customer_id = None  # selection
+        self.account_id = None  # selection
+        self.ord_quantity = None  # numeric input
+        self.ord_unit = None  # automatic generated from account id
+        self.rate_per_unit = None  # numeric input
+        self.price = None  # automatic generated computation
+        self.payment_status = None  # automatic selection
+        self.date_of_completion = None  # automatic - current date
+        self.date_of_cancellation = None  # automatic - current date

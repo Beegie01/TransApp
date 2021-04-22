@@ -1,5 +1,7 @@
 class Customer:
-    cust_data = None   #'C:\\Users\\welcome\\Desktop\\Personal Python Projects\\GUI\\TransApp\\cust_data.txt'
+    cust_data = None
+    cust_edits = None
+    cust_dels = None
 
     def __init__(self):#, master):
         # self.master = master

@@ -657,9 +657,11 @@ class TransApp:
                 sel_acids.append(a)  # a list of all the customer's account numbers
                 Found = True
         if not Found:
-            return messagebox.showinfo(message="Customer's account is inactive")
+            messagebox.showinfo(message="Customer's account is inactive\n"
+                                        "Please select an active account")
+            return self.new_sale()
 
-        # select the account type from account number
+            # select the account type from account number
         tk.Label(self.new_frame, text='Select Account', font=('calibri', 14),
                  bg=bg, fg=fg, height=1).grid(row=0, column=3, stick='sw')
         self.currCbox = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), values=sel_acids)
@@ -728,6 +730,18 @@ class TransApp:
         self.pay_stat.insert(0, "Pending")
         self.pay_stat.config(state='disabled')
 
+        self.compl_dayEntry = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), width=10)
+        self.compl_dayEntry.insert(0, str(datetime.date.today().day))
+        self.compl_dayEntry.config(state='disabled')
+
+        self.compl_monthEntry = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), width=10)
+        self.compl_monthEntry.insert(0, str(self.month[datetime.date.today().month]))
+        self.compl_monthEntry.config(state='disabled')
+
+        self.compl_yearEntry = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), width=10)
+        self.compl_yearEntry.insert(0, str(datetime.date.today().year))
+        self.compl_yearEntry.config(state='disabled')
+
         paym_stat = tk.BooleanVar()
         paym_stat.set(False)
         self.complCheck = tk.Checkbutton(self.new_frame, text='Confirm', variable=paym_stat,
@@ -739,10 +753,6 @@ class TransApp:
         if self.pay_stat.get() != 'Eligible for Confirmation':
             self.pay_stat.grid_forget()
         else:
-            self.complCheck = tk.Checkbutton(self.new_frame, text='Confirm', variable=paym_stat,
-                                             font=("Calibri", 14, 'bold'), state='disabled',
-                                             selectcolor='black', bg=bg, fg=fg,
-                                             command=lambda: self.sel_paystat(paym_stat.get()))
             self.complCheck.grid(row=9, column=1, padx=2, sticky='nw')
 
         # submit button
@@ -838,12 +848,10 @@ class TransApp:
         :param ord_ids:
         :return:
         '''
-        oids = []
-        for ordid in ord_ids:
-            oids.append(int(ordid))  # transforming order id from string into integers
+        oids = [int(ordid) for ordid in ord_ids]  # transforming order id from string into integers
         if len(oids):  # there are existing order ids
-            return max(oids) + 1  # increment by 1
-        return 10000000  # 8-digits number
+            return str(max(oids) + 1)  # increment by 1
+        return str(10000000)  # 8-digits number
 
     def sel_paystat(self, payment_status):
         '''
@@ -853,7 +861,7 @@ class TransApp:
         '''
         bg, fg = 'brown', 'white'
 
-        l = tk.Label(self.new_frame, text='Payment Completion Date', font=('calibri', 16), bg=bg, fg=fg, height=1)
+        l = tk.Label(self.new_frame, text='Confirmation Date', font=('calibri', 16), bg=bg, fg=fg, height=1)
         ld = tk.Label(self.new_frame, text='Day', font=('calibri', 14), bg=bg, fg=fg, height=1)
         lm = tk.Label(self.new_frame, text='Month', font=('calibri', 14), bg=bg, fg=fg, height=1)
         ly = tk.Label(self.new_frame, text='Year', font=('calibri', 14), bg=bg, fg=fg, height=1)
@@ -871,27 +879,21 @@ class TransApp:
         else:
             self.pay_stat.config(state='normal', width=10)
             self.pay_stat.delete(0, 'end')
-            self.pay_stat.insert(0, 'Completed')
+            self.pay_stat.insert(0, 'Confirmed')
             self.pay_stat.config(state='disabled')
 
             # customer order date
             l.grid(row=11, rowspan=2, column=0, padx=15, stick='nse')
             # day
             ld.grid(row=11, column=1, stick='sw')
-            self.compl_dayEntry = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), width=10)
-            self.compl_dayEntry.insert(0, str(datetime.date.today().day))
             self.compl_dayEntry.grid(row=12, column=1, stick='nw')
             self.compl_dayEntry.config(state='disabled')
             # month
             lm.grid(row=11, column=2, padx=5, stick='sw')
-            self.compl_monthEntry = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), width=10)
-            self.compl_monthEntry.insert(0, str(self.month[datetime.date.today().month]))
             self.compl_monthEntry.grid(row=12, column=2, padx=5, stick='nw')
             self.compl_monthEntry.config(state='disabled')
             # year
             ly.grid(row=11, column=3, stick='sw')
-            self.compl_yearEntry = ttk.Combobox(self.new_frame, font=('calibri', 14, 'bold'), width=10)
-            self.compl_yearEntry.insert(0, str(datetime.date.today().year))
             self.compl_yearEntry.grid(row=12, column=3, stick='nw')
             self.compl_yearEntry.config(state='disabled')
 
@@ -903,7 +905,7 @@ class TransApp:
         self.submit_frame.columnconfigure(list(range(4)), weight=1)
 
         # if order id is existing, simply continue
-        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp = self.sales_fields()
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel = self.sales_fields()
 
         # ord_id = daily_incremental_id(ta, ord_dates)  # use the dates column to determine the current order id
         ord_id = self.gen_ordid(ord_ids)  # use the dates column to determine the current order id
@@ -924,7 +926,7 @@ class TransApp:
         if [True for entry in mandatory_entries if (str(entry) in string.whitespace) or (entry is None)]:
             return messagebox.showerror(title='Blank Field', message='BLANK FIELD(S) DETECTED!')
 
-        if paym_stat != 'Completed':  # order was not confirmed
+        if paym_stat != 'Confirmed':  # order was not confirmed
             paym_stat, date_comp = 'Pending', None
             self.submit_pendingsale(ord_date, ord_time, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, paym_stat, date_comp, ord_id)
         else:  # order was confirmed
@@ -1120,7 +1122,7 @@ class TransApp:
         self.display_frame = self.make_frame(page_title="VIEW CUSTOMER'S ORDERS", background_color=bg)
 
         # get a list of all existing customer orders
-        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp = self.sales_fields()
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel = self.sales_fields()
         cust_details = self.fetch_cust_details()
 
         if not(len(ord_dates)):
@@ -1165,8 +1167,8 @@ class TransApp:
         c, fn, ln = self.cct_Cbox.get().split()  # split the selected tuple (cust_id, firstname, lastname) into elements
         accids = []
         for cid, aid in zip(cust_ids, acct_ids):
-            if (cid == c) and (aid not in accids):  # if cust_id is found
-                accids.append(aid)  # store the account id
+            if (cid == c) and (aid not in accids):  # if cust_id is found and acct_id is not repeated
+                accids.append(aid)  # store unique account ids of the customer
 
         if len(accids):
             self.sacct_Cbox.config(values=accids)  # assign account ids list to drop down menu
@@ -1196,7 +1198,7 @@ class TransApp:
         selected_acctid = self.sacct_Cbox.get()
 
         prod_ids, prod_names, quants, units, entry_dates = self.inv_fields()  # all inventory fields
-        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp = self.sales_fields()
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel = self.sales_fields()
         # display headings for customer sales records
         # create scrolled text field to display customer sales records
 
@@ -1206,9 +1208,9 @@ class TransApp:
         st.grid(row=0, column=0, columnspan=8, sticky='nsew')
         # display headings for customer records
         st.insert(index='end',
-                  chars='ORDER DATE,\tORDER TIME,\tORDER ID,\tACCOUNT ID,\tPRODUCT,\tQUANTITY,\tUNIT,\tRATE/UNIT,\tPRICE,\tPAYMENT STATUS,\tDATE OF COMPLETION\n\n')
+                  chars='ORDER DATE,\tORDER TIME,\tORDER ID,\tACCOUNT ID,\tPRODUCT,\tQUANTITY,\tUNIT,\tRATE/UNIT,\tPRICE,\tPAYMENT STATUS,\tDATE OF COMPLETION\,tDATE OF CANCELLATION\n\n')
 
-        for ord_date, ord_time, ord_id, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, pstat, date_comp in zip(ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp):
+        for ord_date, ord_time, ord_id, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, pstat, date_comp, date_cancel in zip(ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel):
             if acct_id == selected_acctid:  # display only selected account number
                 for prd_id, prod_name, quant, unit, entry_date in zip(prod_ids, prod_names, quants, units, entry_dates):  # to insert product name instead of product id
                     if prd_id == prod_id:
@@ -1223,7 +1225,8 @@ class TransApp:
                                         f'{rpu},\t'
                                         f'{price},\t'
                                         f'{pstat},\t'
-                                        f'{date_comp}\n')
+                                        f'{date_comp},\t'
+                                        f'{date_cancel}\n')
                         break  # stop loop immediately after getting product's name of product id
 
         # make text field read-only
@@ -1249,14 +1252,14 @@ class TransApp:
 
     def sales_fields(self):
         '''
-        (ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp)
+        (ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel)
         :return:
         '''
         with open(self.sales_obj.sales_data, 'r', encoding='utf8') as hand:
             salesdata = hand.readlines()
 
         if not(len(salesdata)):
-            return [], [], [], [], [], [], [], [], [], [], [], []
+            return [], [], [], [], [], [], [], [], [], [], [], [], []
 
         # creating a list of customer transaction fields for each transaction
         ord_ids = [v for line in salesdata for k, v in eval(line).items() if k == 'ord_id']
@@ -1271,8 +1274,9 @@ class TransApp:
         prices = [v for line in salesdata for k, v in eval(line).items() if k == 'price']
         pstats = [v for line in salesdata for k, v in eval(line).items() if k == 'payment_status']
         dates_comp = [v for line in salesdata for k, v in eval(line).items() if k == 'date_of_completion']
+        dates_cancel = [v for line in salesdata for k, v in eval(line).items() if k == 'date_of_cancellation']
 
-        return ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp
+        return ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel
 
     def edit_sale(self):
         bg, fg = 'brown', 'white'
@@ -1280,7 +1284,7 @@ class TransApp:
         self.display_frame = self.make_frame(page_title="UPDATE CUSTOMER'S ORDERS", background_color=bg)
 
         # get a list of all existing customer orders
-        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp = self.sales_fields()
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel = self.sales_fields()
         cust_details = self.fetch_cust_details()
 
         if not (len(ord_dates)):
@@ -1324,12 +1328,11 @@ class TransApp:
 
     def pop_sales_edit(self, selected_acctid):
         bg, fg = 'brown', 'white'
-
         # setup display frame
         self.display_frame = self.make_frame(page_title="UPDATE CUSTOMER'S ORDERS", background_color=bg)
 
         prod_ids, prod_names, quants, units, entry_dates = self.inv_fields()  # all inventory fields
-        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp = self.sales_fields()
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel = self.sales_fields()
         # display headings for customer sales records
         # create scrolled text field to display customer sales records
 
@@ -1339,12 +1342,12 @@ class TransApp:
         st.grid(row=0, column=0, columnspan=8, sticky='nsew')
         # display headings for customer records
         st.insert(index='end',
-                  chars='ORDER DATE,\tORDER TIME,\tORDER ID,\tACCOUNT ID,\tPRODUCT,\tQUANTITY,\tUNIT,\tRATE/UNIT,\tPRICE,\tPAYMENT STATUS,\tDATE OF COMPLETION\n\n')
+                  chars='ORDER DATE,\tORDER TIME,\tORDER ID,\tACCOUNT ID,\tPRODUCT,\tQUANTITY,\tUNIT,\tRATE/UNIT,\tPRICE,\tPAYMENT STATUS,\tDATE OF COMPLETION,\tDATE OF CANCELLATION\n\n')
 
         acct_ord_ids = []  # to collect all orders made through the selected account
-        for ord_date, ord_time, ord_id, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, pstat, date_comp in zip(
+        for ord_date, ord_time, ord_id, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, pstat, date_comp, date_cancel in zip(
                 ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices,
-                pstats, dates_comp):
+                pstats, dates_comp, dates_cancel):
             if acct_id == selected_acctid:  # display only selected account number
                 acct_ord_ids.append(ord_id)  # add current order id to list
                 for prd_id, prod_name, quant, unit, entry_date in zip(prod_ids, prod_names, quants, units,
@@ -1361,7 +1364,8 @@ class TransApp:
                                         f'{rpu},\t'
                                         f'{price},\t'
                                         f'{pstat},\t'
-                                        f'{date_comp}\n')
+                                        f'{date_comp},\t'
+                                        f'{date_cancel}\n')
                         break  # stop loop immediately after getting product's name of product id
 
         # make text field read-only
@@ -1378,7 +1382,7 @@ class TransApp:
         self.cct_Cbox.grid(row=4, column=0, sticky='nsw', padx=10)
 
         tk.Button(self.display_frame, text='UPDATE', font=("Calibri", 12, 'bold'), fg='orange', bg=fg, height=1,
-                  width=15, command=self.editing_sale).grid(row=3, rowspan=2, column=1, sticky='w')
+                  width=15, command=lambda: self.editing_order(self.cct_Cbox.get())).grid(row=3, rowspan=2, column=1, sticky='w')
 
         tk.Button(self.display_frame, text='BACK', font=("Calibri", 12, 'bold'), fg='blue', bg=fg, height=1,
                   width=15, command=self.salepage).grid(row=3, rowspan=2, column=3, sticky='w')
@@ -1387,11 +1391,289 @@ class TransApp:
         self.display_frame.columnconfigure(list(range(5)), weight=1)
         self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
-    def editing_sale(self):
-        pass
+    def editing_order(self, selected_ordid):
+        bg, fg = 'brown', 'white'
+        self.display_frame.grid_forget()
+        self.display_frame = self.make_frame(page_title='CONFIRM OR CANCEL SELECTED ORDER', background_color=bg)
+        # fetch all existing orders
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel = self.sales_fields()
+        # print(ord_ids,'\n', selected_ordid)
+        if not(len(ord_dates)):
+            messagebox.showinfo(message='No Record Available for Update')
+            return self.edit_sale()
+        for ord_date, ord_time, ord_id, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, pstat, date_comp, date_cancel in zip(ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel):
+            if str(ord_id) == selected_ordid:  # when the order is still pending (ie can either confirm or cancel)
+                # check if pending
+                if pstat == 'Confirmed':  # if confirmed order was selected
+                    messagebox.showinfo(title='ORDER CANNOT BE EDITED', message=f'The order selected was confirmed on {date_comp}\n'
+                                                                                f'Please select a pending order')
+                    return self.edit_sale()  # go back to customer selection to select another customer
 
-    def update_sale(self):
-        pass
+                elif pstat == 'Cancelled':  # if confirmed order was selected
+                    messagebox.showinfo(title='ORDER CANNOT BE EDITED', message=f'The order selected was cancelled on {date_cancel}\n'
+                                                                                f'Please select a pending transaction')
+                    return self.edit_sale()  # go back to customer selection to select another customer
+
+                # set selected attribute onto the instance attribute
+                self.sales_obj.ord_date, self.sales_obj.ord_time, self.sales_obj.ord_id, = ord_date, ord_time, ord_id
+                self.sales_obj.product_id, self.sales_obj.customer_id, self.sales_obj.account_id = prod_id, cust_id, acct_id
+                self.sales_obj.ord_quantity, self.sales_obj.ord_unit, self.sales_obj.rate_per_unit = ord_quant, ord_unit, rpu
+                self.sales_obj.price, self.sales_obj.payment_status, self.sales_obj.date_of_completion, self.sales_obj.date_of_cancellation = price, pstat, date_comp, date_cancel
+        # print(self.sales_obj.__dict__)
+        # get selected account currency
+        dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
+        currency = None
+        for date_opened, acct_id, cust_id, acct_type, acct_bal in zip(dates_opened, acct_ids, cust_ids,
+                                                                      acct_types, acct_bals):
+            if acct_id == self.sales_obj.account_id:
+                currency = acct_type
+
+        eligible = False
+        # compare account balance to product price
+        acct_bal = self.get_bal(self.sales_obj.account_id)
+        if acct_bal >= float(self.sales_obj.price):
+            eligible = True
+
+        tk.Label(self.display_frame, text="ORDER DATE", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=0, column=0, sticky='sw', padx=25, pady=15)
+        self.ordate_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.ordate_entry.insert(0, string=f'{self.sales_obj.ord_date}')
+        self.ordate_entry.config(state='disabled')
+        self.ordate_entry.grid(row=1, column=0, sticky='nw', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="ORDER TIME", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=0, column=1, sticky='sw', padx=25, pady=15)
+        self.ortime_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.ortime_entry.insert(0, string=f'{self.sales_obj.ord_time}')
+        self.ortime_entry.config(state='disabled')
+        self.ortime_entry.grid(row=1, column=1, sticky='nw', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="ORDER ID", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=0, column=2, sticky='sw', padx=25, pady=15)
+        self.orid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.orid_entry.insert(0, string=f'{self.sales_obj.ord_id}')
+        self.orid_entry.config(state='disabled')
+        self.orid_entry.grid(row=1, column=2, sticky='nw', padx=25, pady=5)
+        
+        tk.Label(self.display_frame, text="PRODUCT ID", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=2, column=0, sticky='sw', padx=25, pady=15)
+        self.orprid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.orprid_entry.insert(0, string=f'{self.sales_obj.product_id}')
+        self.orprid_entry.config(state='disabled')
+        self.orprid_entry.grid(row=3, column=0, sticky='w', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="CUSTOMER ID", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=2, column=1, sticky='sw', padx=25, pady=15)
+        self.orcusid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.orcusid_entry.insert(0, string=f'{self.sales_obj.customer_id}')
+        self.orcusid_entry.config(state='disabled')
+        self.orcusid_entry.grid(row=3, column=1, sticky='nw', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="ACCOUNT ID", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=2, column=2, sticky='sw', padx=25, pady=15)
+        self.oraccid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.oraccid_entry.insert(0, string=f'{self.sales_obj.account_id}')
+        self.oraccid_entry.config(state='disabled')
+        self.oraccid_entry.grid(row=3, column=2, sticky='nw', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="QUANTITY", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=4, column=0, sticky='sw', padx=25, pady=15)
+        self.orqty_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.orqty_entry.insert(0, string=f'{self.sales_obj.ord_quantity}')
+        self.orqty_entry.config(state='disabled')
+        self.orqty_entry.grid(row=5, column=0, sticky='nw', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="UNIT", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=4, column=1, sticky='sw', padx=25, pady=15)
+        self.orunt_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.orunt_entry.insert(0, string=f'{self.sales_obj.ord_unit}')
+        self.orunt_entry.config(state='disabled')
+        self.orunt_entry.grid(row=5, column=1, sticky='nw', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="RATE/UNIT", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=4, column=2, sticky='sw', padx=25, pady=15)
+        self.orrate_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.orrate_entry.insert(0, string=f'{self.sales_obj.rate_per_unit}')
+        self.orrate_entry.config(state='disabled')
+        self.orrate_entry.grid(row=5, column=2, sticky='nw', padx=25, pady=5)
+
+        tk.Label(self.display_frame, text="PRICE", font=("Calibri", 12, 'bold'),
+                 bg=bg, fg=fg).grid(row=4, column=3, sticky='sw', padx=25, pady=15)
+        self.orprice_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'))
+        self.orprice_entry.insert(0, string=f'{self.sales_obj.price}')
+        self.orprice_entry.config(state='disabled')
+        self.orprice_entry.grid(row=5, column=3, sticky='nw', padx=25, pady=5)
+
+        # payment status
+        tk.Label(self.display_frame, text='Payment Status:', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=6, rowspan=2, column=0, padx=15, stick='nse')
+        # notify that the selected order is eligible for confirmation
+        self.pay_stat = tk.Entry(self.display_frame, font=('calibri', 14, 'bold'))
+        self.pay_stat.grid(row=6, column=1, stick='w')
+
+        # display confirm or cancel options
+        ps_bool = conv_to_bool(self.sales_obj.payment_status)  # convert current payment status into boolean
+        conf = tk.IntVar()
+        conf.set(2)  # start with the boxes unchecked
+        # confirm checkbox
+        self.confCheck = tk.Checkbutton(self.display_frame, text='Confirm', variable=conf, onvalue=1,
+                                        font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                                        selectcolor='black', command=lambda: self.effect(conf.get()))
+        self.confCheck.grid(row=7, column=1, padx=2, sticky='nw')
+        # cancel checkbox
+        self.cancCheck = tk.Checkbutton(self.display_frame, text='Cancel', variable=conf, onvalue=0,
+                                        font=("Calibri", 14, 'bold'), bg=bg, fg=fg,
+                                        selectcolor='black', command=lambda: self.effect(conf.get()))
+        self.cancCheck.grid(row=7, column=1, padx=2, sticky='ne')
+
+        if eligible:  # current account balance can pay for the price of product
+            self.pay_stat.config(state='normal', width=25)
+            self.pay_stat.insert(0, "Eligible for Confirmation")  # display as notification
+            self.pay_stat.config(state='disabled')
+            # display confirm or cancel options
+            self.confCheck.grid(row=7, column=1, padx=2, sticky='nw')
+            # cancel checkbox
+            self.cancCheck.grid(row=7, column=1, padx=2, sticky='ne')
+        else:  # current account balance cannot pay for the price of product
+            self.pay_stat.config(state='normal', width=10)
+            self.pay_stat.delete(0, 'end')
+            self.pay_stat.insert(0, 'Pending')  # display as notification
+            self.pay_stat.config(state='disabled')
+            # display a disabled confirm option
+            self.confCheck.config(state='disabled')
+
+
+        # payment status
+        tk.Label(self.display_frame, text='Current Balance', font=('calibri', 16), bg=bg, fg=fg,
+                 height=1).grid(row=2, column=3, padx=15, stick='sw')
+        self.acbal = tk.Entry(self.display_frame, font=('calibri', 14, 'bold'), width=15)
+        self.acbal.insert(0, f'{currency}{acct_bal}')
+        self.acbal.config(state='disabled')
+        self.acbal.grid(row=3, column=3, padx=15, stick='nw')
+
+
+        # submit button
+        tk.Button(self.display_frame, text='Submit', font=("Calibri", 14, 'bold'), fg='white', bg='green',
+                                   width=10, height=1, command=self.update_order).grid(row=8, column=2, padx=2, sticky='w')
+        tk.Button(self.display_frame, text='Back', font=("Calibri", 14, 'bold'), fg='white', bg='red',
+                  width=10, height=1, command=self.edit_sale).grid(row=8, column=1, padx=2, sticky='w')
+
+        # display an adjustible frame containing the selected info
+        self.display_frame.rowconfigure(list(range(9)), weight=1)
+        self.display_frame.columnconfigure(list(range(4)), weight=1)
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
+
+    def effect(self, value):
+        global paymnt_status, d_completn, d_canceln
+        if value == 1:
+            paymnt_status = 'Confirmed'
+            d_completn = f'{datetime.date.today().year}-{self.month[datetime.date.today().month]}-{datetime.date.today().day}'
+            d_canceln = None
+        elif value == 0:
+            paymnt_status = 'Cancelled'
+            d_canceln = f'{datetime.date.today().year}-{self.month[datetime.date.today().month]}-{datetime.date.today().day}'
+            d_completn = None
+
+    def update_order(self):
+        global paymnt_status, d_completn, d_canceln
+        bg, fg = 'brown', 'white'
+        pay_status = self.sales_obj.payment_status
+        try:
+            if (d_canceln is None) and (d_completn is None):  # meaning order has neither been confirmed nor cancelled
+                messagebox.showerror(title='Same Values As Values',
+                                            message='No Changes Made!\n\nPlease Check The Following Fields: \nTransaction Type, \nAmount fields')
+                return self.edit_sale()
+        except NameError as NE:
+            messagebox.showerror(message=f'{NE}')
+            return self.edit_sale()
+
+        if not (messagebox.askyesno(message='Do You Want To Save Changes Made?')):
+            messagebox.showinfo(message='No Changes Made')
+            return self.edit_sale()  # go back to beginning of the edit page
+
+        self.save_edited_order()  # save entry before changes made is implemented
+        # set to the updated attribute
+        self.sales_obj.payment_status, self.sales_obj.date_of_completion, self.sales_obj.date_of_cancellation = paymnt_status, d_completn, d_canceln
+
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel = self.sales_fields()
+        # print(f"Old: {ord_dates}, {ord_times}, {ord_ids}, {prod_ids}, {cust_ids}, {acct_ids},"
+        #       f"{ord_quants}, {ord_units}, {rpus}, {prices}, {pstats}, {dates_comp}, {dates_cancel}")
+        for ind in range(len(ord_dates)):  # fetch the particular transaction for editing
+            if ord_ids[ind] == self.sales_obj.ord_id:
+                
+                # set list of data to contain updated info
+                ord_dates[ind], ord_times[ind] = self.sales_obj.ord_date, self.sales_obj.ord_time
+                ord_ids[ind], prod_ids[ind], cust_ids[ind], acct_ids[ind] = self.sales_obj.ord_id, self.sales_obj.product_id, self.sales_obj.customer_id, self.sales_obj.account_id
+                ord_quants[ind], ord_units[ind], rpus[ind], prices[ind] = self.sales_obj.ord_quantity, self.sales_obj.ord_unit, self.sales_obj.rate_per_unit, self.sales_obj.price
+                pstats[ind], dates_comp[ind], dates_cancel[ind] = self.sales_obj.payment_status, self.sales_obj.date_of_completion, self.sales_obj.date_of_cancellation
+       
+        # print(f"New: {ord_dates}, {ord_times}, {ord_ids}, {prod_ids}, {cust_ids}, {acct_ids},"
+        #       f"{ord_quants}, {ord_units}, {rpus}, {prices}, {pstats}, {dates_comp}, {dates_cancel}")
+        
+        # save updated version to file
+        with open(self.sales_obj.sales_data, 'w', encoding='utf8') as hand:
+            for ord_date, ord_time, ord_id, prod_id, cust_id, acct_id, ord_quant, ord_unit, rpu, price, pstat, date_comp, date_cancel in zip(ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel):
+                curr_dict = {'ord_date': ord_date, 'ord_time': ord_time, 'ord_id': ord_id, 'product_id': prod_id, 'customer_id': cust_id, 'account_id': acct_id,
+                             'ord_quantity': ord_quant, 'ord_unit': ord_unit, 'rate_per_unit': rpu, 'price': price, 'payment_status': pstat,
+                             'date_of_completion': date_comp, 'date_of_cancellation': date_cancel}
+                # print(ind, curr_dict)
+                hand.writelines(f"{curr_dict}\n")
+
+        # when confirmation is given by user
+        self.display_frame = self.make_frame(background_color=bg)
+
+        tk.Label(self.display_frame, text=f"ORDER DATE\n{self.sales_obj.ord_date}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=0, column=1, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"ORDER TIME\n{self.sales_obj.ord_time}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=0, column=2, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"ORDER ID\n{self.sales_obj.ord_id}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=0, column=3, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"PRODUCT ID\n{self.sales_obj.product_id}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=0, column=4, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"CUSTOMER ID\n{self.sales_obj.customer_id}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=1, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"ACCOUNT ID\n{self.sales_obj.account_id}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=2, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"QUANTITY\n{self.sales_obj.ord_quantity}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=3, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"UNIT\n{self.sales_obj.ord_unit}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=1, column=4, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"RATE PER UNIT\n{self.sales_obj.rate_per_unit}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=2, column=1, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"PRICE\n{self.sales_obj.price}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=2, column=2, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"PAYMENT STATUS\n{self.sales_obj.payment_status}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=2, column=3, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"DATE OF COMPLETION\n{self.sales_obj.date_of_completion}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=3, column=1, sticky='nsew', padx=25)
+        tk.Label(self.display_frame, text=f"DATE OF CANCELLATION\n{self.sales_obj.date_of_cancellation}", font=("Calibri", 16, 'bold'),
+                 bg=bg, fg=fg).grid(row=3, column=2, sticky='nsew', padx=25)
+
+        tk.Label(self.display_frame, text="HAS BEEN UPDATED!!", font=("Calibri", 20, 'bold'),
+                 bg=bg, fg=fg).grid(row=4, column=1, columnspan=2, sticky='NSEW', padx=25)
+
+        tk.Button(self.display_frame, text='Edit More', font=("Calibri", 12, 'bold'),
+                  fg=bg, bg=fg, height=1, width=15, command=self.edit_sale).grid(row=6, column=2, padx=5, pady=5,
+                                                                                    stick='se')
+        tk.Button(self.display_frame, text='Sales Page', font=("Calibri", 12, 'bold'),
+                  fg='blue', bg=fg, height=1, width=15, command=self.salepage).grid(row=6, column=1, padx=5, pady=5,
+                                                                                 stick='se')
+
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.edit_frame is not None:
+            self.edit_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+
+        self.display_frame.rowconfigure([0, 1, 2, 3, 4, 5, 6], weight=1)
+        self.display_frame.columnconfigure(list(range(5)), weight=1)
+        self.display_frame.grid(row=1, rowspan=4, column=0, columnspan=4, sticky='nsew')
+        
+    def save_edited_order(self):
+        with open(self.sales_obj.sales_edits, 'a', encoding='utf8') as hand:
+            hand.writelines(f'{self.acctrans_obj.__dict__}\n')
+        print(self.sales_obj.__dict__)
 
     def delete_sale(self):
         pass
@@ -2480,6 +2762,7 @@ class TransApp:
 
         for ind in range(len([v for k, v in trans.items() if k == 'trans_date'][0])):  # fetch the particular transaction for editing
             if trans['trans_id'][ind] == selected_transid:
+                # set selected attributes onto instance
                 self.acctrans_obj.trans_id, self.acctrans_obj.account_id, self.acctrans_obj.trans_type, self.acctrans_obj.amount, self.acctrans_obj.trans_date = trans['trans_id'][ind], trans['account_id'][ind], trans['trans_type'][ind], trans['amount'][ind], trans['trans_date'][ind]
 
         # print(f"Copied: {self.acctrans_obj.__dict__}")
@@ -2571,7 +2854,7 @@ class TransApp:
 
         self.save_edited_acctrans()  # save entry before changes made is implemented
 
-        if typ != self.acctrans_obj.trans_type:
+        if typ != self.acctrans_obj.trans_type:  # only effect a change in object attr if value is different
             self.acctrans_obj.trans_type = typ
         if amnt != self.acctrans_obj.amount:
             self.acctrans_obj.amount = amnt
@@ -4192,6 +4475,17 @@ class TransApp:
             hand.writelines(f'{self.inv_obj.__dict__}\n')
 
 # some functions
+def conv_to_bool(payment_status):
+    '''
+    converts current payment status from 'confirmed/pending'
+    to True/False
+    :param payment_status:
+    :return:
+    '''
+    if payment_status == 'Pending':
+        return False
+    return True
+
 def daily_incremental_id(ta, ord_dates, ord_ids):
     '''
     among dates, check for the number of times that today's date appears
