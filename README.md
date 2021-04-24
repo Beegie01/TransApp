@@ -1,8 +1,9 @@
 # TRANSAPP (CLI & GUI) - An application for multifaceted business transactions
 
 This is an application for entering records of daily business operations. 
-Users can only use the app after company/user account(s) creation
-Through user authentication, records are better organized per company
+Users can only use the app after company/user account(s) creation.
+Through USER AUTHENTICATION, records are organized per company.
+Thus, TransApp can be used to manage business records of multiple company accounts.
 
 The app consists of 5 main sections (menus): 
 a. INVENTORY - for products records
