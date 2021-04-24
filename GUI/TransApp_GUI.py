@@ -451,7 +451,7 @@ class TransApp:
         # frame for customer sales page containing three rows and one column
         self.sectionFrame = tk.LabelFrame(master=self.master, text='SALES', font=('arial black', 12), bg='brown',
                                           fg='white')
-        self.sectionFrame.rowconfigure(list(range(5)), weight=1)
+        self.sectionFrame.rowconfigure(list(range(4)), weight=1)
         self.sectionFrame.columnconfigure(0, weight=1)
 
         # display sales options
@@ -463,8 +463,8 @@ class TransApp:
                   command=self.new_sale).grid(row=2, padx=60, pady=10, sticky='nsew')
         tk.Button(self.sectionFrame, text='UPDATE ORDER', bg='white', fg='orange', font=('arial black', 14),
                   command=self.edit_sale).grid(row=3, padx=80, pady=10, sticky='nsew')
-        tk.Button(self.sectionFrame, text='DELETE ORDER', bg='white', fg='red', font=('arial black', 14),
-                  command=self.delete_sale).grid(row=4, padx=100, pady=10, sticky='nsew')
+        # tk.Button(self.sectionFrame, text='DELETE ORDER', bg='white', fg='red', font=('arial black', 14),
+        #           command=self.delete_sale).grid(row=4, padx=100, pady=10, sticky='nsew')
 
         # display inventory page's frame
         if self.display_frame is not None:
@@ -1130,25 +1130,25 @@ class TransApp:
                                         message='There are no available orders for display')
         # select customer from list
         tk.Label(self.display_frame, text='Select Customer', font=('calibri', 13),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=0, sticky='sw', padx=10)
-        self.cct_Cbox = ttk.Combobox(self.display_frame, value=cust_details, font=('calibri', 13), width=30, state='readonly')
+                 bg=bg, fg=fg, height=1).grid(row=3, column=0, sticky='sw', padx=10, pady=2)
+        self.cct_Cbox = ttk.Combobox(self.display_frame, value=cust_details, font=('calibri', 16), width=30, state='readonly')
         self.cct_Cbox.set(cust_details[0])
-        self.cct_Cbox.grid(row=1, column=0, sticky='nw', padx=10)
+        self.cct_Cbox.grid(row=4, column=0, sticky='nw', padx=10, ipady=6)
         self.cct_Cbox.bind('<FocusIn>', lambda event: self.show_acct_list(event, cust_ids, acct_ids))
 
         tk.Label(self.display_frame, text='Select Account', font=('calibri', 13),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=1, sticky='sw')
-        self.sacct_Cbox = ttk.Combobox(self.display_frame, font=('calibri', 13), width=20,
+                 bg=bg, fg=fg, height=1).grid(row=3, column=1, sticky='sw', pady=2)
+        self.sacct_Cbox = ttk.Combobox(self.display_frame, font=('calibri', 16), width=20,
                                        state='readonly')
         self.sacct_Cbox.set('Unavailable')
-        self.sacct_Cbox.grid(row=1, column=1, sticky='nw')
+        self.sacct_Cbox.grid(row=4, column=1, sticky='nw', ipady=6)
 
         self.select_btn = tk.Button(self.display_frame, text='DISPLAY', fg='white', bg='green', width=15, height=1, state='disabled',
                                     font=("Calibri", 12, 'bold'), command=lambda: self.pop_salesview(self.cct_Cbox.get()))
-        self.select_btn.grid(row=0, rowspan=2, column=4, sticky='w')
+        self.select_btn.grid(row=4, column=4, sticky='nw')
 
         tk.Button(self.display_frame, text='BACK', font=("Calibri", 12, 'bold'), fg=bg, bg='white', height=1,
-                  width=15, command=self.salepage).grid(row=0, rowspan=2, column=5, sticky='w')
+                  width=15, command=self.salepage).grid(row=4, column=5, sticky='ne')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -1157,7 +1157,7 @@ class TransApp:
         if self.new_frame is not None:
             self.new_frame.grid_forget()
 
-        self.display_frame.rowconfigure(list(range(7)), weight=1)
+        self.display_frame.rowconfigure(list(range(5)), weight=1)
         self.display_frame.columnconfigure(list(range(9)), weight=1)
         self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
@@ -1234,21 +1234,21 @@ class TransApp:
         # ensure that text can be copied to clipboard
         st.bind('<1>', lambda event: st.focus_set())
 
-        # select customer from list
-        tk.Label(self.display_frame, text='Select Customer', font=('calibri', 13),
-                 bg=bg, fg=fg, height=1).grid(row=3, column=0, sticky='sw', padx=10)
-        self.cct_Cbox.config(height=5)
-        self.cct_Cbox.grid(row=4, column=0, sticky='nsw', padx=10)
-
-        tk.Label(self.display_frame, text='Select Account', font=('calibri', 13),
-                 bg=bg, fg=fg, height=1).grid(row=3, column=1, sticky='sw')
-        self.sacct_Cbox.config(height=5)
-        self.sacct_Cbox.grid(row=4, column=1, sticky='nsw')
-
-        self.select_btn.grid(row=3, rowspan=2, column=4, sticky='w')
-
-        tk.Button(self.display_frame, text='BACK', font=("Calibri", 12, 'bold'), fg=bg, bg='white', height=1,
-                  width=15, command=self.salepage).grid(row=3, rowspan=2, column=5, sticky='w')
+        # # select customer from list
+        # tk.Label(self.display_frame, text='Select Customer', font=('calibri', 13),
+        #          bg=bg, fg=fg, height=1).grid(row=3, column=0, sticky='sw', padx=10)
+        # self.cct_Cbox.config(height=5)
+        # self.cct_Cbox.grid(row=4, column=0, sticky='nsw', padx=10)
+        #
+        # tk.Label(self.display_frame, text='Select Account', font=('calibri', 13),
+        #          bg=bg, fg=fg, height=1).grid(row=3, column=1, sticky='sw')
+        # self.sacct_Cbox.config(height=5)
+        # self.sacct_Cbox.grid(row=4, column=1, sticky='nsw')
+        #
+        # self.select_btn.grid(row=3, rowspan=2, column=4, sticky='w')
+        #
+        # tk.Button(self.display_frame, text='BACK', font=("Calibri", 12, 'bold'), fg=bg, bg='white', height=1,
+        #           width=15, command=self.salepage).grid(row=3, rowspan=2, column=5, sticky='w')
 
     def sales_fields(self):
         '''
@@ -1676,7 +1676,37 @@ class TransApp:
         print(self.sales_obj.__dict__)
 
     def delete_sale(self):
-        pass
+        bg, fg = 'red', 'white'
+        # setup display frame
+        self.display_frame = self.make_frame(page_title='DELETE CUSTOMER SALES', background_color=bg)
+
+        tk.Button(self.display_frame, text='BACK', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
+                  width=15, command=self.salepage).grid(row=2, column=3, padx=5, pady=5, stick='se')
+        ord_dates, ord_times, ord_ids, prod_ids, cust_ids, acct_ids, ord_quants, ord_units, rpus, prices, pstats, dates_comp, dates_cancel = self.sales_fields()
+
+        if len(ord_ids) < 1:
+            return messagebox.showerror(title='No Existing Active Account',
+                                        message='There are no transactions available for deletion')
+
+        # select account id
+        tk.Label(self.display_frame, text='Select Order:', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
+        cacct_Cbox = ttk.Combobox(self.display_frame, value=ord_ids, font=('calibri', 13), width=24, state='readonly')
+        cacct_Cbox.set(ord_ids[0])
+        cacct_Cbox.grid(row=0, column=1, sticky='w')
+        ttk.Button(self.display_frame, text='SELECT', command=lambda: self.pop_del_acctrans_form(cacct_Cbox.get())
+                   ).grid(row=0, column=2, sticky='w')
+
+        if self.submit_frame is not None:
+            self.submit_frame.grid_forget()
+        if self.edit_frame is not None:
+            self.edit_frame.grid_forget()
+        if self.new_frame is not None:
+            self.new_frame.grid_forget()
+
+        self.display_frame.rowconfigure(list(range(3)), weight=1)
+        self.display_frame.columnconfigure(list(range(9)), weight=1)
+        self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
     def erase_sale(self):
         pass
@@ -1946,14 +1976,14 @@ class TransApp:
                                                '\n\nPlease create account(s) for customer(s)')
         # select account id
         tk.Label(self.display_frame, text='Select Customer Account:', font=('calibri', 13),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
+                 bg=bg, fg=fg, height=1).grid(row=2, column=0, padx=10, stick='se')
         cacct_Cbox = ttk.Combobox(self.display_frame, value=acct_ids, font=('calibri', 13), width=24, state='readonly')
         cacct_Cbox.set(acct_ids[0])
-        cacct_Cbox.grid(row=0, column=1, sticky='w')
+        cacct_Cbox.grid(row=2, column=1, sticky='sw')
         ttk.Button(self.display_frame, text='SELECT', command=lambda: self.pop_acctview(cacct_Cbox.get())
-                   ).grid(row=0, column=2, sticky='w')
+                   ).grid(row=2, column=2, sticky='sw')
 
-        tk.Button(self.display_frame, text='Accounts Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
+        tk.Button(self.display_frame, text='Back', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
                   width=15, command=self.acctpage).grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
@@ -2055,8 +2085,6 @@ class TransApp:
 
     def edit_acct(self):
         bg, fg = 'green', 'white'
-        acct = []
-        lines = {}
 
         # setup display frame
         self.display_frame = self.make_frame(page_title='CUSTOMER ACCOUNTS VIEW', background_color=bg)
@@ -2073,10 +2101,10 @@ class TransApp:
         cacct_Cbox = ttk.Combobox(self.display_frame, value=acct_ids, font=('calibri', 13), width=24, state='readonly')
         cacct_Cbox.set(acct_ids[0])
         cacct_Cbox.grid(row=0, column=1, sticky='w')
-        ttk.Button(self.display_frame, text='SELECT', command=lambda: self.pop_editacct_form(cacct_Cbox.get())
+        ttk.Button(self.display_frame, text='DISPLAY', command=lambda: self.pop_editacct_form(cacct_Cbox.get())
                    ).grid(row=0, column=2, sticky='w')
 
-        tk.Button(self.display_frame, text='Accounts Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
+        tk.Button(self.display_frame, text='Back', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
                   width=15, command=self.acctpage).grid(row=2, column=3, padx=5, pady=5, stick='se')
 
         if self.submit_frame is not None:
@@ -2176,7 +2204,7 @@ class TransApp:
         tk.Button(self.display_frame, text='Update', font=("Calibri", 12, 'bold'), bg='orange', fg='white',
                   height=1, width=15, command=lambda: self.update_acct(selected_acctid)).grid(row=6, column=1, padx=5, pady=5, stick='w')
 
-        tk.Button(self.display_frame, text='Accounts Page', font=("Calibri", 12, 'bold'),
+        tk.Button(self.display_frame, text='Back', font=("Calibri", 12, 'bold'),
                   bg='blue', fg='white', height=1, width=15, command=self.acctpage).grid(row=6, column=2, padx=5,
                                                                                              pady=5, stick='e')
 
@@ -2524,7 +2552,7 @@ class TransApp:
         self.display_frame = self.make_frame(page_title="CUSTOMER'S FINANCIAL ACTIVITIES", background_color=bg)
 
         tk.Button(self.display_frame, text='Back', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
-                  width=15, command=self.acctranspage).grid(row=2, column=3, padx=5, pady=5, stick='se')
+                  width=15, command=self.acctranspage).grid(row=2, column=3, padx=5, pady=5, stick='se', ipady=2)
 
         # create a list of existing customer accounts
         acctdata = self.read_acct()
@@ -2537,13 +2565,13 @@ class TransApp:
                                         message='There are no available transactions to display')
         # select account id
         tk.Label(self.display_frame, text='Select Customer Account:', font=('calibri', 13),
-                 bg=bg, fg=fg, height=1).grid(row=0, column=0, padx=10, stick='nse')
+                 bg=bg, fg=fg, height=1).grid(row=2, column=0, padx=10, stick='se')
         cacct_Cbox = ttk.Combobox(self.display_frame, value=acct_ids, font=('calibri', 13), width=24, state='readonly')
         cacct_Cbox.set(acct_ids[0])
-        cacct_Cbox.grid(row=0, column=1, sticky='w')
+        cacct_Cbox.grid(row=2, column=1, sticky='sw')
 
-        ttk.Button(self.display_frame, text='SELECT', command=lambda: self.pop_view(cacct_Cbox.get())
-                   ).grid(row=0, column=2, sticky='w')
+        ttk.Button(self.display_frame, text='DISPLAY', command=lambda: self.pop_view(cacct_Cbox.get())
+                   ).grid(row=2, column=2, sticky='sw')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -2560,7 +2588,7 @@ class TransApp:
         global customer_ids, acct_ids, currencies, acct_bals, dates_opened, acctdata
         # global trans_dates, trans_types, trans_acctids, trans_amnts
         bg, fg = 'orange', 'white'
-
+        acct_bal = 0
         acct = self.fetch_acct(selected_acctid)  # customer's account information
         for k, v in acct.items():
             if k == 'currency':
@@ -2663,7 +2691,7 @@ class TransApp:
         # setup display frame
         self.display_frame = self.make_frame(page_title='UPDATE CUSTOMER TRANSACTIONS', background_color=bg)
 
-        tk.Button(self.display_frame, text='Transactions Page', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
+        tk.Button(self.display_frame, text='Back', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
                   width=15, command=self.acctranspage).grid(row=2, column=3, padx=5, pady=5, stick='se')
         dates_opened, acct_ids, cust_ids, acct_types, acct_bals = self.acct_fields()
 
@@ -3372,46 +3400,34 @@ class TransApp:
                 return cid, f, m, l, g, db, n, s, o, do
 
     def display_cust(self):
-        global edit_custid_entry, cust, lines
-        cust = []
-        lines = {}
+        bg, fg = 'blue', 'white'
 
         # setup display frame
-        self.display_frame = self.make_frame(page_title='CUSTOMER RECORDS VIEW', background_color='blue')
+        self.display_frame = self.make_frame(page_title="CUSTOMER'S RECORD VIEW", background_color='blue')
 
         # retrieve customer data from file
         # cust is a list of strings containing customer records
-        cust_rec = self.read_cust()
+        tk.Button(self.display_frame, text='Back', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
+                  width=15, command=self.custpage).grid(row=2, column=3, padx=5, pady=5, stick='se', ipady=2)
 
-        for ind in range(len(cust_rec)):
-            # labelled format of saved customer record
-            lines['Row_' + str(ind)] = eval(cust_rec[ind])
-            # cust is a list of saved customer instances
-            cust.append(eval(cust_rec[ind]))
+        # create a list of existing customer accounts
+        customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened = self.cust_fields()
 
-        # display headings for customer records
-        # create scrolled text field to display customer records
-        st = scrolledtext.ScrolledText(self.display_frame, bg='blue', fg='white', wrap='word',
-                                       font=("Calibri", 14, 'bold'), relief='flat')
-        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
-        # display headings for customer records
-        st.insert(index='end',
-                  chars='CUSTOMER ID, FIRST NAME, MIDDLE NAME, LAST NAME, GENDER, DATE OF BIRTH, NATIONALITY, STATE OF ORIGIN, OFFICE ADDRESS, DATE OPENED\n\n')
+        # creating a list of customer account details for each customer
+        cust_details = [(cid, fn, ln) for cid, fn, mn, ln, g, dob, natn, s_of_o, off_addr, date_opened in zip(customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened)]
 
-        for ind in range(len(cust)):
-            # assign user input from stored customer records to each customer class attribute
-            self.cust_obj.__dict__ = cust[ind]
+        if not (len(customer_ids)):
+            return messagebox.showerror(title='No Existing Active Account',
+                                        message='There are no available transactions to display')
+        # select account id
+        tk.Label(self.display_frame, text='Select Customer:', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=2, column=0, padx=10, stick='se')
+        cust_Cbox = ttk.Combobox(self.display_frame, value=cust_details, font=('calibri', 13), width=24, state='readonly')
+        cust_Cbox.set(cust_details[0])
+        cust_Cbox.grid(row=2, column=1, sticky='sw')
 
-            st.insert(index='end',
-                      chars=f"{self.cust_obj.customer_id}, {self.cust_obj.first_name}, {self.cust_obj.mid_name}, {self.cust_obj.last_name}, {self.cust_obj.gender}, {self.cust_obj.date_of_birth}, {self.cust_obj.country}, {self.cust_obj.state_of_origin}, {' '.join(self.cust_obj.office_addr.split())}, {self.cust_obj.date_opened}\n\n")
-        # make text field read-only
-        st.config(state='disabled')
-        # ensure that text can be copied to clipboard
-        st.bind('<1>', lambda event: st.focus_set())
-
-        custpageb = tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'),
-                             fg='blue', bg='white', height=1, width=15, command=self.custpage)
-        custpageb.grid(row=2, column=3, padx=5, pady=5, stick='se')
+        ttk.Button(self.display_frame, text='DISPLAY', command=lambda: self.pop_custview(cust_Cbox.get())
+                   ).grid(row=2, column=2, sticky='sw')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -3424,56 +3440,67 @@ class TransApp:
         self.display_frame.columnconfigure(list(range(9)), weight=1)
         self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
+    def pop_custview(self, customer_details):
+        bg, fg = 'blue', 'white'
+        cid, fname, lname = customer_details.split()
+        customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened = self.cust_fields()
+
+        # display headings for customer records
+        # create scrolled text field to display customer records
+        st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, wrap='word',
+                                       font=("Calibri", 14, 'bold'), relief='flat')
+        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
+        # display headings for customer records
+        st.insert(index='end',
+                  chars='CUSTOMER ID,\tFIRST NAME,\tMIDDLE NAME,\tLAST NAME,\tGENDER,\tDATE OF BIRTH,\tNATIONALITY,\tSTATE OF ORIGIN,\t'
+                        'OFFICE ADDRESS,\tDATE OPENED\n\n')
+
+        for cust_id, fname, mname, lname, gender, dob, nationality, state_of_origin, office_addr, date_opened in zip(customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened):
+            if cust_id == cid:  # display customer details of the selected customer id
+                st.insert(index='end',
+                          chars=f'{cust_id},\t'
+                                f'{fname},\t'
+                                f'{mname},\t'
+                                f'{lname},\t'
+                                f'{gender},\t'
+                                f'{dob},\t'
+                                f'{nationality},\t'
+                                f'{state_of_origin},\t'
+                                f'{office_addr},\t'
+                                f'{date_opened}\n')
+
+        # make text field read-only
+        st.config(state='disabled')
+        # ensure that text can be copied to clipboard
+        st.bind('<1>', lambda event: st.focus_set())
+
     def edit_cust(self):
-        global edit_custid_entry, cust, lines
-        cust = []
-        lines = {}
+        bg, fg = 'blue', 'white'
 
         # setup display frame
         self.display_frame = self.make_frame(page_title='UPDATE CUSTOMER RECORDS', background_color='blue')
 
         # retrieve customer data from file
         # cust is a list of strings containing customer records
-        cust_rec = self.read_cust()
+        customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened = self.cust_fields()
+        cust_details = [(cid, fn, ln) for cid, fn, mn, ln, g, dob, natn, s_of_o, off_addr, date_opened in
+                        zip(customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin,
+                            office_addrs, dates_opened)]
 
-        for ind in range(len(cust_rec)):
-            # labelled format of saved customer record
-            lines['Row_' + str(ind)] = eval(cust_rec[ind])
-            # cust is a list of saved customer instances
-            cust.append(eval(cust_rec[ind]))
+        if len(customer_ids) < 1:
+            return messagebox.showerror(title='No Existing Active Account',
+                                        message='There are no transactions available for update')
 
-        # display headings for customer records
-        # create scrolled text field to display customer records
-        st = scrolledtext.ScrolledText(self.display_frame, bg='blue', fg='white', wrap='word', font=("Calibri", 14, 'bold'))
-        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
-        # display headings for customer records
-        st.insert(index='end',
-                  chars='CUSTOMER ID, FIRST NAME, MIDDLE NAME, LAST NAME, GENDER, DATE OF BIRTH, NATIONALITY, STATE OF ORIGIN, OFFICE ADDRESS, DATE OPENED\n\n')
-
-
-        for ind in range(len(cust)):
-            # assign user input from stored customer records to each customer class attribute
-            self.cust_obj.__dict__ = cust[ind]
-
-            st.insert(index='end', chars=f"{self.cust_obj.customer_id}, {self.cust_obj.first_name}, {self.cust_obj.mid_name}, {self.cust_obj.last_name}, {self.cust_obj.gender}, {self.cust_obj.date_of_birth}, {self.cust_obj.country}, {self.cust_obj.state_of_origin}, {' '.join(self.cust_obj.office_addr.split())}, {self.cust_obj.date_opened}\n\n")
-        # make text field read-only
-        st.config(state='disabled')
-        # ensure that text can be copied to clipboard
-        st.bind('<1>', lambda event: st.focus_set())
-
-        # to edit the given row number (at row entry - 1)
-        tk.Label(self.display_frame, text='ENTER CUSTOMER ID:', font=("Calibri", 12, 'bold'), bg='blue',
-                 fg='white').grid(row=2, column=0, padx=2, sticky='e')
-        # custid entry
-        edit_custid_entry = tk.Entry(self.display_frame, font=("Calibri", 12, 'bold'), relief='sunken')
-        edit_custid_entry.grid(row=2, column=1, padx=2, sticky='ew')
-        # edit button
-        tk.Button(self.display_frame, text='Edit', font=("Calibri", 12, 'bold'),
-                  bg='orange', fg='white', height=1, width=10, command=self.editing_cust).grid(row=2,
-                                                                                               padx=5, column=2, sticky='w')
-
-        tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'), fg='blue', bg='white',
-                  height=1, width=15, command=self.custpage).grid(row=2, column=6, padx=5, pady=5, stick='se')
+        # select account id
+        tk.Label(self.display_frame, text='Select Customer:', font=('calibri', 13),
+                 bg=bg, fg=fg, height=1).grid(row=2, column=0, padx=10, stick='e')
+        self.cust_Cbox = ttk.Combobox(self.display_frame, value=cust_details, font=('calibri', 13), width=24, state='readonly')
+        self.cust_Cbox.set(cust_details[0])
+        self.cust_Cbox.grid(row=2, column=1, sticky='w')
+        ttk.Button(self.display_frame, text='Edit', command=lambda: self.pop_edit_cust_form(self.cust_Cbox.get())
+                   ).grid(row=2, column=2, sticky='w')
+        tk.Button(self.display_frame, text='Back', font=("Calibri", 12, 'bold'), fg=bg, bg=fg, height=1,
+                  width=15, command=self.custpage).grid(row=2, column=3, padx=5, pady=5, stick='e')
 
         if self.submit_frame is not None:
             self.submit_frame.grid_forget()
@@ -3486,57 +3513,85 @@ class TransApp:
         self.display_frame.columnconfigure(list(range(9)), weight=1)
         self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
-    def editing_cust(self):
-        global edit_custid_entry, cust, lines, edit_row
+    def pop_edit_cust_form(self, customer_details):
+        bg, fg = 'blue', 'white'
+        cid, fname, lname = customer_details.split()
+        customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened = self.cust_fields()
+
+        st = scrolledtext.ScrolledText(self.display_frame, bg=bg, fg=fg, wrap='word',
+                                       font=("Calibri", 14, 'bold'), relief='flat')
+        st.grid(row=0, column=0, columnspan=8, sticky='nsew')
+        # display headings for customer records
+        st.insert(index='end',
+                  chars='CUSTOMER ID,\tFIRST NAME,\tMIDDLE NAME,\tLAST NAME,\tGENDER,\tDATE OF BIRTH,\tNATIONALITY,\tSTATE OF ORIGIN,\t'
+                        'OFFICE ADDRESS,\tDATE OPENED\n\n')
+
+        for cust_id, fname, mname, lname, gender, dob, nationality, state_of_origin, office_addr, date_opened in zip(customer_ids, fnames, mnames, lnames, genders, dobs, nationalities, states_of_origin, office_addrs, dates_opened):
+            if cust_id == cid:  # display customer details of the selected customer id
+                st.insert(index='end',
+                          chars=f'{cust_id},\t'
+                                f'{fname},\t'
+                                f'{mname},\t'
+                                f'{lname},\t'
+                                f'{gender},\t'
+                                f'{dob},\t'
+                                f'{nationality},\t'
+                                f'{state_of_origin},\t'
+                                f'{office_addr},\t'
+                                f'{date_opened}\n')
+
+        # make text field read-only
+        st.config(state='disabled')
+        # ensure that text can be copied to clipboard
+        st.bind('<1>', lambda event: st.focus_set())
+
+        # to edit the given row number (at row entry - 1)
+        tk.Label(self.display_frame, text='CONFIRM CUSTOMER ID:', font=("Calibri", 12, 'bold'), bg=bg,
+                 fg=fg).grid(row=2, column=0, padx=2, sticky='e')
+        # confirm customer id
+        self.cust_Cbox.grid_forget()
+        edit_custidCbox = ttk.Combobox(self.display_frame, width=12, value=cid,
+                                       font=("Calibri", 12, 'bold'), state='readonly')
+        edit_custidCbox.set(cid)
+        edit_custidCbox.grid(row=2, column=1, sticky='w')
+
+        # edit button
+        ttk.Button(self.display_frame, text='Confirm', width=15, command=lambda:
+        self.editing_cust(edit_custidCbox.get())).grid(row=2, column=2, sticky='w')
+
+    def editing_cust(self, selected_custid):
+        bg, fg = 'blue', 'white'
 
         self.display_frame = self.make_frame(page_title='UPDATING CUSTOMER RECORD', background_color='blue')
+        custid, f_name, m_name, l_name, sex, dbirth, country, state, office, dopened = self.fetch_cust(selected_custid)
 
-        customer_ids = []
-
-        for rec in cust:
-            # list of all existing customer ids (converted to lower case)
-            customer_ids.extend([v.lower() for k, v in rec.items() if k.lower() == 'customer_id'])
-        print(customer_ids)
-
-        inp = edit_custid_entry.get()
-
-        if inp.lower() not in customer_ids:
-            return messagebox.showerror(title='INVALID ENTRY', message=f'{inp} IS NOT VALID')
-
-        # get the row index of the selected customer id
-        for row, rec in lines.items():
-            for k, v in rec.items():
-                # if valid ID is entered
-                if k.lower() == 'customer_id' and v.lower() == inp.lower():
-                    edit_row = row
-                    # print(f"Found at {edit_row}")
-
-        # assign the selected record to the customer object
-        for row, rec in lines.items():
-            if row == edit_row:
-                self.cust_obj.__dict__ = rec
-        print(self.cust_obj.__dict__)
+        # print(self.cust_obj.__dict__)
+        # setting the account instance to have the selected account details
+        self.cust_obj.customer_id, self.cust_obj.first_name, self.cust_obj.mid_name, self.cust_obj.last_name = custid, f_name, m_name, l_name
+        self.cust_obj.gender, self.cust_obj.date_of_birth, self.cust_obj.country, self.cust_obj.state_of_origin = sex, dbirth, country, state
+        self.cust_obj.office_addr, self.cust_obj.date_opened = office, dopened
+        # print(self.cust_obj.__dict__)
 
         # entry fields for new data
         tk.Label(self.display_frame, text=f"ENTER NEW DATA BELOW", font=("Calibri", 14, 'bold'),
-                 bg='blue', fg='white').grid(row=0, columnspan=3, sticky='ew', padx=50)
+                 bg=bg, fg=fg).grid(row=0, columnspan=3, sticky='ew', padx=50)
 
         # customer labels and entries
         # customer name labels and entries
         tk.Label(self.display_frame, text="FIRST NAME", font=("Calibri", 10, 'bold'),
-                 bg='blue', fg='white').grid(row=1, column=0, sticky='sw', padx=25, pady=15)
+                 bg=bg, fg=fg).grid(row=1, column=0, sticky='sw', padx=25, pady=15)
         self.fname_entry = tk.Entry(self.display_frame)
         self.fname_entry.insert(0, string=f'{self.cust_obj.first_name}')
         self.fname_entry.grid(row=2, column=0, sticky='w', padx=25, pady=5)
 
         tk.Label(self.display_frame, text="MIDDLE NAME", font=("Calibri", 10, 'bold'),
-                 bg='blue', fg='white').grid(row=1, column=1, sticky='sw', padx=25, pady=15)
+                 bg=bg, fg=fg).grid(row=1, column=1, sticky='sw', padx=25, pady=15)
         self.mname_entry = tk.Entry(self.display_frame)
         self.mname_entry.insert(0, f'{self.cust_obj.mid_name}')
         self.mname_entry.grid(row=2, column=1, sticky='w', padx=25, pady=5)
 
         tk.Label(self.display_frame, text="LAST NAME", font=("Calibri", 10, 'bold'),
-                 bg='blue', fg='white').grid(row=1, column=2, sticky='sw', padx=25, pady=15)
+                 bg=bg, fg=fg).grid(row=1, column=2, sticky='sw', padx=25, pady=15)
         self.lname_entry = tk.Entry(self.display_frame)
         self.lname_entry.insert(0, f'{self.cust_obj.last_name}')
         self.lname_entry.grid(row=2, column=2, sticky='w', padx=25, pady=5)
@@ -3544,7 +3599,7 @@ class TransApp:
         gends = ['Male', 'Female']
 
         tk.Label(self.display_frame, text="GENDER", font=("Calibri", 10, 'bold'),
-                 bg='blue', fg='white').grid(row=1, column=3, sticky='sw', padx=25, pady=15)
+                 bg=bg, fg=fg).grid(row=1, column=3, sticky='sw', padx=25, pady=15)
         self.genderCbox = ttk.Combobox(self.display_frame, font=('calibri', 16, 'bold'), value=gends,
                                      width=8, state='readonly')
         self.genderCbox.set(f'{self.cust_obj.gender}')
@@ -3552,10 +3607,10 @@ class TransApp:
 
         # date of birth labels and entries
         tk.Label(self.display_frame, text="DATE OF BIRTH", font=("Calibri", 10, 'bold'),
-                 bg='blue', fg='white').grid(row=3, column=0, sticky='sw', padx=25, pady=15)
+                 bg=bg, fg=fg).grid(row=3, column=0, sticky='sw', padx=25, pady=15)
 
         tk.Label(self.display_frame, text="BIRTH YEAR", font=("Calibri", 10, 'bold'),
-                 bg='blue', fg='white').grid(row=3, column=1, sticky='sw', padx=25, pady=15)
+                 bg=bg, fg=fg).grid(row=3, column=1, sticky='sw', padx=25, pady=15)
         year = re.findall(r'(\d{2,4})-(\w{3})-(\d{1,2})', self.cust_obj.date_of_birth)[0][0]
         self.byearCbox = ttk.Combobox(self.display_frame, font=('calibri', 16, 'bold'), value=self.year,
                                      width=10, state='readonly')
@@ -3563,7 +3618,7 @@ class TransApp:
         self.byearCbox.grid(row=4, column=1, sticky='w', padx=25, pady=5)
 
         tk.Label(self.display_frame, text="BIRTH MONTH", font=("Calibri", 10, 'bold'),
-                 bg='blue', fg='white').grid(row=3, column=2, sticky='sw', padx=25, pady=15)
+                 bg=bg, fg=fg).grid(row=3, column=2, sticky='sw', padx=25, pady=15)
         month = re.findall(r'(\d{2,4})-(\w{3})-(\d{1,2})', self.cust_obj.date_of_birth)[0][1]
         self.bmonCbox = ttk.Combobox(self.display_frame, font=('calibri', 16, 'bold'),
                                      value=[v for k, v in self.month.items()], width=10, state='readonly')
@@ -3571,7 +3626,7 @@ class TransApp:
         self.bmonCbox.grid(row=4, column=2, sticky='w', padx=25, pady=5)
 
         tk.Label(self.display_frame, text="BIRTH DAY", font=("Calibri", 10, 'bold'),
-                 bg='blue', fg='white').grid(row=3, column=3, sticky='sw', padx=25, pady=15)
+                 bg=bg, fg=fg).grid(row=3, column=3, sticky='sw', padx=25, pady=15)
         day = re.findall(r'(\d{2,4})-(\w{3})-(\d{1,2})', self.cust_obj.date_of_birth)[0][2]
         self.bdCbox = ttk.Combobox(self.display_frame, font=('calibri', 16, 'bold'), value=self.day,
                                      width=10, state='readonly')
@@ -3580,31 +3635,31 @@ class TransApp:
 
         # nationality
         tk.Label(self.display_frame, text="NATIONALITY", font=("Calibri", 10, 'bold'),
-                 bg='blue', fg='white').grid(row=5, column=0, sticky='sw', padx=25, pady=15)
+                 bg=bg, fg=fg).grid(row=5, column=0, sticky='sw', padx=25, pady=15)
         self.natn_entry = tk.Entry(self.display_frame)
         self.natn_entry.insert(0, f'{self.cust_obj.country}')
         self.natn_entry.grid(row=6, column=0, sticky='w', padx=25, pady=5)
 
         # state of origin
         tk.Label(self.display_frame, text="STATE OF ORIGIN", font=("Calibri", 10, 'bold'),
-                 bg='blue', fg='white').grid(row=5, column=1, sticky='sw', padx=25, pady=15)
+                 bg=bg, fg=fg).grid(row=5, column=1, sticky='sw', padx=25, pady=15)
         self.ori_state_entry = tk.Entry(self.display_frame)
         self.ori_state_entry.insert(0, f'{self.cust_obj.state_of_origin}')
         self.ori_state_entry.grid(row=6, column=1, sticky='w', padx=25, pady=5)
 
         # office address
         tk.Label(self.display_frame, text="OFFICE ADDRESS", font=("Calibri", 10),
-                 bg='blue', fg='white').grid(row=5, column=2, sticky='sw', padx=25, pady=15)
+                 bg=bg, fg=fg).grid(row=5, column=2, sticky='sw', padx=25, pady=15)
         self.off_entry = tk.Text(self.display_frame, font=('calibri', 16, 'bold'), width=30, height=3)
         self.off_entry.insert('1.0', f'{self.cust_obj.office_addr}')
         self.off_entry.grid(row=6, column=2, sticky='w', padx=25, pady=5)
 
         # update and customer page buttons
         tk.Button(self.display_frame, text='Update', font=("Calibri", 12, 'bold'),
-                            bg='orange', fg='white', height=1, width=15, command=self.update_cust).grid(row=8, column=1, padx=5, pady=5, stick='sw')
+                            bg='orange', fg=fg, height=1, width=15, command=self.update_cust).grid(row=8, column=1, padx=5, pady=5, stick='sw')
 
         tk.Button(self.display_frame, text='Customer Page', font=("Calibri", 12, 'bold'),
-                             bg='blue', fg='white', height=1, width=15, command=self.custpage).grid(row=8, column=3, padx=5, pady=5, stick='sw')
+                             bg=bg, fg=fg, height=1, width=15, command=self.custpage).grid(row=8, column=3, padx=5, pady=5, stick='sw')
 
         # clear the frames before and after this page
         if self.submit_frame is not None:
@@ -3620,6 +3675,7 @@ class TransApp:
         self.display_frame.grid(row=1, rowspan=2, column=0, columnspan=4, sticky='nsew')
 
     def update_cust(self):
+        bg, fg = 'blue', 'white'
         global lines, edit_row
         # raise error alarm if any of the field is blank
         fname, mname, lname, gender = self.fname_entry.get(), self.mname_entry.get(), self.lname_entry.get(), self.genderCbox.get()
@@ -3662,7 +3718,7 @@ class TransApp:
                                         message=f'INVALID CHARACTER HAS BEEN ENTERED!\n\nPlease Check entries:\nFIRST NAME\nLAST NAME\nNATIONALITY')
 
         # when confirmation is given by user
-        self.display_frame = self.make_frame(background_color='blue')
+        self.display_frame = self.make_frame(background_color=bg)
 
         # reassign the newly entered values to the inventory object's name, qty, unit and date
         self.cust_obj.first_name, self.cust_obj.last_name, self.cust_obj.gender = fname.capitalize(), lname.capitalize(), gender.capitalize()
